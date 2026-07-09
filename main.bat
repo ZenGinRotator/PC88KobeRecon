@@ -1,0 +1,3 @@
+echo pause
+
+@ goto :eof
