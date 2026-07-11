@@ -30,7 +30,7 @@ for /f "tokens=4 delims=|" %%i in ("%~1") do (
     @ set "brkt=%%i"
 )
 
-for /d %%i in ("%~1\*") do (
+for /d %%i in ("!src!\*") do (
 
 
     @ rem parse the directory

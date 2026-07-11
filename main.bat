@@ -15,25 +15,35 @@
 
 @ set "args=%src%|%u_scor%|%prnth%|%brkt%"
 @ set "lm=LIST_MADE"
+@ set "ers=ERRORS"
+if not exist "%lm%" (
 
-@ call "funcs_list.bat" :list "%args%" "%lm%"
+@ rem UNDERSCORES/DIR/*
+@ REM UNDERSCORES/FILE/ROM_DIR/*
+@ rem What if directory and its files both have underscores in the title?
+@ rem Reasoning:
+@ rem Make a list of all directories and files having underscores at the same time
+@ rem ... is a problem
+@ rem Need to remove underscores from every title before attempting to 
+@ rem ... remove underscores from all files; especially files from directories 
+@ rem ... that also have underscores
+@ call "funcs_list.bat" :list_gen "%args%" "%lm%"
+    @ goto :eof
+)
 
-if exist "%lm%" (
     echo NEED TO CHANGE UNDERSCOREED TITLES AND FILES
     echo NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
+    @ call "funcs_analyze.bat" :empty_check "%brkt%" "%ers%"
+    @ call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
 
-)
+    @ rem Change underscored file first, then change directories
+    @ rem ... to use incorrect directories as look up method in src.
+
+    @ call "funcs_analyze.bat" :underscore_file "%src%" "%u_scor%\FILE"
+    @ call "funcs_analyze.bat" :underscore_dir "%src%" "%u_scor%\DIR"
+
+
 
 echo END OF MAIN
 pause
 goto :eof
-
-
-
-
-:make_dir
-    md "%~1"
-    echo > "%~1\%~2"
-exit /b
-
-

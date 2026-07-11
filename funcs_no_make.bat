@@ -6,7 +6,7 @@ goto :eof
 :no_file_make
     if not exist "%~1" (
         @ rem @ md ""
-        echo > "%~1"z
+        echo > "%~1"
     )
 exit /b
 
