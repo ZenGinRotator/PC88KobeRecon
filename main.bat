@@ -12,10 +12,18 @@
 @ set "u_scor=UNDERSCORES"
 @ set "prnth=PARENTHESES"
 @ set "brkt=BRACKETS"
+@ set "exts=EXTENSIONS"
 
-@ set "args=%src%|%u_scor%|%prnth%|%brkt%"
+@ set "args=%src%|%u_scor%|%prnth%|%brkt%|%exts%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
+
+
+@ rem Testing extensions list
+@ rem @ call "funcs_list.bat" :extensions "%src%" "%exts%"
+@ pause
+@ goto :eof
+
 if not exist "%lm%" (
 
 @ rem UNDERSCORES/DIR/*

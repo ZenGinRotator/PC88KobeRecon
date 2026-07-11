@@ -1,4 +1,4 @@
-@ call *%
+@ call %*
 
 goto :eof
 

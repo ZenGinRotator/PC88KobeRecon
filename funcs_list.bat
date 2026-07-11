@@ -16,6 +16,7 @@
 @ set u_scor=
 @ set prnth=
 @ set brkt=
+@ set exts=
 
 for /f "tokens=1 delims=|" %%i in ("%~1") do (
     @ set "src=%%i"
@@ -28,6 +29,9 @@ for /f "tokens=3 delims=|" %%i in ("%~1") do (
 )
 for /f "tokens=4 delims=|" %%i in ("%~1") do (
     @ set "brkt=%%i"
+)
+for /f "tokens=5 delims=|" %%i in ("%~1") do (
+    @ set "exts=%%i"
 )
 
 for /d %%i in ("!src!\*") do (
@@ -42,7 +46,7 @@ for /d %%i in ("!src!\*") do (
         @ call :find_underscore "!u_scor!\FILE\%%~nxi" "%%~nxj"
         @ call :parenths "!prnth!\FILE" "%%~nxj"
         @ call :brackets "!brkt!\FILE" "%%~nxj"
-
+        @ call :extensions "!src!" "!exts!"
     )
 
 )
@@ -92,6 +96,7 @@ exit /b
 	)
 
 
+    @ rem This excludes second word beyond the space
     @ rem Remove the last char from word that might be a space character
     for /f "tokens=1 delims= " %%i in ("!wrd!") do (
         @ set "wrd=%%i"
@@ -104,4 +109,20 @@ exit /b
 		@ rem echo > "%~3\!wrd!\%~4"
         @ call "funcs_no_make.bat" :no_file_make "%~3\!wrd!\%~4"
 	)
+exit /b
+
+
+
+
+
+:extensions
+
+    for /d %%i in ("%~1\*") do (
+        for %%j in ("%%i\*") do (
+            echo ECHO "%%~nxj" "%%~xj"
+            @ call "funcs_no_make.bat" :no_dir_make "%~2\%%~xj"
+            @ call "funcs_no_make.bat" :no_file_make "%~2\%%~xj\%%~nxj"
+           
+        )
+    )
 exit /b
