@@ -21,8 +21,26 @@
 
 @ rem Testing extensions list
 @ rem @ call "funcs_list.bat" :extensions "%src%" "%exts%"
-@ pause
-@ goto :eof
+@ set "t= a (first sec last)"
+@ rem @ call "funcs_list.bat" :temp_parenth "allocate_path" "!t!"
+@ set "t_nst=a (n_first (nest) n_last)"
+@ rem call "funcs_list.bat" :temp_parenth "!t_nst!"
+@ set "t_alt_nest=a (first sec (nest) last)"
+@ rem call "funcs_list.bat" :temp_parenth "!t_alt_nest!"
+@ set "t__=a (first sec third (nested) last)"
+@ rem call "funcs_list.bat" :temp_parenth "!t__!"
+@ set "t-=a (first seco third (nested))"
+@ rem call "funcs_list.bat" :temp_parenth "!t-!"
+@ set "t_one= (single)"
+@ rem call "funcs_list.bat" :temp_parenth "!t_one!"
+@ set "t_none= first last"
+@ rem call "funcs_list.bat" :temp_parenth "!t_none!"
+@ set "t_blank= "
+@ rem call "funcs_list.bat" :temp_parenth "!t_blank!"
+
+
+@ rem @ pause
+@ rem @ goto :eof
 
 if not exist "%lm%" (
 
