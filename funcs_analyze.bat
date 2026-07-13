@@ -18,12 +18,8 @@
         
             for %%k in ("%%j\*") do (
                 @ set /a qty+=1
-                echo "%%k"
-                @ rem pause
             )
             if !qty! equ 0 (
-                echo NEED TO REPORT THIS DIRECTORY THAT CONTAINS NO FILES
-                pause
                 @ call "funcs_no_make.bat" :no_dir_make "%~2"
                 @ call "funcs_no_make.bat" :no_file_make "%~2\%%~nxi"
             )

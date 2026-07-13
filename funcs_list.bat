@@ -53,7 +53,7 @@ for /d %%i in ("!src!\*") do (
 
     for %%j in ("%%i\*") do (
 
-       @ call :find_underscore "!u_scor!\FILE\%%~nxi" "%%~nxj"
+       @ call :underscores "!u_scor!\FILE\%%~nxi" "%%~nxj"
        @ call :parenths "!prnth!\FILE" "%%~nxj"
        @ call :sqr_brackets "!sqr_brkt!\FILE" "%%~nxj"
        @ call :curly_brackets "!curl_brkt!\FILE" "%%~nxj"

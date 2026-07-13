@@ -59,8 +59,7 @@ if not exist "%lm%" (
     @ goto :eof
 )
 
-    echo NEED TO CHANGE UNDERSCOREED TITLES AND FILES
-    echo NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
+    @ rem  NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
     @ call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
     @ call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
     @ call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
@@ -76,3 +75,13 @@ if not exist "%lm%" (
 echo END OF MAIN
 pause
 goto :eof
+
+
+:ers_check
+
+if exist "%ers%" (
+    ECHO FOUND AN EMPTY
+) else (
+    echo NO EMPTIES
+)
+exit /b
