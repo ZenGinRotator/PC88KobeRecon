@@ -11,10 +11,12 @@
 @ set "src=..\ARCHV_RECON"
 @ set "u_scor=UNDERSCORES"
 @ set "prnth=PARENTHESES"
-@ set "brkt=BRACKETS"
+@ set "sqr_brkt=SQUARE_BRACKETS"
+@ set "curl_brkt=CURLY_BRACKETS"
 @ set "exts=EXTENSIONS"
+@ set "cmpltd=COMPLETE"
 
-@ set "args=%src%|%u_scor%|%prnth%|%brkt%|%exts%"
+@ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 
@@ -59,7 +61,8 @@ if not exist "%lm%" (
 
     echo NEED TO CHANGE UNDERSCOREED TITLES AND FILES
     echo NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
-    @ call "funcs_analyze.bat" :empty_check "%brkt%" "%ers%"
+    @ call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
+    @ call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
     @ call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
 
     @ rem Change underscored file first, then change directories

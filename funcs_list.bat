@@ -15,8 +15,10 @@
 @ set src=
 @ set u_scor=
 @ set prnth=
-@ set brkt=
+@ set sqr_brkt=
+@ set curl_brkt=
 @ set exts=
+@ set compl=
 
 for /f "tokens=1 delims=|" %%i in ("%~1") do (
     @ set "src=%%i"
@@ -28,24 +30,35 @@ for /f "tokens=3 delims=|" %%i in ("%~1") do (
     @ set "prnth=%%i"
 )
 for /f "tokens=4 delims=|" %%i in ("%~1") do (
-    @ set "brkt=%%i"
+    @ set "sqr_brkt=%%i"
 )
 for /f "tokens=5 delims=|" %%i in ("%~1") do (
+    @ set "curl_brkt=%%i"
+)
+for /f "tokens=6 delims=|" %%i in ("%~1") do (
     @ set "exts=%%i"
 )
+for /f "tokens=7 delims=|" %%i in ("%~1") do (
+    @ set "compl=%%i"
+)
+
 
 for /d %%i in ("!src!\*") do (
 
-    @ call :find_underscore "!u_scor!\DIR" "%%~nxi"
-    @ call :temp_parenth "!prnth!\DIR" "%%~nxi"
-    @ call :temp_bracket "!brkt!\DIR" "%%~nxi"
+    @ call :underscores "!u_scor!\DIR" "%%~nxi"
+    @ call :parenths "!prnth!\DIR" "%%~nxi"
+    @ call :sqr_brackets "!sqr_brkt!\DIR" "%%~nxi"
+    @ call :curly_brackets "!curl_brkt!\DIR" "%%~nxi"
+
 
     for %%j in ("%%i\*") do (
 
        @ call :find_underscore "!u_scor!\FILE\%%~nxi" "%%~nxj"
-       @ call :temp_parenth "!prnth!\FILE" "%%~nxj"
-       @ call :temp_bracket "!brkt!\FILE" "%%~nxj"
+       @ call :parenths "!prnth!\FILE" "%%~nxj"
+       @ call :sqr_brackets "!sqr_brkt!\FILE" "%%~nxj"
+       @ call :curly_brackets "!curl_brkt!\FILE" "%%~nxj"
        @ call :extensions "!exts!\%%~xj" "%%~nxj"
+       @ call :completed "!compl!\%%~nxi" "%%~nxj"
     )
 
 )
@@ -54,9 +67,12 @@ for /d %%i in ("!src!\*") do (
 echo > "%~2"
 exit /b
 
+:completed
+    @ call "funcs_no_make.bat" :file_into_dir "%~1" "%~2"
+exit /b
 
 
-:find_underscore
+:underscores
 
     @ set part=
     for /f "tokens=1 delims=_" %%i in ("%~2") do (
@@ -67,46 +83,29 @@ exit /b
     
     @ rem @ goto :eof
     if "%~2" neq "!part!" (
-
-        @ rem @ call :make_dir "%~1" "%~2"
-        @ rem call "funcs_no_make.bat" :no_dir_make "%~1"
-        @ rem @ call "funcs_no_make.bat" :no_file_make "%~1\%~2"
-
         @ call "funcs_no_make.bat" :file_into_dir "%~1" "%~2"
-  
-   
-
     )
 exit /b
 
-:parenths
-	@ call :word_only "(" ")" "%~1" "%~2"
-exit /b
-
-:brackets
-	@ call :word_only "[" "]" "%~1" "%~2"
-exit /b
 
 
 @ rem "path" "title of dir/file"
-:temp_parenth
-    echo ---- PARENTH ----- "%~2"
-
-
-    @ rem "delim" "delim" "path" "title"
-    @ call :temp_word "(" ")" "%~1" "%~2"
+:parenths
+    @ call :encapsulated_word "(" ")" "%~1" "%~2"
 exit /b
 
 
-:temp_bracket
-    echo ------- BRACKET---- "%~2"
+:curly_brackets
+    @ call :encapsulated_word "{" "}" "%~1" "%~2"
+exit /b
 
-    @ call :temp_word "[" "]" "%~1" "%~2"
+:sqr_brackets
+    @ call :encapsulated_word "[" "]" "%~1" "%~2"
 exit /b
 
 
-@ rem Use this newer version after implementing make_dir functions at its conclusion
-:temp_word
+
+:encapsulated_word
     
     @ rem a (word)
     @ rem a (word1 word2 ... word N)
@@ -225,72 +224,17 @@ exit /b
         )
 
     )
-
-  
+ 
 
     @ set "combo_wrd=!one!!two!!three!!four!!five!!six!!sevn!"
-    echo FOUR "%~4"
-    echo THREE "%~3"
-    echo combo word "!combo_wrd!" 
-    echo "VS %~3 \ !combo_wrd! \ %~4"
-   
-    @ rem @ goto :eof
+ 
     if "!combo_wrd!" neq "" (
-        @ rem call "funcs_no_make.bat" :no_dir_make "%~3\!combo_wrd!"
-        @ rem @ call "funcs_no_make.bat" :no_file_make "%~3\!combo_wrd!\%~4"
-
         @ call "funcs_no_make.bat" :file_into_dir "%~3\!combo_wrd!" "%~4"
-
     )
-
-    @ rem goto :eof
-exit /b
-
-:word_only
-    @ rem 3: path to copy file or title name to
-    @ rem 4: title or file name
-    @ rem (word)
-    @ rem (word1 word2 ... word N)
-    @ rem (word1 (nested) word2 ...word N)
-    @ set uniq=
-	@ set wrd_tail=
-	@ set wrd=
-    @ set nest_wrd=
-	for /f "tokens=2 delims=%~1" %%i in ("%~4") do (
-		@ set "wrd_tail=%%i"
-	)
-	for /f "tokens=1 delims=%~2" %%i in ("!wrd_tail!") do (
-		@ set "wrd=%%i"
-	)
-
-
-    @ rem This excludes second word beyond the space
-    @ rem Remove the last char from word that might be a space character
-    @ rem ...To fix error directory is created with a space at the end
-    @ rem ... of the title of the directory (cannot delete this using windows 10)
-    @ set wrd_1=
-    @ set wrd_2=
-    for /f "tokens=1 delims= " %%i in ("!wrd!") do (
-        @ set "wrd_1=%%i"
-    )
-
-    for /f "tokens=2 delims= " %%i in ("!wrd!") do (
-        @ set "wrd_2=%%i"
-
-    )
-
-	if "!wrd!" neq "" (
-        @ rem @ call "funcs_no_make.bat" :no_dir_make "%~3\!wrd!"
-        @ rem @ call "funcs_no_make.bat" :no_file_make "%~3\!wrd!\%~4"
-
-        @ call "funcs_no_make.bat" :file_into_dir "%~3\!wrd!" "%~4"
-	)
 exit /b
 
 
 
 :extensions
-    @ rem @ call "funcs_no_make.bat" :no_dir_make "%~1"
-    @ rem @ call "funcs_no_make.bat" :no_file_make "%~1\%~2"
     @ call "funcs_no_make.bat" :file_into_dir "%~1" "%~2"
 exit /b
