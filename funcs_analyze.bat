@@ -1,4 +1,7 @@
 @ setlocal EnableDelayedExpansion
+@ set brk=^
+
+
 
 @ call %*
 
@@ -8,23 +11,70 @@
 @ rem For brackets & parentheses directories
 @ rem 3 layer directory
 :empty_check
+    set list=
     
 
+    if not exist "nums.txt" (
+        
+        @ set "list=!brk!       DIRECTORY                  # OF FILES              GREATER THAN ZERO        STATUS!brk!"
+    ) else (
+        for /f "tokens=*" %%i in (nums.txt) do (
+            set "list=!list!!brk!%%i"
+        )
+    )
+    
+    
+    @ rem %~1 = X_BRACKETS OR PARENTHESES
     for /d %%i in ("%~1\*") do (
+        @ set /a empty_qty=0
+        @ set "list=!brk!!list!%~1\%%~nxi"
+        @ set "gtz=NO"
+        @ set "pass=FAIL"
+
         
+        @ REM i = FILE OR DIR
         for /d %%j in ("%%i\*") do (
-        
-            @ set /a qty=0
-        
+
+       
+          
+            @ set /a item_qty=0
+            @ set file=
+
+
+            @ set "src=%~1"
+            @ set "type=%%~nxi"
+            @ set "encaps_wrd=%%~nxj"
+            @ rem set "file_name=%%~nxk"
+
+            @ rem this is the item to list within ERRORS directory
+            @ set "err_item=!src!_!type!_!encaps_wrd!"
+
+          
+
+            @ rem J = encapsulated word
             for %%k in ("%%j\*") do (
                 @ set /a qty+=1
             )
+
             if !qty! equ 0 (
                 @ call "funcs_no_make.bat" :no_dir_make "%~2"
-                @ call "funcs_no_make.bat" :no_file_make "%~2\%%~nxi"
+                @ call "funcs_no_make.bat" :no_file_make "%~2\!err_item!"
+                set "list=!list!           !empty_qty!         !gtz!       !pass!"
+                exit /b
             )
+
+            @ set /a empty_qty=!qty!
+            
+            set "gtz=YES"
+            set "pass=PASS"
+            
+   
         )
+        set "line=           !empty_qty!                  !gtz!             !pass!!brk!"
+        set "list=!list!!line!"
+        echo !list! > "nums.txt"
     )
+
 
 exit /b
 

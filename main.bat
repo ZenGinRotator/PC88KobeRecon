@@ -1,4 +1,8 @@
+@ echo off
 @ setlocal EnableDelayedExpansion
+set brk=^
+
+
 
 @ rem Use as arguments
 @ rem src: Need to traverse directory when making list and
@@ -20,7 +24,12 @@
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 
+set /a q=0
+
 echo PRINTING MESSAGE
+
+rem pause
+rem goto :eof
 @ rem call "funcs_msg.bat" :after_list "%args%"
 @ rem pause
 @ rem goto :eof
@@ -40,29 +49,33 @@ if not exist "%lm%" (
 echo hi
 @ call "funcs_msg.bat" :before_list "%args%"
 pause
-@ rem @ call "funcs_list.bat" :list_gen "%args%" "%lm%"
+@ call "funcs_list.bat" :list_gen "%args%" "%lm%"
 @ call "funcs_msg.bat" :after_list "%args%"
 pause
 echo > "%lm%"
     @ goto :eof
 )
 
-echo NEED MORE MESSAGES
-
+@ call "funcs_msg.bat" :before_analyze "%args%"
+@ pause
     @ rem  NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
-    @ rem @ call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
-    @ rem @ call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
-    @ rem @ call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
+    call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
+    call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
+    call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
+
+
+
 
     @ rem Change underscored file first, then change directories
     @ rem ... to use incorrect directories as look up method in src.
 
     @ rem call "funcs_analyze.bat" :underscore_file "%src%" "%u_scor%\FILE"
     @ rem call "funcs_analyze.bat" :underscore_dir "%src%" "%u_scor%\DIR"
+    
 
-
-
+call "funcs_msg.bat" :after_analyze
 echo END OF MAIN
+
 pause
 goto :eof
 
