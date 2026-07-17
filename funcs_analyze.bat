@@ -11,6 +11,7 @@
 @ rem For brackets & parentheses directories
 @ rem 3 layer directory
 :empty_check
+
     set list=
     
 
@@ -44,7 +45,7 @@
             @ set "src=%~1"
             @ set "type=%%~nxi"
             @ set "encaps_wrd=%%~nxj"
-            @ rem set "file_name=%%~nxk"
+            
 
             @ rem this is the item to list within ERRORS directory
             @ set "err_item=!src!_!type!_!encaps_wrd!"
@@ -74,8 +75,6 @@
         set "list=!list!!line!"
         echo !list! > "nums.txt"
     )
-
-
 exit /b
 
 @ rem For every item in the argumented directory
@@ -92,7 +91,6 @@ exit /b
 :underscore_file
     for /d %%i in ("%~2\*") do (
         for %%j in ("%%i\*") do (
-    
             @ call :remove "%~1" "%%~nxi\" "%%~nxj" ""
         )
     )
@@ -105,7 +103,6 @@ exit /b
    
     @ set "path=%~1\%~2%~3%~4"
     
-    
     @ rem If underscored title (of dir or file) does not exist in the src directory, 
     @ rem ... then exit.
     if not exist "!path!" (
@@ -114,21 +111,56 @@ exit /b
 
 
     @ set first=
+    set two=
+    set three=
+    set four=
+    set five=
+    set six=
+    set sevn=
+    set eight=
+    set nine=
     @ set last=
     for /f "tokens=1 delims=_" %%i in ("%~3") do (
         @ set "first=%%i"
     )
     for /f "tokens=2 delims=_" %%i in ("%~3") do (
+        @ set "two=%%i"
+    )
+    for /f "tokens=3 delims=_" %%i in ("%~3") do (
+        @ set "three=%%i"
+    )
+    for /f "tokens=4 delims=_" %%i in ("%~3") do (
+        @ set "four=%%i"
+    )
+    for /f "tokens=5 delims=_" %%i in ("%~3") do (
+        @ set "five=%%i"
+    )
+    for /f "tokens=6 delims=_" %%i in ("%~3") do (
+        @ set "six=%%i"
+    )
+    for /f "tokens=7 delims=_" %%i in ("%~3") do (
+        @ set "sevn=%%i"
+    )
+    for /f "tokens=8 delims=_" %%i in ("%~3") do (
+        @ set "eight=%%i"
+    )
+    for /f "tokens=9 delims=_" %%i in ("%~3") do (
+        @ set "nine=%%i"
+    )
+    for /f "tokens=10 delims=_" %%i in ("%~3") do (
         @ set "last=%%i"
     )
 
+    set "combo=!first!!two!!three!!four!!five!!six!!sevn!!eight!!nine!!last!"
+
     @ rem If no underscores in the title, then exit
-    if "!first! !last!" equ "%~3" (
+    if "!combo!" equ "%~3" (
         exit /b
     )
 
-   
-    @ ren "!path!" "!first! !last!"
-   
+  
+    if exist "!path!" (
+        @ ren "!path!" "!combo!"
+    )
 
 exit /b

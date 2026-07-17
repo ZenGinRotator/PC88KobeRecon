@@ -46,7 +46,6 @@ if not exist "%lm%" (
 @ rem Need to remove underscores from every title before attempting to 
 @ rem ... remove underscores from all files; especially files from directories 
 @ rem ... that also have underscores
-echo hi
 @ call "funcs_msg.bat" :before_list "%args%"
 pause
 @ call "funcs_list.bat" :list_gen "%args%" "%lm%"
@@ -57,11 +56,14 @@ echo > "%lm%"
 )
 
 @ call "funcs_msg.bat" :before_analyze "%args%"
-@ pause
-    @ rem  NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
-    call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
-    call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
-    call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
+pause
+call :pause
+
+
+@ rem  NEED TO SEARCH FOR EMPTY DIRS IN UNDERSCORES & BRACKETS
+call "funcs_analyze.bat" :empty_check "%sqr_brkt%" "%ers%"
+call "funcs_analyze.bat" :empty_check "%curl_brkt%" "%ers%"
+call "funcs_analyze.bat" :empty_check "%prnth%" "%ers%"
 
 
 
@@ -69,8 +71,8 @@ echo > "%lm%"
     @ rem Change underscored file first, then change directories
     @ rem ... to use incorrect directories as look up method in src.
 
-    @ rem call "funcs_analyze.bat" :underscore_file "%src%" "%u_scor%\FILE"
-    @ rem call "funcs_analyze.bat" :underscore_dir "%src%" "%u_scor%\DIR"
+call "funcs_analyze.bat" :underscore_file "%src%" "%u_scor%\FILE"
+call "funcs_analyze.bat" :underscore_dir "%src%" "%u_scor%\DIR"
     
 
 call "funcs_msg.bat" :after_analyze
@@ -79,16 +81,6 @@ echo END OF MAIN
 pause
 goto :eof
 
-
-:ers_check
-
-if exist "%ers%" (
-    ECHO FOUND AN EMPTY
-) else (
-    echo NO EMPTIES
-)
-exit /b
-
-:mofo
-    echo BYE
+:pause
+    echo .... PROCESSING. PLEASE WAIT.....
 exit /b

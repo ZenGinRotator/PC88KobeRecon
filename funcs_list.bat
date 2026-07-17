@@ -64,7 +64,7 @@ for /d %%i in ("!src!\*") do (
 )
 
 @ rem %~2 = LIST_MADE
-echo > "%~2"
+rem  echo > "%~2"
 exit /b
 
 :completed
