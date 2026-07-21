@@ -51,7 +51,7 @@ for /d %%i in ("!src!\*") do (
     rem call :curly_brackets_test "!curl_brkt!\DIR" "%%~nxi"
 
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
-    echo "%%~nxi"
+    rem echo "%%~nxi"
 
 
     for %%j in ("%%i\*") do (
@@ -307,7 +307,7 @@ exit /b
         set "six=%%i"
     )
 
-    set /a qty=7
+    set /a qty=5
     if "!six!" equ "" (
         set /a qty-=1        
     )
@@ -320,20 +320,84 @@ exit /b
     if "!three!" equ "" (
         set /a qty-=1        
     )
-    if "!six!" equ "" (
+    if "!two!" equ "" (
         set /a qty-=1        
     )
-    if "!six!" equ "" (
+    if "!one!" equ "" (
         set /a qty-=1        
     )
+    rem echo one "!one!"
+    rem echo two "!two!"
+    rem echo three "!three!"
+    rem echo four "!four!"
+    rem echo five "!five!"
+    rem echo six "!six!"
+    echo NAME "%~1" QTY "!qty!"
+    rem pause
     rem echo QTY !qty!
     set /a file_qty=0
-    for /f "tokens=*" %%i in (qty.txt) do (
+    for /f "tokens=*" %%i in (largest_parenth_qty.txt) do (
         set /a file_qty=%%i
     )
 
     if !qty! gtr !file_qty! (
-        echo !qty! > "qty.txt"
-        echo "%~1" > "largest.txt"
+        echo !qty! > "largest_parenth_qty.txt"
+        echo "%~1" > "largest_parenth.txt"
     )
+
+    rem parse single () pair
+    rem Parse double () pair
+    rem Parse Yakyuudou (Utility (Taisen) disk).d88
+    rem Parse triple () pair
+    call :parse_three_parenth "%~1" "!qty!"
+exit /b
+
+
+:parse_three_parenth
+    set one=
+    set two=
+    set three=
+    set words=
+    for /f "tokens=2 delims=(" %%i in ("%~1") do (
+        set "one=%%i"
+    )
+    for /f "tokens=3 delims=(" %%i in ("%~1") do (
+        set "two=%%i"
+    )
+    for /f "tokens=4 delims=(" %%i in ("%~1") do (
+        set "three=%%i"
+    )
+    set "words=!one!!two!!three!"
+
+    for /f "tokens=1 delims=)" %%i in ("!words!") do (
+        set "one=%%i"
+    )
+    for /f "tokens=2 delims=)" %%i in ("!words!") do (
+        set "two=%%i"
+    )
+    for /f "tokens=3 delims=)" %%i in ("!words!") do (
+        set "three=%%i"
+    )
+
+    rem Sometimes appends the file extension to the end of 
+    rem .... the encapsulated words.
+    set "words=!one!!two!!three!"
+   
+    if "%~2" equ "0" (
+        echo "%~1 =  !words!" > "zero.txt"
+    )
+
+    if "%~2" equ "1" (
+        echo "%~1 = !words!" > "one.txt"
+    )
+    if "%~2" equ "2" (
+        echo "%~1 = !words!" > "two.txt"
+    )
+    if "%~2" equ "3" (
+        echo "%~1 = !words!" > "three.txt"
+    )
+    if "%~1" equ "Yakyuudou (Utility (Taisen) disk).d88" (
+        echo "%~1 = !words!" > "four.txt"
+    )
+
 exit /b

@@ -19,8 +19,9 @@ set brk=^
 @ set "curl_brkt=CURLY_BRACKETS"
 @ set "exts=EXTENSIONS"
 @ set "cmpltd=COMPLETE"
+set "quan=QUANTITY"
 
-@ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
+@ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%|%quan%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"
@@ -47,6 +48,9 @@ if not exist "%lm%" (
 @ rem Need to remove underscores from every title before attempting to 
 @ rem ... remove underscores from all files; especially files from directories 
 @ rem ... that also have underscores
+
+rem Need to implement references to quantitity directory within
+rem ... messages.
 @ call "funcs_msg.bat" :before_list "%args%"
 pause
 @ call "funcs_list.bat" :list_gen "%args%" "%lm%" "%no_encaps%"
