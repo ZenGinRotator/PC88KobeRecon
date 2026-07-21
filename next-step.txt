@@ -1,0 +1,73 @@
+need to determine the number of () pairs within each file name in the archive, and 
+.... save the file names with the maximum number of () pairs in its file name
+... to genereate an algorith that can account for any number of () pairs in the file name
+
+
+
+
+among all .d88, .cmt, .t88 files in archive
+1. find all instances of "disk" or "Disk" encapsulated by () within the file name
+    and list all file names without grouping by the rom directory associated with the file name
+** Need to see if existence of "disk" or "Disk" within the file name implies multi-disk
+    (Don't believe it does at this time, before collecing all "disk"/"Disk" file names).
+
+** some files in directory might not have an encapsulated disk within a file name for that directory,
+  but we need all d88, cmt, t88 files from that directory
+
+-- code --
+for each file within the rom directory with a .d88, .cmt or .t88 extension
+
+    if the old rom directory is different than the current rom directory
+        ... write the contents of the temp file to the previously determined collection-directory
+        ... delete the temp file so its ready for the current rom directory
+        ....set the collection directory as non-disk
+
+
+
+
+        
+    if the file name has an encapsulated disk or Disk within its parenthesis
+        set the collection directory as disk 
+
+    write file name to a temp file corresponding to that directory
+    set old directory as the current directory
+
+
+set a= *.d88 *.cmt *.t88
+set src=folder
+set old=
+set curr=
+set "non_disK=NON DISK"
+
+set "temp=temp.txt"
+
+for /d %%i in ("!src!\*") do (
+
+    set exts=%%i\*.d88 %%i\*.t88 %%i\*.cmt
+    set "curr=%%i"
+    
+    for %%j in (!exts!) do (
+
+        if exist "!temp!" (
+            for /f "tokens=*" %%k in (!temp!) do (
+                copy %%k to "!non_disk!"
+            )
+
+            del "!temp!"
+            set "non_disc=NON DISK"
+        )
+
+        rem parse disk or Disk from file name
+        for /f "tokens=2 delims=(" %%k in ("%%j") do (
+            set "!wrd_tail=%%k"
+        )
+
+        for /f "tokens=1 delims= " %%k in ("!wrd_tail!") do (
+            set "wrd=%%k"
+        )
+
+        if "!wrd!" equ "Disk" (
+            rem This is a multi-disk rom.
+        )
+    )
+)

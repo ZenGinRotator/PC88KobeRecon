@@ -1,0 +1,102 @@
+-- EmulationStation & .d88 files --
+
+
+-- demos -- might be single- or multi-disk
+(demo),
+(Demo disk) ** disk does not imply multi-disc, "Demo disk" could be a single-disk demo,
+(demo Disk 1), -- multi-disc
+(demo Disk 2),
+(demo Disk A),
+(demo Disk B),
+(demo readme), 
+(demo readme2),
+(demo version)
+
+-- demo - parsing code --
+set wrd=set wrd_tail=
+set wrd=
+rem parse ("Disk ")
+for /f "tokens=2 delims=(" %%i in ("!arg!") do (
+    set "!wrd_tail=%%i"
+)
+
+for /f "tokens=1 delims= " %%i in ("!wrd_tail!") do (
+    set "wrd=%%i"
+)
+
+if "!wrd!" equ "Demo" (
+    rem This is a demo-disk rom.
+)
+
+if "!wrd!" equ "demo" (
+    rem This is a demo-disk rom.
+)
+
+if "!wrd!" equ "" (
+    rem This is a publcly released rom.
+)
+
+-- disks -- (implies multi-disc rom)
+(Disk 0)
+(Disk 01 - i)
+(Disk 2)
+(Disk A)
+(Disk U)
+
+-- disks - parsing code --
+set wrd_tail=
+set wrd=
+rem parse ("Disk ")
+for /f "tokens=2 delims=(" %%i in ("!arg!") do (
+    set "!wrd_tail=%%i"
+)
+
+for /f "tokens=1 delims= " %%i in ("!wrd_tail!") do (
+    set "wrd=%%i"
+)
+
+if "!wrd!" equ "Disk" (
+    rem This is a multi-disk rom.
+)
+
+
+-- parse 
+
+
+(Disk ...) - from parentheses, implies multidisc -> id -> "Disk " (with space)
+
+Given rom R, 
+- R might be single disk only
+- R might be multi disk only
+- R might include both single and multi-disk versions
+
+Given rom R that is a single-disk version
+- R might have a single release ("" or Set 1)
+- R might be a re-release (Set 1, Set 2, Set 3, ... Set N)
+- R might be an alternate version (Alt 1, [a], Alt 2, Alt 3, ..., Alt n)
+- R might be a re-release or a revised, alternate version ( Set 1 w/ Alt 2, Alt 3, ..., Alt n)
+
+Given rom R that is a multi-disk version (Disk A, Disk 1, Disk 01, Disk B, Disk 2, Disk 02, etc.)
+- R might be a single release ("" or Set 1)
+- R might be a re-release (Set 2, Set 3, ... Set N)
+- R might be an alternate version (Alt 1, [a])
+- R might be a re-release or a revised, alternate version (Alt 2, Alt 3, ..., Alt n)
+
+Given rom R
+roms/pc88/R/
+    Single Disk
+        1st ed.
+            Set-free label
+            Set 1
+        Re-release
+            Set 1, Alt 1, Set 1 w/ Alt
+
+-- are there any roms that do not have set but have alts instead?
+-- what other types of disks exist (ex: Program, Data, User, Boot, A ressha de ikou Disk 1, Character)
+
+    Multi Disk (look for (Disk (space)))
+        1st ed.
+            Set-free label
+            Set 1
+        Re-release
+            Set 1 Alt 1

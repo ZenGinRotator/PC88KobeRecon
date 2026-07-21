@@ -1,0 +1,143 @@
+-- In Rom Disk Name meanings --
+Sets & Alts (in square brackets [])
+Set 1 - original release of rom
+Set 2, ..., Set n - nth release of rom on disks
+Alt 1 - alternate version with possible hacks, cheat codes, bug fixes after initial rom release on (Set 1) disks
+Alt 2 - subsequent of an alternatie release of rom on disk.
+
+
+PARENTHESIES
+DIR - publisher names
+FILE - disk type (boot, user, etc.)
+
+CURLY_BRACKETS
+FILE - describes mode for disk usage, enabled/selected within RetroArch
+
+1. move ARCHV_RECON to desktop of PC to shorten path length? change ARCHV_RECON to KB?
+
+
+2. tableify ARCHVS
+FORMAT of each item that has been keyified
+numDir_romDir_numRom_rom
+
+DIR_TABLE          
+num (dir) -> contains -> romDir         num_romDir
+155 -> romDir                           155_romDir
+
+FILE_TABLE
+num -> romFile
+155.1 -> romFile 1
+155.2 -> romFile 2
+168.1 -> romFile 1
+
+PATH_TABLE
+Given Nihon(Alpha) -> Nihon [Set 1].d88 & Nihon [Set 2].d88
+
+make 155 -> 155.1 & 155.2
+155 = Nihon(Alpha)
+155.1 = Nihon [Set 1].d88
+155.2 = Nihon [Set 2].d88
+
+
+
+set dir=
+set file=
+for %%i in ("DIR_TABLE\155\*") do (
+    set "dir=%%i"
+)
+
+for %%i in ("FILE_TABLE\155.1\*") do (
+    set "file=%%i"
+)
+
+set "path=desktop\root\!dir!\!file!"
+
+path=desktop/root/155/155.1 => desktop/root/Nihon.d88 (single disk)
+copy "!path!" "roms\Nihon.d88"
+
+path=desktop/root/155/155.1 => desktop/root/Nihon (Alpha)/Nihon (Disk A).d88 (multi-disk)
+path=desktop/root/Nihon (Alpha)/Nihon (Disk B).d88 (multi-disk)
+copy "!path! "roms\Nihon (Alpha)/Nihon (Disk A/B).d88
+
+
+* need to parse encapulated word from [], then ()
+* need to parse encapulated Set 1 before parsing encapsulated Alt/Alt 1/Alt 1 b/Alt 1 b bad sectors/Alt 1 melody module crack
+** encapsulated-sqsuare-bracket word can be 5 words in length **
+
+
+--Square Bracket Permutations--
+Notation: Alt + 1 = Alt 1, Alt 2, A ""
+Alt ...: Alt +1, Alt +2, Alt +3 , Alt +3 {}
+Set ..: Set + 1 Alt + 1, Set + 1 Alt + 1 {}, Set + 2, Set + 2 {}, Set + 3, 
+path=desktop\root\Nihon (Alpha)\Set 1\Nihon (Disk 1/A) [Set 1].d88
+path=destkop\root\Nihon (Alpha)\Alt 1\Nihon (Disk 1/A) [Alt 1].d88
+
+rom file might have
+....[Set ..] [Alt ..] (Disk...) in the disk name
+
+
+What if rom disk does not have () nor [] in its name? -- NEED TO COLLECT THESE ROMS
+
+Partiton Sets by Set number (but need to check)
+example:
+Set 1
+    rom Set 1.d88
+    rom set 1 (Disk A).d88
+    rom Set 1 (Disk B).d88
+Set 2
+    rom Set 2 (Disk A).d88
+    rom Set 2 (Disk B).d88
+    rom Set 2 [Alt1] (Disk B).d88
+
+
+
+PATH_TABLE
+
+
+ITEM LISTING
+155.1
+155.2
+...
+168.1
+....
+
+Sorted Item Listings...
+d88
+    demos
+    music - need to get all music files and test with ps classic to see what happens (are they independent disks or required disks for rom usage?)
+    full disks (I want this structure within roms/ dir within project-eris)
+        rom title (dir: 155) (image)
+            Sets (image)
+                155.1 (image)
+            Alts
+                155.2
+
+
+images
+    .gif
+        155.1
+    .img
+    .jpg
+    .png
+numDir_romDir       numFile_file
+
+
+
+DEMOS vs ROMS vs MUSIC
+USER DISK - FOR USER DATA FROM GAME PROGRESS SAVES
+
+
+EXTENSIOSN - 1ST STEP SORTING
+.cmt, .d88, .t88
+
+.gif, .img, .jpg, .png
+
+.txt
+
+.pdf - can use as source for image files
+
+.mp3, .wav
+
+PARENTHESIES\DIR - publishers & developers
+
+PARENTHESES\FILE
