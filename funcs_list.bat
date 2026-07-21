@@ -45,20 +45,25 @@ for /f "tokens=7 delims=|" %%i in ("%~1") do (
 
 for /d %%i in ("!src!\*") do (
 
-    @ call :underscores "!u_scor!\DIR" "%%~nxi"
-    @ call :parenths "!prnth!\DIR" "%%~nxi"
-    @ call :sqr_brackets "!sqr_brkt!\DIR" "%%~nxi"
-    @ call :curly_brackets "!curl_brkt!\DIR" "%%~nxi"
+    rem call :underscores "!u_scor!\DIR" "%%~nxi"
+    rem call :parenths "!prnth!\DIR" "%%~nxi"
+    rem call :sqr_brackets "!sqr_brkt!\DIR" "%%~nxi"
+    rem call :curly_brackets_test "!curl_brkt!\DIR" "%%~nxi"
+
+    rem call :no_encaps_test "%~3\DIR" "%%~nxi"
+    echo "%%~nxi"
 
 
     for %%j in ("%%i\*") do (
 
-       @ call :underscores "!u_scor!\FILE\%%~nxi" "%%~nxj"
-       @ call :parenths "!prnth!\FILE" "%%~nxj"
-       @ call :sqr_brackets "!sqr_brkt!\FILE" "%%~nxj"
-       @ call :curly_brackets "!curl_brkt!\FILE" "%%~nxj"
-       @ call :extensions "!exts!\%%~xj" "%%~nxj"
-       @ call :completed "!compl!\%%~nxi" "%%~nxj"
+       rem call :underscores "!u_scor!\FILE\%%~nxi" "%%~nxj"
+       rem call :parenths "!prnth!\FILE" "%%~nxj"
+       rem call :sqr_brackets "!sqr_brkt!\FILE" "%%~nxj"
+       rem call :curly_brackets "!curl_brkt!\FILE" "%%~nxj"
+       rem call :extensions "!exts!\%%~xj" "%%~nxj"
+       rem call :completed "!compl!\%%~nxi" "%%~nxj" 
+       rem call :no_encaps_test "%~3\FILE" "%%~nxj"
+       call :parenth_pair_qty "%%~nxj"
     )
 
 )
@@ -104,7 +109,10 @@ exit /b
 exit /b
 
 
-
+rem Portions of this function intended to parse an encapsulated 
+rem .... word are going to change after we derive method for
+rem ... identifying which file names have the greatest number of
+rem ... () pairs in the file name
 :encapsulated_word
     
     @ rem a (word)
@@ -128,7 +136,6 @@ exit /b
     )
 
     for /f "tokens=1 delims=%~2" %%i in ("!nested_tail!") do (
-        echo FFFF "%%i"
         @ set "nested=%%i"
        
     )
@@ -237,4 +244,96 @@ exit /b
 
 :extensions
     @ call "funcs_no_make.bat" :file_into_dir "%~1" "%~2"
+exit /b
+
+:no_encaps_test
+
+    echo "%~2"
+    set no_sqr_brkt=
+    set no_curl_brkt=
+    set no_parenth=
+    for /f "tokens=1 delims=[" %%i in ("%~2") do (
+        set "no_sqr_brkt=%%i"
+    )
+    for /f "tokens=1 delims={" %%i in ("%~2") do (
+        set "no_curl_brkt=%%i"
+    )
+
+    for /f "tokens=1 delims=(" %%i in ("%~2") do (
+        set "no_parenth=%%i"
+    )
+    rem ECHO "!no_sqr_brkt!" "%~2"
+    rem pause
+    if "!no_sqr_brkt!" neq "%~2" (
+        exit /b
+    )
+    if "!no_curl_brkt!" neq "%~2" (
+        exit /b
+    )
+    if "!no_parenth!" neq "%~2" (
+        exit /b
+    )
+    call "funcs_no_make.bat" :file_into_dir "%~1" "%~2"
+    
+exit /b
+
+:no_encap
+exit /b
+
+:parenth_pair_qty
+    set one=
+    set two=
+    set three=
+    set four=
+    set five=
+    set six=
+    for /f "tokens=1 delims=(" %%i in ("%~1") do (
+        set "one=%%i"
+    )
+    for /f "tokens=2 delims=(" %%i in ("%~1") do (
+        set "two=%%i"
+    )
+
+    for /f "tokens=3 delims=(" %%i in ("%~1") do (
+        set "three=%%i"
+    )
+    for /f "tokens=4 delims=(" %%i in ("%~1") do (
+        set "four=%%i"
+    )
+    for /f "tokens=5 delims=(" %%i in ("%~1") do (
+        set "five=%%i"
+    )
+    for /f "tokens=6 delims=(" %%i in ("%~1") do (
+        set "six=%%i"
+    )
+
+    set /a qty=7
+    if "!six!" equ "" (
+        set /a qty-=1        
+    )
+    if "!five!" equ "" (
+        set /a qty-=1        
+    )
+    if "!four!" equ "" (
+        set /a qty-=1        
+    )
+    if "!three!" equ "" (
+        set /a qty-=1        
+    )
+    if "!six!" equ "" (
+        set /a qty-=1        
+    )
+    if "!six!" equ "" (
+        set /a qty-=1        
+    )
+    rem echo QTY !qty!
+    set /a file_qty=0
+    for /f "tokens=*" %%i in (qty.txt) do (
+        set /a file_qty=%%i
+    )
+
+    if !qty! gtr !file_qty! (
+        echo !qty! > "qty.txt"
+        echo "%~1" > "largest.txt"
+    )
 exit /b

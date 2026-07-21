@@ -23,6 +23,7 @@ set brk=^
 @ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
+set "no_encaps=NO_ENCAPSULATED"
 
 set /a q=0
 
@@ -48,7 +49,7 @@ if not exist "%lm%" (
 @ rem ... that also have underscores
 @ call "funcs_msg.bat" :before_list "%args%"
 pause
-@ call "funcs_list.bat" :list_gen "%args%" "%lm%"
+@ call "funcs_list.bat" :list_gen "%args%" "%lm%" "%no_encaps%"
 @ call "funcs_msg.bat" :after_list "%args%"
 pause
 echo > "%lm%"
