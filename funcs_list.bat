@@ -42,6 +42,12 @@ for /f "tokens=7 delims=|" %%i in ("%~1") do (
     @ set "compl=%%i"
 )
 
+set quan=
+
+for /f "tokens=1 delims=|" %%i in ("%~4") do (
+    set "quan=%%i"
+)
+
 
 for /d %%i in ("!src!\*") do (
 
@@ -50,8 +56,11 @@ for /d %%i in ("!src!\*") do (
     rem call :sqr_brackets "!sqr_brkt!\DIR" "%%~nxi"
     rem call :curly_brackets_test "!curl_brkt!\DIR" "%%~nxi"
 
+
+    call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
     rem echo "%%~nxi"
+    
 
 
     for %%j in ("%%i\*") do (
@@ -63,7 +72,7 @@ for /d %%i in ("!src!\*") do (
        rem call :extensions "!exts!\%%~xj" "%%~nxj"
        rem call :completed "!compl!\%%~nxi" "%%~nxj" 
        rem call :no_encaps_test "%~3\FILE" "%%~nxj"
-       call :parenth_pair_qty "%%~nxj"
+       rem call :parenth_qty "%%~nxj" "%~2" "FILE"
     )
 
 )
@@ -277,33 +286,47 @@ exit /b
     
 exit /b
 
-:no_encap
+
+
+
+:square_qty
+
 exit /b
 
-:parenth_pair_qty
+:curly_qty
+
+exit /b
+
+
+:parenth_qty
+    call :encaps_pair_qty "(" ")" "%~1" "%~2" "%~3"
+exit /b
+
+:encaps_pair_qty
+    rem %~5 = DIR or FILE
     set one=
     set two=
     set three=
     set four=
     set five=
     set six=
-    for /f "tokens=1 delims=(" %%i in ("%~1") do (
+    for /f "tokens=1 delims=%~1" %%i in ("%~3") do (
         set "one=%%i"
     )
-    for /f "tokens=2 delims=(" %%i in ("%~1") do (
+    for /f "tokens=2 delims=%~1" %%i in ("%~3") do (
         set "two=%%i"
     )
 
-    for /f "tokens=3 delims=(" %%i in ("%~1") do (
+    for /f "tokens=3 delims=%~1" %%i in ("%~3") do (
         set "three=%%i"
     )
-    for /f "tokens=4 delims=(" %%i in ("%~1") do (
+    for /f "tokens=4 delims=%~1" %%i in ("%~3") do (
         set "four=%%i"
     )
-    for /f "tokens=5 delims=(" %%i in ("%~1") do (
+    for /f "tokens=5 delims=%~1" %%i in ("%~3") do (
         set "five=%%i"
     )
-    for /f "tokens=6 delims=(" %%i in ("%~1") do (
+    for /f "tokens=6 delims=%~1" %%i in ("%~3") do (
         set "six=%%i"
     )
 
@@ -326,56 +349,61 @@ exit /b
     if "!one!" equ "" (
         set /a qty-=1        
     )
-    rem echo one "!one!"
-    rem echo two "!two!"
-    rem echo three "!three!"
-    rem echo four "!four!"
-    rem echo five "!five!"
-    rem echo six "!six!"
-    echo NAME "%~1" QTY "!qty!"
-    rem pause
-    rem echo QTY !qty!
+  
+  
     set /a file_qty=0
-    for /f "tokens=*" %%i in (largest_parenth_qty.txt) do (
+
+
+    set larg_qty_txt=largest_qty.txt
+
+    for /f "tokens=*" %%i in (%~5\!larg_qty_txt!) do (
         set /a file_qty=%%i
     )
 
+
+
     if !qty! gtr !file_qty! (
-        echo !qty! > "largest_parenth_qty.txt"
-        echo "%~1" > "largest_parenth.txt"
+        rem Make the directories first, then write  to the file
+        rem echo !qty! > "!larg_qty_txt!"
+        rem echo "%~3" > "%~5\longest_encaps_words.txt"
+        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
+        call "funcs_no_make.bat" :fine_into_dir "%~5" "longest_encaps_words.txt"
+        echo !qty! > "%~5\!larg_qty_txt!"
+        echo "%~3" > "%~5\longest_encaps_words.txt"
+        
     )
 
     rem parse single () pair
     rem Parse double () pair
-    rem Parse Yakyuudou (Utility (Taisen) disk).d88
     rem Parse triple () pair
-    call :parse_three_parenth "%~1" "!qty!"
+    call :parse_multi_encaps "%~1" "%~2" "%~3" "%~4" "%~5" "!qty!"
 exit /b
 
 
-:parse_three_parenth
+:parse_multi_encaps
+    rem echo parse_multi_encaps 1 "%~1"
     set one=
     set two=
     set three=
     set words=
-    for /f "tokens=2 delims=(" %%i in ("%~1") do (
+    for /f "tokens=2 delims=%~1" %%i in ("%~3") do (
         set "one=%%i"
     )
-    for /f "tokens=3 delims=(" %%i in ("%~1") do (
+    for /f "tokens=3 delims=%~1" %%i in ("%~3") do (
         set "two=%%i"
     )
-    for /f "tokens=4 delims=(" %%i in ("%~1") do (
+    for /f "tokens=4 delims=%~1" %%i in ("%~3") do (
         set "three=%%i"
     )
     set "words=!one!!two!!three!"
 
-    for /f "tokens=1 delims=)" %%i in ("!words!") do (
+    for /f "tokens=1 delims=%~2" %%i in ("!words!") do (
         set "one=%%i"
     )
-    for /f "tokens=2 delims=)" %%i in ("!words!") do (
+    for /f "tokens=2 delims=%~2" %%i in ("!words!") do (
         set "two=%%i"
     )
-    for /f "tokens=3 delims=)" %%i in ("!words!") do (
+    for /f "tokens=3 delims=%~2" %%i in ("!words!") do (
         set "three=%%i"
     )
 
@@ -383,21 +411,51 @@ exit /b
     rem .... the encapsulated words.
     set "words=!one!!two!!three!"
    
-    if "%~2" equ "0" (
-        echo "%~1 =  !words!" > "zero.txt"
+    rem %~2 = quan|singl|doubl|tripl
+    set none=
+    set singl=
+    set doubl=
+    set tripl=
+
+    for /f "tokens=2 delims=|" %%i in ("%~4") do (
+        set "none=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("%~4") do (
+        set "singl=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("%~4") do (
+        set "doubl=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("%~4") do (
+        set "tripl=%%i"
     )
 
-    if "%~2" equ "1" (
-        echo "%~1 = !words!" > "one.txt"
+    rem How to show that we parsed the encapsulated words and
+    rem     the original fiile name containing those encapsulated
+    rem     words.
+    rem file name (encapsulated words)_encapsulated words
+    rem echo path file_encapsulated "%~3_!words!" 
+    
+
+    if "%~6" equ "0" (
+        echo "%~5\!none!\%~3_!words!"
+        call "funcs_no_make.bat" :file_into_dir "%~5\!none!" "%~3_!words!"
+        rem echo %~3\!words! > 
     )
-    if "%~2" equ "2" (
-        echo "%~1 = !words!" > "two.txt"
+
+    if "%~6" equ "1" (
+        echo "%~5\!singl!\%~3_!words!"
+        call "funcs_no_make.bat" :file_into_dir "%~5\!singl!" "%~3_!words!"
+
     )
-    if "%~2" equ "3" (
-        echo "%~1 = !words!" > "three.txt"
+    if "%~6" equ "2" (
+        echo "%~5\!doubl!\%~3_!words!"
+        call "funcs_no_make.bat" :file_into_dir "%~5\!doubl!" "%~3_!words!"
     )
-    if "%~1" equ "Yakyuudou (Utility (Taisen) disk).d88" (
-        echo "%~1 = !words!" > "four.txt"
+    if "%~6" equ "3" (
+        echo "%~5\!tripl!\%~3_!words!"
+        call "funcs_no_make.bat" :file_into_dir "%~5\!tripl!" "%~3_!words!"
     )
+pause
 
 exit /b

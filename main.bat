@@ -19,22 +19,36 @@ set brk=^
 @ set "curl_brkt=CURLY_BRACKETS"
 @ set "exts=EXTENSIONS"
 @ set "cmpltd=COMPLETE"
-set "quan=QUANTITY"
-
-@ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%|%quan%"
+set "quan=QUANTITIES"
+set "zeros=NONES"
+set "singl=SINGLES"
+set "doubl=DOUBLES"
+set "tripl=TRIPLES"
+rem parentheses/quantity
+    rem file
+        rem singles 
+        rem doubles
+        rem triples
+        rem largest_x.txt
+    rem dir
+        rem singles 
+        rem doubles
+        rem triples
+        rem largest_x.txt
+@ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
+set "args2=|%quan%|%zeros%|%singl%|%doubl%|%tripl%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"
 
-set /a q=0
-
-echo PRINTING MESSAGE
-
+echo WANT TO READ A FILE
+set r=READ
+pause
+rem for /f "tokens=*" %%i in (!r!\file.txt) do (
+rem     echo CONTENT "%%i"
+rem )
 rem pause
 rem goto :eof
-@ rem call "funcs_msg.bat" :after_list "%args%"
-@ rem pause
-@ rem goto :eof
 
 
 if not exist "%lm%" (
@@ -53,7 +67,7 @@ rem Need to implement references to quantitity directory within
 rem ... messages.
 @ call "funcs_msg.bat" :before_list "%args%"
 pause
-@ call "funcs_list.bat" :list_gen "%args%" "%lm%" "%no_encaps%"
+@ call "funcs_list.bat" :list_gen "%args%" "%lm%" "%no_encaps%" "!args2!"
 @ call "funcs_msg.bat" :after_list "%args%"
 pause
 echo > "%lm%"
