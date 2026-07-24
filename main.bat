@@ -41,14 +41,6 @@ set "args2=|%quan%|%zeros%|%singl%|%doubl%|%tripl%"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"
 
-echo WANT TO READ A FILE
-set r=READ
-pause
-rem for /f "tokens=*" %%i in (!r!\file.txt) do (
-rem     echo CONTENT "%%i"
-rem )
-rem pause
-rem goto :eof
 
 
 if not exist "%lm%" (
