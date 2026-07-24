@@ -58,8 +58,8 @@ for /d %%i in ("!src!\*") do (
 
     rem Call these functions one at a time because of the HUGE time penalty
     rem     when creating the directories and files.
-    call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
-    rem call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
+    rem call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
+    call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
     rem call :curly_qty "%%~nxi" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\DIR"
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
     echo " --- %%~nxi ---"
@@ -81,7 +81,6 @@ for /d %%i in ("!src!\*") do (
         rem call :curly_qty "%%~nxj" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\FILE"
 
        rem call :no_encaps_test "%~3\FILE" "%%~nxj"
-       rem call :parenth_qty "%%~nxj" "%~2" "FILE"
     )
 
 )
@@ -368,6 +367,7 @@ exit /b
     set larg_qty_txt=largest_qty.txt
 
     if not exist %~5\!larg_qty_txt! (
+        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
         echo -1 > %~5\!larg_qty_txt!
     )
 
@@ -375,13 +375,10 @@ exit /b
         set /a file_qty=%%i
     )
 
-    echo          FIVE "%~5" QTY "!qty!" "%~3"
-    PAUSE
+   
 
     if !qty! gtr !file_qty! (
-        rem Make the directories first, then write  to the file
-        rem echo !qty! > "!larg_qty_txt!"
-        rem echo "%~3" > "%~5\longest_encaps_words.txt"
+   
         call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
         call "funcs_no_make.bat" :file_into_dir "%~5" "longest_encaps_words.txt"
         echo !qty! > "%~5\!larg_qty_txt!"
@@ -451,27 +448,18 @@ exit /b
     rem     words.
     rem file name (encapsulated words)_encapsulated words
     rem echo path file_encapsulated "%~3_!words!" 
-    
 
-    if "%~6" equ "0" (
-        rem echo "%~5\!none!\%~3_!words!"
-        call "funcs_no_make.bat" :file_into_dir "%~5\!none!" "%~3_!words!"
-        rem echo %~3\!words! > 
-    )
-
+    set "path=%~5\!none!"
     if "%~6" equ "1" (
-        rem echo "%~5\!singl!\%~3_!words!"
-        call "funcs_no_make.bat" :file_into_dir "%~5\!singl!" "%~3_!words!"
-
+        set "path=%~5\!singl!"
     )
     if "%~6" equ "2" (
-        rem echo "%~5\!doubl!\%~3_!words!"
-        call "funcs_no_make.bat" :file_into_dir "%~5\!doubl!" "%~3_!words!"
+        set "path=%~5\!doubl!"
     )
     if "%~6" equ "3" (
-        echo "%~5\!tripl!\%~3_!words!"
-        call "funcs_no_make.bat" :file_into_dir "%~5\!tripl!" "%~3_!words!"
+        set "path=%~5\!tripl!"
     )
-rem pause
+
+    call "funcs_no_make.bat" :file_into_dir "!path!" "%~3___!words!____%~6"
 
 exit /b
