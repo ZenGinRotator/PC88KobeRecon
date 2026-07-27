@@ -2,7 +2,21 @@ need to determine the number of () pairs within each file name in the archive, a
 .... save the file names with the maximum number of () pairs in its file name
 ... to genereate an algorith that can account for any number of () pairs in the file name
 
+Does name have?:
+1. (): yes/no,
+2. How many ()?
+3. have []: yes/no
+4. How many []?
+5. {}: yes/no
+6. Hown many {}?
 
+Is name part of single-disk rom or multi-disk rom?
+
+extension, (), [], {}
+Order of Importance when organizing files for EmulationStation
+1. d88, t88, cmt
+2. (demo) - can be single or multi-disk
+3.
 
 
 among all .d88, .cmt, .t88 files in archive

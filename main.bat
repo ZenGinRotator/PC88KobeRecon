@@ -24,6 +24,7 @@ set "zeros=NONES"
 set "singl=SINGLES"
 set "doubl=DOUBLES"
 set "tripl=TRIPLES"
+set "encap=ENCAPSULATED"
 rem parentheses/quantity
     rem file
         rem singles 
@@ -36,13 +37,20 @@ rem parentheses/quantity
         rem triples
         rem largest_x.txt
 @ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
-set "args2=|%quan%|%zeros%|%singl%|%doubl%|%tripl%"
+set "args2=|%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encap%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"
 
-
-
+rem TESTING NO TOKENS TO FIND RESULT - RETURN ALL STATEMENT OR NOTHING?
+set "s=hiby"
+set t=
+for /f "tokens=1 delims=(" %%i in ("!s!") do (
+	set "t=%%i"
+)
+echo T "!t!"
+rem PAUSE
+rem goto :eof
 if not exist "%lm%" (
 
 @ rem UNDERSCORES/DIR/*

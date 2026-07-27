@@ -19,6 +19,7 @@
 @ set curl_brkt=
 @ set exts=
 @ set compl=
+set encap=
 
 for /f "tokens=1 delims=|" %%i in ("%~1") do (
     @ set "src=%%i"
@@ -47,6 +48,11 @@ set quan=
 for /f "tokens=1 delims=|" %%i in ("%~4") do (
     set "quan=%%i"
 )
+for /f "tokens=6 delims=|" %%i in ("%~4") do (
+    set "encap=%%i"
+)
+
+
 
 
 for /d %%i in ("!src!\*") do (
@@ -59,10 +65,17 @@ for /d %%i in ("!src!\*") do (
     rem Call these functions one at a time because of the HUGE time penalty
     rem     when creating the directories and files.
     rem call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
-    call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
+    rem call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
     rem call :curly_qty "%%~nxi" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\DIR"
+
+    rem need to isolate an encapsulated disk/Disk from parenthese...
+    rem .... but need to have prior knowledge about the maximum number of encapsulated words
+    rem .... within a found set of parentehesis
+
+
+
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
-    echo " --- %%~nxi ---"
+    rem echo " --- %%~nxi ---"
     
 
 
@@ -77,10 +90,11 @@ for /d %%i in ("!src!\*") do (
 
 
         rem call :parenth_qty "%%~nxj" "%~4" "!prnth!\!quan!\FILE"
-        call :square_qty "%%~nxj" "%~4" "!sqr_brkt!\!quan!\FILE"
+        rem call :square_qty "%%~nxj" "%~4" "!sqr_brkt!\!quan!\FILE"
         rem call :curly_qty "%%~nxj" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\FILE"
+        call :parenth_word_qty "%%~nj" "%~4" "!prnth!\!encap!_!quan!\FILE"
 
-       rem call :no_encaps_test "%~3\FILE" "%%~nxj"
+        rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )
 
 )
@@ -310,6 +324,7 @@ exit /b
     call :encaps_pair_qty "(" ")" "%~1" "%~2" "%~3"
 exit /b
 
+
 :encaps_pair_qty
     rem %~5 = DIR or FILE
     rem echo five "%~5"
@@ -424,7 +439,7 @@ exit /b
     rem .... the encapsulated words.
     set "words=!one!!two!!three!"
    
-    rem %~2 = quan|singl|doubl|tripl
+    rem %~4 = quan|singl|doubl|tripl
     set none=
     set singl=
     set doubl=
@@ -461,5 +476,279 @@ exit /b
     )
 
     call "funcs_no_make.bat" :file_into_dir "!path!" "%~3___!words!____%~6"
+
+exit /b
+
+rem                             file_name   bundled-dirs    root
+:parenth_word_qty
+    rem call :encaps_word_qty "()" ")" "%~1" "%~2" "%~3"
+    call :has_nested_parenth "" "" "%~1"
+exit /b
+
+:encaps_word_qty
+    rem echo parse_multi_encaps 1 "%~1"
+    set one=
+    set two=
+    set three=
+    set words=
+    for /f "tokens=2 delims=%~1" %%i in ("%~3") do (
+        set "one=%%i"
+    )
+    for /f "tokens=3 delims=%~1" %%i in ("%~3") do (
+        set "two=%%i"
+    )
+    for /f "tokens=4 delims=%~1" %%i in ("%~3") do (
+        set "three=%%i"
+    )
+    set "words=!one!!two!!three!"
+
+    for /f "tokens=1 delims=%~2" %%i in ("!words!") do (
+        set "one=%%i"
+    )
+    for /f "tokens=2 delims=%~2" %%i in ("!words!") do (
+        set "two=%%i"
+    )
+    for /f "tokens=3 delims=%~2" %%i in ("!words!") do (
+        set "three=%%i"
+    )
+    set "words=!one!!two!!three!"
+    echo FIRST WORD "!words!"
+
+   
+    set first=
+    set sec=
+    set third=
+    set fourth=
+    set fifth=
+    set sixth=
+    set seventh=
+    set eighth=
+    set ninth=
+    set tenth=
+    set eleventh=
+    set twelfth=
+    set thirteenth=
+    set fourteenth=
+    set fifteenth=
+    set sixteenth=
+    set seventeenth=
+    set eighteenth=
+    set nineteenth=
+    set twentieth=
+
+    for /f "tokens=1 delims= " %%i in ("!words!") do (
+        set "first=%%i"
+
+    )
+    for /f "tokens=2 delims= " %%i in ("!words!") do (
+        set "sec=%%i"
+
+    )
+    for /f "tokens=3 delims= " %%i in ("!words!") do (
+        set "third=%%i"
+
+    )
+    for /f "tokens=4 delims= " %%i in ("!words!") do (
+        set "fourth=%%i"
+    )
+    for /f "tokens=5 delims= " %%i in ("!words!") do (
+        set "fifth=%%i"
+
+    )
+    for /f "tokens=6 delims= " %%i in ("!words!") do (
+        set "sixth=%%i"
+
+    )
+    for /f "tokens=7 delims= " %%i in ("!words!") do (
+        set "seventh=%%i"
+
+    )
+    for /f "tokens=8 delims= " %%i in ("!words!") do (
+        set "eighth=%%i"
+
+    )
+    for /f "tokens=9 delims= " %%i in ("!words!") do (
+        set "ninth=%%i"
+
+    )
+    for /f "tokens=10 delims= " %%i in ("!words!") do (
+        set "tenth=%%i"
+    )
+    for /f "tokens=11 delims= " %%i in ("!words!") do (
+        set "eleventh=%%i"
+    )
+    for /f "tokens=12 delims= " %%i in ("!words!") do (
+        set "twelfth=%%i"
+    )
+    for /f "tokens=13 delims= " %%i in ("!words!") do (
+        set "thirteenth=%%i"
+    )
+    for /f "tokens=14 delims= " %%i in ("!words!") do (
+        set "fourteenth=%%i"
+    )
+    for /f "tokens=15 delims= " %%i in ("!words!") do (
+        set "fifteenth=%%i"
+    )
+    for /f "tokens=16 delims= " %%i in ("!words!") do (
+        set "sixteenth=%%i"
+    )
+    for /f "tokens=17 delims= " %%i in ("!words!") do (
+        set "seventeenth=%%i"
+    )
+    for /f "tokens=18 delims= " %%i in ("!words!") do (
+        set "eighteenth=%%i"
+    )
+    for /f "tokens=19 delims= " %%i in ("!words!") do (
+        set "nineteenth=%%i"
+    )
+    for /f "tokens=20 delims= " %%i in ("!words!") do (
+        set "twentieth=%%i"
+    )
+
+
+
+   
+    
+    set /a qty=0
+
+
+    if "!first!" neq "" (
+        set /a qty+=1
+    )
+    if "!sec!" neq "" (
+        set /a qty+=1
+    )
+
+    if "!third!" neq "" (
+        set /a qty+=1        
+    )
+    if "!fourth!" neq "" (
+        set /a qty+=1        
+    )
+    if "!fifth!" neq "" (
+        set /a qty+=1        
+    )
+    if "!sixth!" neq "" (
+        set /a qty+=1        
+    )
+    if "!seventh!" neq "" (
+        set /a qty+=1        
+    )
+    if "!eighth!" neq "" (
+         set /a qty+=1       
+    )
+    if "!ninth!" neq "" (
+        set /a qty+=1        
+    )
+    if "!tenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!eleventh!" neq "" (
+        set /a qty+=1
+    )
+    if "!twelfth!" neq "" (
+        set /a qty+=1
+    )
+    if "!thirteenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!fourteenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!fifteenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!sixteenth!" neq "" (
+        set /a qty+=1
+    )
+    
+    if "!seventeenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!eighteenth!" neq "" (
+        set /a qty+=1
+    )
+    if "!nineteenth!" neq "" (
+        set /a qty+=1
+    )
+    
+    if "!twentieth!" neq "" (
+        set /a qty+=1
+    )
+
+    
+
+
+ rem echo ORIGINAL "%~3"
+ rem echo WORDS "!words!"  !qty!
+ rem echo ONE "!one!" TWO "!two!" THREE "!three!"
+ rem echo FIVE "%~5"
+ rem pause
+ rem qty !qty! "!words!"
+ 
+ echo "!first! !sec! !third! !fourth! !fifth! !sixth! !seventh! !eighth! !ninth! !tenth! !eleventh! !twelfth! !thirteenth! !fourteen! !fifteenth! !sixteenth! !seventeenth! !eighteenth! !nineteenth! !twentieth!"
+ 
+ 
+
+
+
+    set larg_qty_txt=largest_qty.txt
+
+    if not exist %~5\!larg_qty_txt! (
+        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
+        echo -1 > %~5\!larg_qty_txt!
+    )
+
+    for /f "tokens=*" %%i in (%~5\!larg_qty_txt!) do (
+        set /a file_qty=%%i
+    )
+
+    
+    if !qty! gtr !file_qty! (
+   
+        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
+        call "funcs_no_make.bat" :file_into_dir "%~5" "longest_encaps_words.txt"
+        echo !qty! > "%~5\!larg_qty_txt!"
+        echo "%~3" > "%~5\longest_encaps_words.txt"
+        
+    )
+
+
+
+exit /b
+
+
+:has_nested_parenth
+
+    set one=
+    set two=
+    for /f "tokens=2 delims=(" %%i in ("%~3") do (
+        set "one=%%i"
+    )
+
+    if "!one!" equ "%~3" (
+        set one=
+    )
+
+    for /f "tokens=1 delims=)" %%i in ("!one!") do (
+        set "two=%%i"
+    )
+
+    set is_nested="T"
+
+    rem When file name contains no parentheses at all.
+    if "!two!" equ "" (
+        set "is_nested=F"
+    )
+
+    if "!two!" neq "!one!" (
+        set "is_nested=F"
+    )
+
+    if "!is_nested!" equ "F" (
+        echo NOT NESTED "%~3"
+    ) else (
+        echo IS NESTED "%~3"
+    )
 
 exit /b
