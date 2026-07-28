@@ -4,6 +4,25 @@ set brk=^
 
 
 
+
+rem GROUPER can be:
+rem 1. PARENTHESES
+rem 2. CURLY_BRACKETS
+rem 3. SQUARE_BRACKETS
+
+rem OBJECT can be:
+rem 1. FILE
+rem 2. DIR
+
+
+rem More directories
+rem ENCAPSULATOR/OBJECT/ALL
+rem ENCAPSULATOR/OBJECT/QUANTITY/ENCAPSULATOR
+rem ENCAPSULATOR/OBJECT/QUANTITY/ENCAPSULATED
+
+REM STRUCT
+
+
 @ rem Use as arguments
 @ rem src: Need to traverse directory when making list and
 @ rem      when identifying directories without extracted files

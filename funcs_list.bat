@@ -483,6 +483,7 @@ rem                             file_name   bundled-dirs    root
 :parenth_word_qty
     rem call :encaps_word_qty "()" ")" "%~1" "%~2" "%~3"
     call :has_nested_parenth "" "" "%~1"
+    rem call :p_word_qty "%~1"
 exit /b
 
 :encaps_word_qty
@@ -745,10 +746,129 @@ exit /b
         set "is_nested=F"
     )
 
-    if "!is_nested!" equ "F" (
-        echo NOT NESTED "%~3"
-    ) else (
-        echo IS NESTED "%~3"
+   
+
+    call :p_word_qty "%~3" "!is_nested!"
+
+exit /b
+
+
+
+rem Collect all parenthesized words within dir or file name
+rem     and show the entire collection words as a string.
+rem Need this function because we wish to determine if one
+rem     of the collected words is "demo", "Demo", "disk",
+rem     "Disk", "Music", or "music" and to categorize 
+rem     those dirs or files 
+rem     for EmulationStation:
+
+
+:p_word_qty
+
+    rem File or directory name
+    set "name=%~1"
+    set "is_nested=%~2"
+
+    rem A file or directory name can have 0 or up to 3
+    rem     groups of parenthesized words, where each
+    rem     group can contain 1 or more words.
+
+    rem 3 groups of words and combine the groups to find
+    rem     the string of all parenthesized words.
+    set one=
+    set two=
+    set three=
+
+    rem The group of words and any other words
+    rem     (grouped or ungrouped) that follow words in the
+    rem     group of interest.
+    rem "Followed words" will be separated from the group,
+    rem     leaving only the words belonging to the group
+    rem     of interest.
+    set one_tail=
+    set two_tail=
+    set three_tail=
+
+    rem            Collecting Group 1
+    for /f "tokens=2 delims=(" %%i in ("!name!") do (
+        set "one_tail=%%i"
     )
+
+
+    rem Account for circumstances when directory or file name
+    rem     does not have parenthesized words in the name 
+    rem     nor the delimiting character, and the for /f loop
+    rem     returns teh  entire file name instead of the 
+    rem     non-existing group of words.
+    if "!one_tail!" equ "!name!" (
+        set one_tail=
+    )
+
+    for /f "tokens=1 delims=)" %%i in ("!one_tail!") do (
+        set "one=%%i"
+    )
+
+    for /f "tokens=1 delims=(" %%i in ("!one!") do (
+        set "one=%%i"
+    )
+
+
+
+
+
+
+
+
+    rem          Find Group 2
+    for /f "tokens=3 delims=(" %%i in ("!name!") do (
+        set "two_tail=%%i"
+    )
+
+    rem Account for circumstances where the previous 
+    rem     delimiting character is non-existent and we
+    rem     we get the entirety of one_tail when determining
+    rem     two_tail.
+    if "!two_tail!" equ "!name!" (
+        set two_tail=
+    )
+
+    for /f "tokens=1 delims=)" %%i in ("!two_tail!") do (
+        set "two=%%i"
+    )
+
+
+    if "!is_nested!" equ "T" (
+        set "name=(!name!"
+    )
+
+    
+    rem                 Group 3
+    for /f "tokens=4 delims=(" %%i in ("!name!") do (
+        set "three_tail=%%i"
+    )
+
+    if "!is_nested!" equ "F" (
+        set "three_tail=)!three_tail!"
+    )
+    
+
+    for /f "tokens=2 delims=)" %%i in ("!three_tail!") do (
+        set "three=%%i"
+    )
+
+    for /f "tokens=1 delims=)" %%i in ("!three_tail!") do (
+        set "three=%%i"
+    )
+
+
+    echo "!name!"
+    set "encaps=(!one!)   (!two!)    (!three!)"
+    
+    echo "!encaps!"
+    set brk=^
+
+
+    echo "!brk!"
+
 
 exit /b
