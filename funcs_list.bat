@@ -12,6 +12,8 @@
 
 :list_gen
 
+set "prim_dirs=%~1"
+set "secnd_dirs=%~2"
 @ set src=
 @ set u_scor=
 @ set prnth=
@@ -21,36 +23,47 @@
 @ set compl=
 set encap=
 
-for /f "tokens=1 delims=|" %%i in ("%~1") do (
+for /f "tokens=1 delims=|" %%i in ("!prim_dirs!") do (
     @ set "src=%%i"
 )
-for /f "tokens=2 delims=|" %%i in ("%~1") do (
+for /f "tokens=2 delims=|" %%i in ("!prim_dirs!") do (
     @ set "u_scor=%%i"
 )
-for /f "tokens=3 delims=|" %%i in ("%~1") do (
+for /f "tokens=3 delims=|" %%i in ("!prim_dirs!") do (
     @ set "prnth=%%i"
 )
-for /f "tokens=4 delims=|" %%i in ("%~1") do (
+for /f "tokens=4 delims=|" %%i in ("!prim_dirs!") do (
     @ set "sqr_brkt=%%i"
 )
-for /f "tokens=5 delims=|" %%i in ("%~1") do (
+for /f "tokens=5 delims=|" %%i in ("!prim_dirs!") do (
     @ set "curl_brkt=%%i"
 )
-for /f "tokens=6 delims=|" %%i in ("%~1") do (
+for /f "tokens=6 delims=|" %%i in ("!prim_dirs!") do (
     @ set "exts=%%i"
 )
-for /f "tokens=7 delims=|" %%i in ("%~1") do (
+for /f "tokens=7 delims=|" %%i in ("!prim_dirs!") do (
     @ set "compl=%%i"
 )
 
 set quan=
-
-for /f "tokens=1 delims=|" %%i in ("%~4") do (
+set prelim=
+set label=
+for /f "tokens=1 delims=|" %%i in ("!secnd_dirs!") do (
     set "quan=%%i"
 )
-for /f "tokens=6 delims=|" %%i in ("%~4") do (
+for /f "tokens=6 delims=|" %%i in ("!secnd_dirs!") do (
     set "encap=%%i"
 )
+
+for /f "tokens=7 delims=|" %%i in ("!secnd_dirs!") do (
+    set "prelim=%%i"
+)
+
+for /f "tokens=8 delims=|" %%i in ("!secnd_dirs!") do (
+    set "label=%%i"
+)
+
+set "prelim_label=!prelim!_!label!"
 
 
 
@@ -58,12 +71,25 @@ for /f "tokens=6 delims=|" %%i in ("%~4") do (
 for /d %%i in ("!src!\*") do (
 
     rem call :underscores "!u_scor!\DIR" "%%~nxi"
-    rem call :parenths "!prnth!\DIR" "%%~nxi"
-    rem call :sqr_brackets "!sqr_brkt!\DIR" "%%~nxi"
-    rem call :curly_brackets_test "!curl_brkt!\DIR" "%%~nxi"
+
+    set "pl_dir=%prelim_label%\DIR"
+    set "pare_pl_d=!prnth!\!pl_dir!"
+    set "sqr_pl_d=!sqr_brkt!\!pl_dir!"
+    set "curl_pl_d=!curl_brkt!\!pl_dir!"
+    rem echo "!pare_pl_d!"
+    rem echo "!sqr_pl_d!"
+    rem echo "!curl_pl_d!"
+    rem echo "^"
+   
+    
+
+    rem call "funcs_prelim_labels.bat" :parenths "!pare_pl_d!" "%%~nxi"
+    rem call "funcs_prelim_labels.bat" :sqr_brackets "!sqr_pl_d!" "%%~nxi"
+    rem call "funcs_prelim_labels.bat" :curly_brackets "!curl_pl_d!" "%%~nxi"
 
     rem Call these functions one at a time because of the HUGE time penalty
     rem     when creating the directories and files.
+
     rem call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
     rem call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
     rem call :curly_qty "%%~nxi" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\DIR"
@@ -82,9 +108,25 @@ for /d %%i in ("!src!\*") do (
     for %%j in ("%%i\*") do (
 
         rem call :underscores "!u_scor!\FILE\%%~nxi" "%%~nxj"
-        rem call :parenths "!prnth!\FILE" "%%~nxj"
-        rem call :sqr_brackets "!sqr_brkt!\FILE" "%%~nxj"
-        rem call :curly_brackets "!curl_brkt!\FILE" "%%~nxj"
+
+
+        set "pl_file=%prelim_label%\FILE"
+
+        set "pare_pl_f=!prnth!\!pl_file!"
+        set "sqr_pl_f=!sqr_brkt!\!pl_file!"
+        set "curl_pl_f=!curl_brkt!\!pl_file!"
+
+
+        rem echo "!pare_pl_f!"
+        rem echo "!sqr_pl_f!"
+        rem echo "!curl_pl_f!"
+        rem pause
+
+        rem call "funcs_prelim_labels.bat" :parenths "!pare_pl_f!" "%%~nxj"
+        rem call "funcs_prelim_labels.bat" :sqr_brackets "!sqr_pl_f!" "%%~nxj"
+        rem call "funcs_prelim_labels.bat" :curly_brackets "!curl_pl_f!" "%%~nxj"
+
+
         rem call :extensions "!exts!\%%~xj" "%%~nxj"
         rem call :completed "!compl!\%%~nxi" "%%~nxj" 
 
@@ -108,6 +150,7 @@ exit /b
 exit /b
 
 
+
 :underscores
 
     @ set part=
@@ -125,151 +168,8 @@ exit /b
 
 
 
-@ rem "path" "title of dir/file"
-:parenths
-    @ call :encapsulated_word "(" ")" "%~1" "%~2"
-exit /b
 
 
-:curly_brackets
-    @ call :encapsulated_word "{" "}" "%~1" "%~2"
-exit /b
-
-:sqr_brackets
-    @ call :encapsulated_word "[" "]" "%~1" "%~2"
-exit /b
-
-
-rem Portions of this function intended to parse an encapsulated 
-rem .... word are going to change after we derive method for
-rem ... identifying which file names have the greatest number of
-rem ... () pairs in the file name
-:encapsulated_word
-    
-    @ rem a (word)
-    @ rem a (word1 word2 ... word N)
-    @ rem a (word1 (nested) word2 ...word N)
-    @ set uniq=
-	@ set wrd_tail=
-	@ set wrd=
-    @ set nested_tail=
-    @ set nested=
-	for /f "tokens=2 delims=%~1" %%i in ("%~4") do (
-		@ set "wrd_tail=%%i"
-	)
-	for /f "tokens=1 delims=%~2" %%i in ("!wrd_tail!") do (
-		@ set "wrd=%%i"
-	)
-
-
-    for /f "tokens=3 delims=%~1" %%i in ("%~4") do (
-        @ set "nested_tail=%%i"
-    )
-
-    for /f "tokens=1 delims=%~2" %%i in ("!nested_tail!") do (
-        @ set "nested=%%i"
-       
-    )
-
-    for /f "tokens=2 delims=%~2" %%i in ("!nested_tail!") do (
-        @ set "nested=!nested! %%i"
-    )
-
-    if "!nested!" neq "" (
-        @ set "wrd=!wrd! !nested!"
-    )
-
-
-   
-    @ rem This excludes second word beyond the space
-    @ rem Remove the last char from word that might be a space character
-    @ rem ...To fix error directory is created with a space at the end
-    @ rem ... of the title of the directory (cannot delete this using windows 10)
-    @ set one=
-    @ set two=
-    @ set three=
-    @ set four=
-    @ set five=
-    @ set six=
-    @ set sevn=
-    @ set eight=
-    @ set nine=
-    @ set ten=
-    for /f "tokens=1 delims= " %%i in ("!wrd!") do (
-        @ set "one=%%i"
-    )
-
-    for /f "tokens=2 delims= " %%i in ("!wrd!") do (
-        @ set "two=%%i"
-        if "!two!" neq "" (
-            @ set "two= !two!"
-        )
-    )
-    for /f "tokens=3 delims= " %%i in ("!wrd!") do (
-        @ set "three=%%i"
-        if "!three!" neq "" (
-            @ set "three= !three!"
-        )
-
-    )
-    for /f "tokens=4 delims= " %%i in ("!wrd!") do (
-        @ set "four=%%i"
-        if "!four!" neq "" (
-            @ set "four= !four!"
-        )
-
-    )
-    for /f "tokens=5 delims= " %%i in ("!wrd!") do (
-        @ set "five=%%i"
-        if "!five!" neq "" (
-            @ set "five= !five!"
-        )
-
-    )
-    for /f "tokens=6 delims= " %%i in ("!wrd!") do (
-        @ set "six=%%i"
-        if "!six!" neq "" (
-            @ set "six= !six!"
-        )
-
-    )
-    for /f "tokens=7 delims= " %%i in ("!wrd!") do (
-        @ set "sevn=%%i"
-        if "!sevn!" neq "" (
-            @ set "sevn= !sevn!"
-        )
-
-    )
-
-    for /f "tokens=8 delims= " %%i in ("!wrd!") do (
-        @ set "eight=%%i"
-        if "!eight!" neq "" (
-            @ set "eight= !eight!"
-        )
-
-    )   
-    for /f "tokens=9 delims= " %%i in ("!wrd!") do (
-        @ set "nine=%%i"
-        if "!nine!" neq "" (
-            @ set "nine= !nine!"
-        )
-
-    )
-    for /f "tokens=7 delims= " %%i in ("!wrd!") do (
-        @ set "ten=%%i"
-        if "!ten!" neq "" (
-            @ set "ten= !ten!"
-        )
-
-    )
- 
-
-    @ set "combo_wrd=!one!!two!!three!!four!!five!!six!!sevn!"
- 
-    if "!combo_wrd!" neq "" (
-        @ call "funcs_no_make.bat" :file_into_dir "%~3\!combo_wrd!" "%~4"
-    )
-exit /b
 
 
 
