@@ -21,7 +21,7 @@ set "secnd_dirs=%~2"
 @ set curl_brkt=
 @ set exts=
 @ set compl=
-set encap=
+set encaptor=
 
 for /f "tokens=1 delims=|" %%i in ("!prim_dirs!") do (
     @ set "src=%%i"
@@ -52,7 +52,7 @@ for /f "tokens=1 delims=|" %%i in ("!secnd_dirs!") do (
     set "quan=%%i"
 )
 for /f "tokens=6 delims=|" %%i in ("!secnd_dirs!") do (
-    set "encap=%%i"
+    set "encaptor=%%i"
 )
 
 for /f "tokens=7 delims=|" %%i in ("!secnd_dirs!") do (
@@ -90,9 +90,22 @@ for /d %%i in ("!src!\*") do (
     rem Call these functions one at a time because of the HUGE time penalty
     rem     when creating the directories and files.
 
-    rem call :parenth_qty "%%~nxi" "%~4" "!prnth!\!quan!\DIR"
-    rem call :square_qty "%%~nxi" "%~4" "!sqr_brkt!\!quan!\DIR"
-    rem call :curly_qty "%%~nxi" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\DIR"
+
+    set "qed=!quan!\!encaptor!\DIR"
+
+    set "pqed=!prnth!\!qed!"
+    set "sqed=!sqr_brkt!\!qed!"
+    set "cqed=!curl_brkt!\!qed!"
+
+    rem echo "!pqed!"
+    rem echo "!sqed!"
+    rem echo "!cqed!"
+    rem echo -
+
+
+    call "funcs_encapsulator_qty.bat" :parenth "%%~nxi" "!secnd_dirs!" "!pqed!"
+    call "funcs_encapsulator_qty.bat" :square "%%~nxi" "!secnd_dirs!" "!sqed!"
+    call "funcs_encapsulator_qty.bat" :curly "%%~nxi" "!secnd_dirs!" "!cqed!"
 
     rem need to isolate an encapsulated disk/Disk from parenthese...
     rem .... but need to have prior knowledge about the maximum number of encapsulated words
@@ -101,7 +114,7 @@ for /d %%i in ("!src!\*") do (
 
 
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
-    rem echo " --- %%~nxi ---"
+    echo " --- %%~nxi ---"
     
 
 
@@ -112,29 +125,36 @@ for /d %%i in ("!src!\*") do (
 
         set "pl_file=%prelim_label%\FILE"
 
-        set "pare_pl_f=!prnth!\!pl_file!"
-        set "sqr_pl_f=!sqr_brkt!\!pl_file!"
-        set "curl_pl_f=!curl_brkt!\!pl_file!"
+        set "pplf=!prnth!\!pl_file!"
+        set "splf=!sqr_brkt!\!pl_file!"
+        set "cplf=!curl_brkt!\!pl_file!"
 
 
-        rem echo "!pare_pl_f!"
-        rem echo "!sqr_pl_f!"
-        rem echo "!curl_pl_f!"
-        rem pause
 
-        rem call "funcs_prelim_labels.bat" :parenths "!pare_pl_f!" "%%~nxj"
-        rem call "funcs_prelim_labels.bat" :sqr_brackets "!sqr_pl_f!" "%%~nxj"
-        rem call "funcs_prelim_labels.bat" :curly_brackets "!curl_pl_f!" "%%~nxj"
+        rem call "funcs_prelim_labels.bat" :parenths "!pplf!" "%%~nxj"
+        rem call "funcs_prelim_labels.bat" :sqr_brackets "!splf!" "%%~nxj"
+        rem call "funcs_prelim_labels.bat" :curly_brackets "!cplf!" "%%~nxj"
 
 
         rem call :extensions "!exts!\%%~xj" "%%~nxj"
         rem call :completed "!compl!\%%~nxi" "%%~nxj" 
 
+        set "qef=!quan!\!encaptor!\FILE"
+        set "pqef=!prnth!\!qef!"
+        set "sqef=!sqr_brkt!\!qef!"
+        set "cqef=!curl_brkt!\!qef!"
 
-        rem call :parenth_qty "%%~nxj" "%~4" "!prnth!\!quan!\FILE"
-        rem call :square_qty "%%~nxj" "%~4" "!sqr_brkt!\!quan!\FILE"
-        rem call :curly_qty "%%~nxj" "%~4" "!curl_brkt!" "!curl_brkt!\!quan!\FILE"
-        call :parenth_word_qty "%%~nj" "%~4" "!prnth!\!encap!_!quan!\FILE"
+        rem echo "!pqef!"
+        rem echo "!sqef!"
+        rem echo "!cqef!"
+        rem pause
+
+        call "funcs_encapsulator_qty.bat" :parenth "%%~nxj" "!secnd_dirs!" "!pqef!"
+        call "funcs_encapsulator_qty.bat" :square "%%~nxj" "!secnd_dirs!" "!sqef!"
+        call "funcs_encapsulator_qty.bat" :curly "%%~nxj" "!secnd_dirs!" "!cqef!"
+        
+        rem this parses all words encapsulated by parentheses
+        rem call :parenth_word_qty "%%~nj" "%~4" "!prnth!\!encapted!_!quan!\FILE"
 
         rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )
@@ -211,173 +231,6 @@ exit /b
 
 
 
-:square_qty
-    call :encaps_pair_qty "[" "]" "%~1" "%~2" "%~3"
-exit /b
-
-:curly_qty
-    call :encaps_pair_qty "{" "}" "%~1" "%~2" "%~3"
-exit /b
-
-
-:parenth_qty
-    call :encaps_pair_qty "(" ")" "%~1" "%~2" "%~3"
-exit /b
-
-
-:encaps_pair_qty
-    rem %~5 = DIR or FILE
-    rem echo five "%~5"
-    rem pause
-    set one=
-    set two=
-    set three=
-    set four=
-    set five=
-    set six=
-    for /f "tokens=1 delims=%~1" %%i in ("%~3") do (
-        set "one=%%i"
-    )
-    for /f "tokens=2 delims=%~1" %%i in ("%~3") do (
-        set "two=%%i"
-    )
-
-    for /f "tokens=3 delims=%~1" %%i in ("%~3") do (
-        set "three=%%i"
-    )
-    for /f "tokens=4 delims=%~1" %%i in ("%~3") do (
-        set "four=%%i"
-    )
-    for /f "tokens=5 delims=%~1" %%i in ("%~3") do (
-        set "five=%%i"
-    )
-    for /f "tokens=6 delims=%~1" %%i in ("%~3") do (
-        set "six=%%i"
-    )
-
-    set /a qty=5
-    if "!six!" equ "" (
-        set /a qty-=1        
-    )
-    if "!five!" equ "" (
-        set /a qty-=1        
-    )
-    if "!four!" equ "" (
-        set /a qty-=1        
-    )
-    if "!three!" equ "" (
-        set /a qty-=1        
-    )
-    if "!two!" equ "" (
-        set /a qty-=1        
-    )
-    if "!one!" equ "" (
-        set /a qty-=1        
-    )
-  
-  
-    set /a file_qty=0
-
-
-    set larg_qty_txt=largest_qty.txt
-
-    if not exist %~5\!larg_qty_txt! (
-        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
-        echo -1 > %~5\!larg_qty_txt!
-    )
-
-    for /f "tokens=*" %%i in (%~5\!larg_qty_txt!) do (
-        set /a file_qty=%%i
-    )
-
-   
-
-    if !qty! gtr !file_qty! (
-   
-        call "funcs_no_make.bat" :file_into_dir "%~5" "!larg_qty_txt!"
-        call "funcs_no_make.bat" :file_into_dir "%~5" "longest_encaps_words.txt"
-        echo !qty! > "%~5\!larg_qty_txt!"
-        echo "%~3" > "%~5\longest_encaps_words.txt"
-        
-    )
-
-    rem parse single () pair
-    rem Parse double () pair
-    rem Parse triple () pair
-    call :parse_multi_encaps "%~1" "%~2" "%~3" "%~4" "%~5" "!qty!"
-exit /b
-
-
-:parse_multi_encaps
-    rem echo parse_multi_encaps 1 "%~1"
-    set one=
-    set two=
-    set three=
-    set words=
-    for /f "tokens=2 delims=%~1" %%i in ("%~3") do (
-        set "one=%%i"
-    )
-    for /f "tokens=3 delims=%~1" %%i in ("%~3") do (
-        set "two=%%i"
-    )
-    for /f "tokens=4 delims=%~1" %%i in ("%~3") do (
-        set "three=%%i"
-    )
-    set "words=!one!!two!!three!"
-
-    for /f "tokens=1 delims=%~2" %%i in ("!words!") do (
-        set "one=%%i"
-    )
-    for /f "tokens=2 delims=%~2" %%i in ("!words!") do (
-        set "two=%%i"
-    )
-    for /f "tokens=3 delims=%~2" %%i in ("!words!") do (
-        set "three=%%i"
-    )
-
-    rem Sometimes appends the file extension to the end of 
-    rem .... the encapsulated words.
-    set "words=!one!!two!!three!"
-   
-    rem %~4 = quan|singl|doubl|tripl
-    set none=
-    set singl=
-    set doubl=
-    set tripl=
-
-    for /f "tokens=2 delims=|" %%i in ("%~4") do (
-        set "none=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("%~4") do (
-        set "singl=%%i"
-    )
-    for /f "tokens=4 delims=|" %%i in ("%~4") do (
-        set "doubl=%%i"
-    )
-    for /f "tokens=5 delims=|" %%i in ("%~4") do (
-        set "tripl=%%i"
-    )
-
-    rem How to show that we parsed the encapsulated words and
-    rem     the original fiile name containing those encapsulated
-    rem     words.
-    rem file name (encapsulated words)_encapsulated words
-    rem echo path file_encapsulated "%~3_!words!" 
-
-    set "path=%~5\!none!"
-    if "%~6" equ "1" (
-        set "path=%~5\!singl!"
-    )
-    if "%~6" equ "2" (
-        set "path=%~5\!doubl!"
-    )
-    if "%~6" equ "3" (
-        set "path=%~5\!tripl!"
-    )
-
-    call "funcs_no_make.bat" :file_into_dir "!path!" "%~3___!words!____%~6"
-
-exit /b
 
 rem                             file_name   bundled-dirs    root
 :parenth_word_qty
@@ -635,7 +488,7 @@ exit /b
         set "two=%%i"
     )
 
-    set is_nested="T"
+    set "is_nested=T"
 
     rem When file name contains no parentheses at all.
     if "!two!" equ "" (
@@ -667,7 +520,9 @@ rem     for EmulationStation:
 
     rem File or directory name
     set "name=%~1"
-    set "is_nested=%~2"
+    set is_nested=%~2
+    echo IS NESTED "!is_nested!" NAME "!name!"
+    pause
 
     rem A file or directory name can have 0 or up to 3
     rem     groups of parenthesized words, where each
@@ -748,17 +603,18 @@ rem     for EmulationStation:
     )
 
     if "!is_nested!" equ "F" (
-        set "three_tail=)!three_tail!"
+        set "three_tail=f)!three_tail!"
+    )
+   
+
+    if "!is_nested!" equ "T" (
+         set "three_tail=!two_tail!"
     )
     
-
     for /f "tokens=2 delims=)" %%i in ("!three_tail!") do (
         set "three=%%i"
     )
 
-    for /f "tokens=1 delims=)" %%i in ("!three_tail!") do (
-        set "three=%%i"
-    )
 
 
     echo "!name!"

@@ -31,7 +31,7 @@ REM STRUCT
 @ rem u_score: Traverse this directory to remove underscores
 @ rem          from directory and file names
 
-@ set "src=..\ARCHV_RECON"
+@ set "src=..\ARCHV_RECON2"
 @ set "u_scor=UNDERSCORES"
 @ set "prnth=PARENTHESES"
 @ set "sqr_brkt=SQUARE_BRACKETS"
@@ -43,7 +43,7 @@ set "zeros=NONES"
 set "singl=SINGLES"
 set "doubl=DOUBLES"
 set "tripl=TRIPLES"
-set "encap=ENCAPSULATED"
+set "encaptor=ENCAPSULATOR"
 set "labl=LABELS"
 set "prelm=PRELIMINARY"
 rem parentheses/quantity
@@ -58,7 +58,7 @@ rem parentheses/quantity
         rem triples
         rem largest_x.txt
 @ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
-set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encap%|%prelm%|%labl%"
+set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"

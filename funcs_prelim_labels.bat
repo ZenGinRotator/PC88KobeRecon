@@ -1,13 +1,15 @@
 setlocal EnableDelayedExpansion
-rem all
-@ rem "path" "title of dir/file"
+
+
+
 :parenths
     set "name=%~2"
     set "list_dirs=%~1"
     @ call :encapsulated_word "(" ")" "%~1" "!name!"
 exit /b
 
-rem all
+
+
 :curly_brackets
     set "list_dirs=%~1"
     set "name=%~2"
@@ -15,14 +17,15 @@ rem all
 exit /b
 
 
-rem all
+
 :sqr_brackets
     set "list_dirs=%~1"
     set "name=%~2"
     @ call :encapsulated_word "[" "]" "%~1" "!name!"
 exit /b
 
-rem all
+
+
 rem Portions of this function intended to parse an encapsulated 
 rem .... word are going to change after we derive method for
 rem ... identifying which file names have the greatest number of
