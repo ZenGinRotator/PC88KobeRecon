@@ -117,7 +117,8 @@ for /d %%i in ("!src!\*") do (
     rem .... within a found set of parentehesis
 
     set "qedd=!quan!\!encapted!\DIR"
-    call "funcs_encapsulated_qty.bat" :parenth_word_qty "%%~nxi" "!secnd_dirs!" "!prnth!\!qedd!"
+    rem call "funcs_encapsulated_qty.bat" :parenth_word_qty "%%~nxi" "!secnd_dirs!" "!prnth!\!qedd!"
+    call "funcs_encapsulated_qty.bat" :sqrd_qty "%%~nxi" "!secnd_dirs!" "!sqr_brkt!\!qedd!"
 
 
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
@@ -161,8 +162,9 @@ for /d %%i in ("!src!\*") do (
         rem call "funcs_encapsulator_qty.bat" :curly "%%~nxj" "!secnd_dirs!" "!cqef!"
         
         rem this parses all words encapsulated by parentheses
-        rem set "qedf=!quan!\!encapted!\FILE"
+        set "qedf=!quan!\!encapted!\FILE"
         rem call "funcs_encapsulated_qty.bat" :parenth_word_qty "%%~nxj" "!secnd_dirs!" "!prnth!\!qedf!"
+        rem call "funcs_encapsulated_qty.bat" :sqrd_qty "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!qedf!"
 
         rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )

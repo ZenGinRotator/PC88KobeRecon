@@ -4,6 +4,13 @@ call %*
 goto :eof
 
 
+:sqrd_qty
+    set "name=%~1"
+    set "sec_dirs=%~2"
+    set "dest_dir=%~3"
+    call :has_nested_encapsulator "[" "]" "%~1" "!sec_dirs!" "!dest_dir!"
+exit /b
+
 
 :parenth_word_qty
     set "name=%~1"
@@ -169,7 +176,28 @@ rem     for EmulationStation:
     rem     of a left-bound delimiting character in the file name.
     if "!one_tail!" equ "!name!" (
         set one_tail=
+        echo stop the function here because there is no need to look for non-existent labels
+        exit /b
     )
+
+
+rem     if "!one_tail!" equ "" (
+rem         echo STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+rem        exit /b
+
+
+
+rem     )
+    rem Use these to count the number of labels within one of
+    rem     the three groups of labels.
+    set /a aqty=0
+    set /a bqty=0
+    set /a cqty=0
+
+    rem TEST TO SEE IF WE CAN EXIT THIS FUNCTION WHEN NO LABLES
+    REM exist the directory and file name
+    rem Then we can write the name to file as described below
+    rem to shorten the scripts running time
 
     rem Finding the first group of labels (encapsulated words)
     rem     in the directory or file name.
@@ -203,6 +231,8 @@ rem     for EmulationStation:
     rem     two_tail, which should be deleted from memory.
     if "!two_tail!" equ "!name!" (
         set two_tail=
+        rem STOP THE FUNCTION HERE
+        exit /b
     )
 
     for /f "tokens=1 delims=%~2" %%i in ("!two_tail!") do (
@@ -446,9 +476,6 @@ rem     for EmulationStation:
 
 
     rem Counting the number of space-delimited labels from each group
-    set /a aqty=0
-    set /a bqty=0
-    set /a cqty=0
 
     if "!a1!" neq "" (
         set /a qty+=1
