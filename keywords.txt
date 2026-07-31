@@ -1,0 +1,109 @@
+
+                                            Quantity of encapsulator E in dir/file name
+    E                  
+                        dir - none              dir - single            dir - double                     file
+parentheses
+
+
+                        file - none             file - single                       file - double                               file - triple
+parentheses                                     (1-disk version)            
+                                                (1990 data)
+                                                (9 user-made levels)               (access to secret areas) (User disk)         (cheats) (ammo cheat) (Program disk)
+                                                (addon scenario vol. 1)                                                             
+                                                (Ao no Sekizou) (Disk 1)            (cheats) (free weapons)                                               (cheats) (free weapons) (Program disk) 
+                                                (base scenario)                                                 
+                                                (Boot disk)                                                 
+                                                (CG loader)
+                                                (Campaign user disk)
+                                                (Character disk)
+                                                (Character disk - Fantasy/Real)
+                                                (cheat disk)
+                                                (Comic Market 39 version)
+                                                (Common disk)
+                                                (Course disk 1)                     (Dai-3-gou) (Disk A)
+                                                (Course Data disk)                                                            
+                                                (demo)                                                            
+                                                (demo version)
+                                                (Demo disk.. ..., 1/A)                         (A Ressha de Ikou) (Disk 1 - System)
+                                                                                                    (Dennou Gakuen) 2 (Disk A)
+                                                
+                                                
+                                                
+                                                (Disk 1 - Demo disk A) * muli-sisk or demo or both?
+
+
+
+
+                                                (Dai-1-shuu)
+                                                (Data Book '89/90)
+                                                (Data disk... ... ..1/A ... 3 - Opening)
+                                                (Data Shuu) *multidisk
+                                                (Disk 1 - Demo disk A)
+                                                (Disk 1/A)                          (2HD version)
+                                                (Disk 1 - Main)                                                
+                                                (Disk 1 - Game... ... ...disk)                                                 
+                                                (Disk 1 - Opening)
+                                                (Disk 2 - Scenario)
+
+                                                (Disk C - Omake)
+                                                (Disk 1 - Program)
+                                                (Disk 2 - Demo)
+                                                (Disk 2 - Game)
+                                                (Disk 2 - Master)
+                                                (Disk 2 - PCM)
+                                                (Disk 2 - Player)
+                                                (Disk 2 - User)
+                                                (Disk 1 - System)
+                                                (Disk 3 - Data)
+                                                (Disk 4 - User)
+                                                
+                                                
+                                                (FD),
+                                                (Game disk)
+                                                (In Summer)
+                                                (Kogado)
+                                                (Main disk)
+                                                (Map Collection)
+                                                (Map disk)
+                                                (Minato disk)
+                                                (Otanoshimi disk)
+                                                (Program disk)
+                                                (Save disk)
+                                                (Scenario disk)
+                                                
+                                                
+                                                (SR)
+                                                (System disk)
+                                                
+                                                
+                                                 
+                                                
+                                                (Umi disk)
+                                                (User disk)
+                                                (Visual disk)
+                                                 (Vol. 1/2/3/4/5)
+                                                
+
+
+
+need to automate alaysis of all keywords as a  single disk or multi-disk rom
+
+multi? has set? has alt?
+y y y
+y y n
+y n y
+y n n 
+n n n 
+n y y
+n y n
+n n y
+
+has same number of sets as alts? y/N
+
+rom R has X number of Sets and Y number of Alts
+    X = Y -> can group sets and alts into different m3u groups ( Set 1,2,3,4 vs Set 1 Alt1, Set2 Alt2, Set3 Alt3, Set4 Alt4)
+    X < Y ->
+    X > Y ->
+
+no set has alt
+no set no alt
