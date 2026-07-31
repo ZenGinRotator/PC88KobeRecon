@@ -19,3 +19,4 @@ exit /b
         @ md "%~1"
     )
 exit /b
+
