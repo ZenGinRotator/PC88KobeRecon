@@ -304,7 +304,7 @@ rem     for EmulationStation:
     rem )
 
     set "path=!dest_dir!"
-    echo path "!path!"
+
 
     rem Counting the number of words withinin each of the 
     rem     "label-only" groups by delimiting each
