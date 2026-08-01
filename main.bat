@@ -65,6 +65,29 @@ set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%|%enc
 set "no_encaps=NO_ENCAPSULATED"
 
 rem TESTING NO TOKENS TO FIND RESULT - RETURN ALL STATEMENT OR NOTHING?
+set "a=hiby"
+set aone=
+set atwo=
+for /f "tokens=1 delims=|" %%i in ("!a!") do (
+    set "aone=%%i"
+)
+for /f "tokens=2 delims=|" %%i in ("!a!") do (
+    set "atwo=%%i"
+)
+set "b=x|y"
+set bone=
+set btwo=
+for /f "tokens=1 delims=|" %%i in ("!b!") do (
+    set "bone=%%i"
+)
+for /f "tokens=2 delims=|" %%i in ("!b!") do (
+    set "btwo=%%i"
+)
+
+echo A "!a!" "!aone!" "!atwo!"
+echo B "!b!" "!bone!" "!btwo!"
+rem pause
+rem exit /b
 
 rem PAUSE
 rem goto :eof

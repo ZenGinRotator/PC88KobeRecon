@@ -169,14 +169,45 @@ rem     for EmulationStation:
     for /f "tokens=2 delims=%~1" %%i in ("!name!") do (
         set "one_tail=%%i"
     )
+    
+    rem Use these to count the number of labels within one of
+    rem     the three groups of labels.
+    set /a aqty=0
+    set /a bqty=0
+    set /a cqty=0
 
+    set first_qty=first_qty.txt
+    set sec_qty=sec_qty.txt
+    set third_qty=third_qty.txt
+
+
+
+
+    rem Write these quantities to a previously created file within a temporary directory
+    set "g_qty_path=!dest_dir!\GROUP_QTYS"
+    echo 3 path = "!g_qty_path!"
+    call "funcs_no_make.bat" :file_into_dir "!g_qty_path!" "!first_qty!"
+  
+    call "funcs_no_make.bat" :file_into_dir "!g_qty_path!" "!sec_qty!"
+    call "funcs_no_make.bat" :file_into_dir "!g_qty_path!" "!third_qty!"
+    echo !aqty! > "!g_qty_path!\!first_qty!"
+    echo !bqty! > "!g_qty_path!\!sec_qty!"
+    echo !cqty! > "!g_qty_path!\!third_qty!"
+    
+    rem del "!dest_dir!\qtys\!first_qty!"
+    
 
     rem Account for a directory or file name
     rem     without encapsulated words because of the absence
     rem     of a left-bound delimiting character in the file name.
-    if "!one_tail!" equ "!name!" (
+    if "!one_tail!" equ "" (
         set one_tail=
-        echo stop the function here because there is no need to look for non-existent labels
+        echo stop "!name!" the function here because there is no need to look for non-existent labels
+        rem read the qty files
+        rem delete the qty files,
+        rem  and write the name, labels, and qtys in the list
+        set "encaps=%~1%~2 %~1%~2 %~1%~2"
+        call :itemize "%~1" "%~2" "!name!" "!encaps!" "!g_qty_path!" "!dest_dir!" "LONG_AND_LARGE"
         exit /b
     )
 
@@ -188,11 +219,24 @@ rem        exit /b
 
 
 rem     )
-    rem Use these to count the number of labels within one of
-    rem     the three groups of labels.
-    set /a aqty=0
-    set /a bqty=0
-    set /a cqty=0
+
+
+rem This needs to be its own function
+rem This function receives, 
+rem     the intended group label (eg: 1, 2, or 3)
+rem     Counts the number of delimited labels using the empty character
+rem     Writes the lables for the intended group to a file
+rem     Writes the number of all lables within this group to a separate file
+
+rem After calling this function for each of the three groups,
+rem     then need to use a different function to read all of these previosuly
+rem     created files to create the file entry for the 
+rem     filename ______ labels for all 3 groups ____ and their respective label quantities
+
+
+
+
+
 
     rem TEST TO SEE IF WE CAN EXIT THIS FUNCTION WHEN NO LABLES
     REM exist the directory and file name
@@ -215,6 +259,9 @@ rem     )
 
 
 
+    rem Write data for the first group only, to file
+    call :save_word_count "%~1" "%~2" "1" "!one!" "!g_qty_path!"
+
 
 
 
@@ -229,9 +276,12 @@ rem     )
     rem     delimiting character is non-existent and we
     rem     we get the entirety of one_tail when determining
     rem     two_tail, which should be deleted from memory.
-    if "!two_tail!" equ "!name!" (
-        set two_tail=
+    if "!two_tail!" equ "" (
+        rem set two_tail=
         rem STOP THE FUNCTION HERE
+        set "encaps=%~1!one!%~2 %~1!two!%~2 %~1!three!%~2"
+        call :itemize "%~1" "%~2" "!name!" "!encaps!" "!g_qty_path!" "!dest_dir!" "LONG_AND_LARGE"
+
         exit /b
     )
 
@@ -249,10 +299,25 @@ rem     )
         set "name=(!name!"
     )
 
+
+    call :save_word_count "%~1" "%~2" "2" "!two!" "!g_qty_path!"
+
+
+
+
+
+
     
     rem                 Group 3
     for /f "tokens=4 delims=%~1" %%i in ("!name!") do (
         set "three_tail=%%i"
+    )
+
+    if "!three_tail!" equ "" (
+        set "encaps=%~1!one!%~2 %~1!two!%~2 %~1!three!%~2"
+        call :itemize "%~1" "%~2" "!name!" "!encaps!" "!g_qty_path!" "!dest_dir!" "LONG_AND_LARGE"
+
+        exit /b
     )
 
     rem Adjust the string to account for directory or
@@ -269,6 +334,20 @@ rem     )
     for /f "tokens=2 delims=%~2" %%i in ("!three_tail!") do (
         set "three=%%i"
     )
+
+
+    call :save_word_count "%~1" "%~2" "3" "!three!" "!g_qty_path!"
+
+
+    set "encaps=%~1!one!%~2 %~1!two!%~2 %~1!three!%~2"
+    call :itemize "%~1" "%~2" "!name!" "!encaps!" "!g_qty_path!" "!dest_dir!" "LONG_AND_LARGE"
+    rem NEED TO EXIT THE FUNCTION 
+
+    exit /b
+
+
+
+
 
 
 
@@ -301,8 +380,7 @@ rem     )
     
 
     
-    rem pause
-    rem exit /b
+ 
     set none=
     set singl=
     set doubl=
@@ -341,17 +419,8 @@ rem     )
     rem     group of encapsulated words by an empty space.
     set /a qty=0
 
-    rem Group 1 labels
-    set a1=
-    set a2=
-    set a3=
-    set a4=
-    set a5=
-    set a6=
-    set a7=
-    set a8=
-    set a9=
-    set a10=
+    
+
 
     rem Group 2 labels
     set b1=
@@ -378,36 +447,7 @@ rem     )
     set c10=
 
     rem Delimt each individual words in the group
-    for /f "tokens=1 delims= " %%i in ("!one!") do (
-        set "a1=%%i"
-    )
-    for /f "tokens=2 delims= " %%i in ("!one!") do (
-        set "a2=%%i"
-    )
-    for /f "tokens=3 delims= " %%i in ("!one!") do (
-        set "a3=%%i"
-    )
-    for /f "tokens=4 delims= " %%i in ("!one!") do (
-        set "a4=%%i"
-    )
-    for /f "tokens=5 delims= " %%i in ("!one!") do (
-        set "a5=%%i"
-    )
-    for /f "tokens=6 delims= " %%i in ("!one!") do (
-        set "a6=%%i"
-    )
-    for /f "tokens=7 delims= " %%i in ("!one!") do (
-        set "a7=%%i"
-    )
-    for /f "tokens=8 delims= " %%i in ("!one!") do (
-        set "a8=%%i"
-    )
-    for /f "tokens=9 delims= " %%i in ("!one!") do (
-        set "a9=%%i"
-    )
-    for /f "tokens=10 delims= " %%i in ("!one!") do (
-        set "a10=%%i"
-    )
+
 
 
 
@@ -475,50 +515,6 @@ rem     )
     )
 
 
-    rem Counting the number of space-delimited labels from each group
-
-    if "!a1!" neq "" (
-        set /a qty+=1
-    )
-    if "!a2!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a3!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a4!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a5!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a6!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a7!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a8!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a9!" neq "" (
-        set /a qty+=1
-        
-    )
-    if "!a10!" neq "" (
-        set /a qty+=1
-        
-    )
-
-    set /a aqty=!qty!
-    set /a qty=0
 
 
     if "!b1!" neq "" (
@@ -611,7 +607,7 @@ rem     )
     set /a cqty=!qty!
 
     rem Encapsulating the number of each words from each group
-    set "qtys= %~1!aqty!%~2 %~1!bqty!%~2 %~1!cqty!%~2"
+    set "qtys=%~1!aqty!%~2 %~1!bqty!%~2 %~1!cqty!%~2"
 
     call "funcs_no_make.bat" :file_into_dir "!path!" "!name!_________!encaps!_____!qtys!"
 
@@ -625,6 +621,151 @@ rem     )
     
 
 exit /b
+
+:save_word_count
+    set "flag=%~3"
+    set "labels=%~4"
+    set "g_qty_path=%~5"
+
+
+    set first_qty=!g_qty_path!\first_qty.txt
+    set sec_qty=!g_qty_path!\sec_qty.txt
+    set third_qty=!g_qty_path!\third_qty.txt
+
+
+    set txt_f=!first_qty!
+    if "!flag!" equ "2" (
+        set txt_f=!sec_qty!
+    )
+    if "!flag!" equ "3" (
+        set txt_f=!third_qty!
+    )
+
+    set /a qty=0
+    set a1=
+    set a2=
+    set a3=
+    set a4=
+    set a5=
+    set a6=
+    set a7=
+    set a8=
+    set a9=
+    set a10=
+
+    for /f "tokens=1 delims= " %%i in ("!labels!") do (
+        set "a1=%%i"
+    )
+    for /f "tokens=2 delims= " %%i in ("!labels!") do (
+        set "a2=%%i"
+    )
+    for /f "tokens=3 delims= " %%i in ("!labels!") do (
+        set "a3=%%i"
+    )
+    for /f "tokens=4 delims= " %%i in ("!labels!") do (
+        set "a4=%%i"
+    )
+    for /f "tokens=5 delims= " %%i in ("!labels!") do (
+        set "a5=%%i"
+    )
+    for /f "tokens=6 delims= " %%i in ("!labels!") do (
+        set "a6=%%i"
+    )
+    for /f "tokens=7 delims= " %%i in ("!labels!") do (
+        set "a7=%%i"
+    )
+    for /f "tokens=8 delims= " %%i in ("!labels!") do (
+        set "a8=%%i"
+    )
+    for /f "tokens=9 delims= " %%i in ("!labels!") do (
+        set "a9=%%i"
+    )
+    for /f "tokens=10 delims= " %%i in ("!labels!") do (
+        set "a10=%%i"
+    )
+
+    
+    rem Counting the number of space-delimited labels from each group
+
+    if "!a1!" neq "" (
+        set /a qty+=1
+    )
+    if "!a2!" neq "" (
+        set /a qty+=1
+    )
+    if "!a3!" neq "" (
+        set /a qty+=1
+    )
+    if "!a4!" neq "" (
+        set /a qty+=1
+    )
+    if "!a5!" neq "" (
+        set /a qty+=1
+    )
+    if "!a6!" neq "" (
+        set /a qty+=1
+    )
+    if "!a7!" neq "" (
+        set /a qty+=1
+    )
+    if "!a8!" neq "" (
+        set /a qty+=1
+    )
+    if "!a9!" neq "" (
+        set /a qty+=1
+    )
+    if "!a10!" neq "" (
+        set /a qty+=1
+    )
+
+    echo !qty! > "!txt_f!"
+exit /b
+
+:itemize
+    set "name=%~3"
+    set "encaps=%~4"
+    set "g_qty_path=%~5"
+    set "dest_dir=%~6"
+    set "ll_dir=%~7"
+
+    set first_qty=!g_qty_path!\first_qty.txt
+    set sec_qty=!g_qty_path!\sec_qty.txt
+    set third_qty=!g_qty_path!\third_qty.txt
+
+    set f_qty=
+    set s_qty=
+    set t_qty=
+    for /f "tokens=*" %%i in (!first_qty!) do (
+        set /a "f_qty=%%i"
+    )
+    for /f "tokens=*" %%i in (!sec_qty!) do (
+        set /a "s_qty=%%i"
+    )
+    for /f "tokens=*" %%i in (!third_qty!) do (
+        set /a "t_qty=%%i"
+    )
+
+    del "!first_qty!"
+    del "!sec_qty!"
+    del "!third_qty!"
+
+    set "ll_dir=!dest_dir!\!ll_dir!"
+    
+
+    set "qtys=%~1!f_qty!%~2 %~1!s_qty!%~2 %~1!t_qty!%~2"
+    call :largest_into_dir "1" "!ll_dir!" "!f_qty!" "!name!"
+    call :largest_into_dir "2" "!ll_dir!" "!s_qty!" "!name!"
+    call :largest_into_dir "3" "!ll_dir!" "!t_qty!" "!name!"
+
+    
+    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!name!_____!encaps!_____!qtys!"
+
+exit /b
+
+
+
+
+
 
 
 
