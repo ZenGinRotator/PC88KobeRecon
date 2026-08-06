@@ -4,6 +4,16 @@ call %*
 
 goto :eof
 
+rem largest values -> max # of encapsulators, 3
+rem {}: dir -> 0
+rem {}: file -> 0
+
+rem []}: dir -> 0
+rem []]: file -> 2
+
+rem (): dir -> 2
+rem (): file -> 3
+
 
 
 

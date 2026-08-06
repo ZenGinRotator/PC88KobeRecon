@@ -23,6 +23,7 @@ set "secnd_dirs=%~2"
 @ set compl=
 set encaptor=
 set encapted=
+set akeywd=
 
 for /f "tokens=1 delims=|" %%i in ("!prim_dirs!") do (
     @ set "src=%%i"
@@ -68,6 +69,10 @@ for /f "tokens=9 delims=|" %%i in ("!secnd_dirs!") do (
     set "encapted=%%i"
 )
 
+for /f "tokens=10 delims=|" %%i in ("!secnd_dirs!") do (
+    set "akeywd=%%i"
+)
+
 set "prelim_label=!prelim!_!label!"
 
 
@@ -102,6 +107,8 @@ for /d %%i in ("!src!\*") do (
     set "sqed=!sqr_brkt!\!qed!"
     set "cqed=!curl_brkt!\!qed!"
 
+
+
     rem echo "!pqed!"
     rem echo "!sqed!"
     rem echo "!cqed!"
@@ -118,8 +125,13 @@ for /d %%i in ("!src!\*") do (
 
     set "qedd=!quan!\!encapted!\DIR"
     rem call "funcs_encapsulated_qty.bat" :parenth_word_qty "%%~nxi" "!secnd_dirs!" "!prnth!\!qedd!"
-    call "funcs_encapsulated_qty.bat" :sqrd_qty "%%~nxi" "!secnd_dirs!" "!sqr_brkt!\!qedd!"
+    rem call "funcs_encapsulated_qty.bat" :sqrd_qty "%%~nxi" "!secnd_dirs!" "!sqr_brkt!\!qedd!"
+    rem call "funcs_encapsulated_qty.bat" :curl_qty "%%~nxi" "!secnd_dirs!" "!curl_brkt!\!qedd!"
 
+    rem KEYWORDS
+    set "akd=!akeywd!\DIR"
+    rem call "funcs_all_keywords.bat" :parenths "%%~nxi" "!secnd_dirs!" "!prnth!\!akd!"
+    rem call "funcs_all_keywords.bat" :curl "%%~nxi" "!secnd_dirs!" "!sqr_brkt!\!akd!"
 
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
     rem echo " --- %%~nxi ---"
@@ -165,6 +177,14 @@ for /d %%i in ("!src!\*") do (
         set "qedf=!quan!\!encapted!\FILE"
         rem call "funcs_encapsulated_qty.bat" :parenth_word_qty "%%~nxj" "!secnd_dirs!" "!prnth!\!qedf!"
         rem call "funcs_encapsulated_qty.bat" :sqrd_qty "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!qedf!"
+        rem call "funcs_encapsulated_qty.bat" :curl_qty "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!qedf!"
+
+
+        rem KEYWORDS....
+        set "akf=!akeywd!\FILE"
+        rem call "funcs_all_keywords.bat" :parenths "%%~nxj" "!secnd_dirs!" "!prnth!\!akf!"
+        rem call "funcs_all_keywords.bat" :sqr "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!akf!"
+        call "funcs_all_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!akf!"
 
         rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )

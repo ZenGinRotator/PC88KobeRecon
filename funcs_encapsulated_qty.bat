@@ -3,6 +3,22 @@ call %*
 
 goto :eof
 
+rem largest values: max. # of encapsulated in each group -> 10
+rem {}: dir -> 0, 0, 0
+rem {}: file -> 8, 0, 0
+
+rem []: dir -> 0, 0, 0
+rem []: file -> 2, 3, 1
+
+rem (): dir -> 8, 5, 0
+rem (): file -> 7, 5, 2
+
+:curl_qty
+    set "name=%~1"
+    set "sec_dirs=%~2"
+    set "dest_dir=%~3"
+    call :has_nested_encapsulator "{" "}" "%~1" "!sec_dirs!" "!dest_dir!"
+exit /b
 
 :sqrd_qty
     set "name=%~1"
@@ -17,7 +33,6 @@ exit /b
     set "sec_dirs=%~2"
     set "dest_dir=%~3"
     call :has_nested_encapsulator "(" ")" "%~1" "!sec_dirs!" "!dest_dir!"
-    
 exit /b
 
 rem Function to determine whether the directory or file name contains
@@ -183,9 +198,11 @@ rem     for EmulationStation:
 
 
 
-    rem Write these quantities to a previously created file within a temporary directory
+    rem Write these quantities to a previously created file within a temporary directory,
+    rem     for any directory or file name that has nested lables (ie. nested delimiting characters)
+    rem     or does not have nested labels.
     set "g_qty_path=!dest_dir!\GROUP_QTYS"
-    echo 3 path = "!g_qty_path!"
+    
     call "funcs_no_make.bat" :file_into_dir "!g_qty_path!" "!first_qty!"
   
     call "funcs_no_make.bat" :file_into_dir "!g_qty_path!" "!sec_qty!"
@@ -200,9 +217,11 @@ rem     for EmulationStation:
     rem Account for a directory or file name
     rem     without encapsulated words because of the absence
     rem     of a left-bound delimiting character in the file name.
+    rem We can end this function because the directory or file name
+    rem     does not contain any labels.
     if "!one_tail!" equ "" (
         set one_tail=
-        echo stop "!name!" the function here because there is no need to look for non-existent labels
+        rem echo stop "!name!" the function here because there is no need to look for non-existent labels
         rem read the qty files
         rem delete the qty files,
         rem  and write the name, labels, and qtys in the list
@@ -212,13 +231,6 @@ rem     for EmulationStation:
     )
 
 
-rem     if "!one_tail!" equ "" (
-rem         echo STOPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
-rem        exit /b
-
-
-
-rem     )
 
 
 rem This needs to be its own function
@@ -272,10 +284,14 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
         set "two_tail=%%i"
     )
 
-    rem Account for circumstances where the previous 
-    rem     delimiting character is non-existent and we
-    rem     we get the entirety of one_tail when determining
-    rem     two_tail, which should be deleted from memory.
+    rem Account for circumstances where the file or directory
+    rem     name only has 1 group of lables.
+    rem If so, then read the label quantities for the 
+    rem     first group (0 to n lables)
+    rem     second group (always 0)
+    rem     and the third group (always 0).
+    
+    rem Then terminate the function.
     if "!two_tail!" equ "" (
         rem set two_tail=
         rem STOP THE FUNCTION HERE
@@ -292,14 +308,13 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
     rem Account for a directory or file name that contains 
     rem     nested lables or non-nested lables, and change the name
     rem     so we can retrieve the third group of lables using
-    rem     the same delimiting character and numerical value
-    rem     for associated with the partition found by the 
-    rem     delimiting character.
+    rem     the same delimiting character and token value
+    rem     for the intended partition of the string.
     if "!is_nested!" equ "T" (
         set "name=(!name!"
     )
 
-
+    rem Saving for Group 2
     call :save_word_count "%~1" "%~2" "2" "!two!" "!g_qty_path!"
 
 
@@ -321,7 +336,10 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
     )
 
     rem Adjust the string to account for directory or
-    rem     file names with or without nested lables.
+    rem     file names with or without nested lables,
+    rem     both of which are unchanged, would require using differnet
+    rem     token numbers to partition three_tail with the same 
+    rem     delimiting character.
     if "!is_nested!" equ "F" (
         set "three_tail=X)!three_tail!"
     )
@@ -617,9 +635,6 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
     call :largest_into_dir "1" "!path!\long" "!aqty!" "!name!"
     call :largest_into_dir "2" "!path!" "!bqty!" "!name!"
     call :largest_into_dir "3" "!path!" "!cqty!" "!name!"
-
-    
-
 exit /b
 
 :save_word_count
