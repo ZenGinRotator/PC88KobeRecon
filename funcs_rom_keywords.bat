@@ -1,5 +1,14 @@
 setlocal EnableDelayedExpansion
 
+set hep=has_encaps_pnth.txt
+set hec=has_encaps_curl.txt
+set hes=has_encaps_sqr.txt
+
+set inp=is_nested_pnth.txt
+set inc=is_nested_curl.txt
+set ins=is_nested_sqr.txt
+
+
 call %*
 
 goto :eof
@@ -16,18 +25,419 @@ rem 3. extract keywords from Groups 1, 2, 3, using the non-nested status of the
 rem     directory or file name
 rem 4. sort directory or file names by Groups 1, 2, 3, or none (when there are no groups in the name)
 
+rem need d88 t88 or .cmt file extensions only -- use counter > 0 accept, equ 0 -> reject
+
+
+rem determine whether file is .d88, .cmt, or .t88
+:find_rom
+
+    call :del_all
+    set "name=%~1"
+    set "prim_dirs=%~2"
+    set "sec_dirs=%~3"
+    rem set "dest_dir=%~3"
+    set "ext=%~4"
+    set /a ct=0
+
+    set f=disk_ext_qty.txt
+  
+    call :disk_count_ "!ext!" "!f!"
+  
+    for /f "tokens=*" %%i in (!f!) do (
+        set /a "ct=%%i"
+    )
+    echo  ------------------- NAME "!name!" CT "!ct!" --------------------
+    del "!f!"
+  
+    if !ct! equ 0 (
+        exit /b
+    )
+
+    call :name_ "!name!"
+    rem pause
+    
+    
+exit /b
+
+
+:del_all
+    call :del_indiv "%hep%"
+    call :del_indiv "%hec%"
+    call :del_indiv "%hes%"
+    call :del_indiv "%inp%"
+    call :del_indiv "%inc%"
+    call :del_indiv "%ins%"
+exit /b
+
+:del_indiv
+    set "file=%~1"
+    if exist "!file!" (
+        del "!file!"
+    )
+exit /b
+
+rem determine whether file and directory name has (), {}, [], or does not have encapsulator
+
+
+:name_
+    set "name=%~1"
+
+    rem use to identify whether we need to skip file or directory name when
+    rem     the name has no encapsulators
+
+
+    rem nested flag
+    call :delim_into_file "(" ")" "!name!" "%hep%" "%inp%"
+    call :delim_into_file "{" "}" "!name!" "%hec%" "%inc%"
+    call :delim_into_file "[" "]" "!name!" "%hes%" "%ins%"
+
+    set ptail=
+    set ctail=
+    set stail=
+
+    for /f "tokens=*" %%i in (%hep%) do (
+        set "ptail=%%i"
+    )
+    for /f "tokens=*" %%i in (%hec%) do (
+        set "ctail=%%i"
+    )
+    for /f "tokens=*" %%i in (%hes%) do (
+        set "stail=%%i"
+    )
+    rem blank = ECHO is off.
+    set "blnk=ECHO is off."
+    echo start "!name!"
+    echo parnet "!ptail!"
+    echo curly "!ctail!"
+    echo square "!stail!"
+
+    del "%hep%"
+    del "%hec%"
+    del "%hes%"
+
+    set /a qty=0
+    if "!ptail!" equ "!blnk!" (
+        set /a qty+=1
+    )
+    if "!ctail!" equ "!blnk!" (
+        set /a qty+=1
+    )
+    if "!stail!" equ "!blnk!" (
+        set /a qty+=1
+    )
+    if !qty! equ 3 (
+        echo NO ENCAPSULATORS
+        exit /b
+    )
+
+
+    pause
+    if "!ptail!" neq "!blnk!" (
+        call :delim_it "!name!" "(" ")"
+    )
+
+    if "!ctail!" neq "!blnk!" (
+        call :delim_it "!name!" "{" "}"
+    )
+
+    if "!stail!" neq "!blnk!" (
+        call :delim_it "!name!" "[" "]"
+    )
+
+    
+    rem pause
+exit /b
+
+
+
+
+:delim_it
+rem echo DELIM NAME "!name!" "%~2" "%~3"
+    set "name=%~1"
+    rem 2 = left bound encapsulator
+    rem 3 = right bound encapsulator
+
+
+
+    REM set inp=is_nested_pnth.txt
+    REM set inc=is_nested_curl.txt
+    REM set ins=is_nested_sqr.txt
+
+    set nested=%inp%
+
+    if "%~2" equ "{" (
+        set nested=%inc%
+    )
+    if "%~2" equ "[" (
+        set nested=%ins%
+    )
+
+    set is_nested=
+    for /f "tokens=*" %%i in (!nested!) do (
+        set "is_nested=%%i"
+    )
+
+
+    rem removing the appended space character after reading is_nested from file
+    for /f "tokens=1 delims= " %%i in ("!is_nested!") do (
+        set "is_nested=%%i"
+    )
+    
+    del "!nested!"
+
+    set one=
+    set two=
+    set three=
+    set one_tail=
+    set two_tail=
+    set three_tail=
+
+    
+    rem 1-A
+    for /f "tokens=2 delims=%~2" %%i in ("!name!") do (
+        set "one_tail=%%i"
+    )
+    rem 1-B
+    for /f "tokens=1 delims=%~3" %%i in ("!one_tail!") do (
+        set "one=%%i"
+    )
+    rem 1-C
+    for /f "tokens=1 delims=%~2" %%i in ("!one!") do (
+        set "one=%%i"
+    )
+
+
+    rem 2-A
+    for /f "tokens=3 delims=%~2" %%i in ("!name!") do (
+        set "two_tail=%%i"
+    )
+        rem 2-B
+    for /f "tokens=1 delims=%~3" %%i in ("!two_tail!") do (
+        set "two=%%i"
+    )
+
+
+
+
+
+    if "!is_nested!" equ "T" (
+        set "name=(!name!"
+    )
+
+
+
+
+    rem 3-A
+    for /f "tokens=4 delims=%~2" %%i in ("!name!") do (
+        set "three_tail=%%i"
+    )
+    rem 3-B
+    if "!is_nested!" equ "F" (
+        set "three_tail=X)!three_tail!"
+    )
+    rem 3-C
+    if "!is_nested!" equ "T" (
+        set "three_tail=!two_tail!"
+    )
+
+
+
+
+
+
+    rem 3-D
+    for /f "tokens=2 delims=%~3" %%i in ("!three_tail!") do (
+        set "three=%%i"
+    )
+
+    rem Removing unwanted spaces from blank keywords
+    set "sp_three= !three!"
+    set "sp_two= !two!"
+    if "!sp_three!" equ " " (
+        set sp_three=
+    )
+
+    if "!sp_two!" equ " " (
+        set sp_two=
+    )
+
+    rem Need to fix nested
+    rem (x (y) z) outputs x  y  z and not x y z
+    rem need to remove the spaces when we do the 
+    rem     search through all words in x, y, and z
+
+    set "c=!one!!sp_two!!sp_three!"
+     echo is nested "!is_nested!" 
+    echo c "%~2 %~3" "!c!"
+    rem pause
+
+exit /b
+
+rem Delimit file or directory name with {, [, or (
+rem if not delimited, skip the file or directory name
+rem otherwise save group 1, 2, and possibly 3 in the directory or file name
+:delim_into_file
+    rem 1: left bound char
+    rem 2: token
+    rem 3: name
+    set "name=%~3"
+    set "has_encaps_file=%~4"
+    set "is_nested_file=%~5"
+    set one_tail=
+
+    rem determine if we have an encapsulator in the name or just skip it 
+    for /f "tokens=2 delims=%~1" %%i in ("!name!") do (
+        rem echo "%%i"
+        set "one_tail=%%i"
+    )
+    echo FIRST ONE TAIL "!one_tail!"
+    echo !one_tail! > "!has_encaps_file!"
+    
+    
+    
+    rem stop this iteration
+    if "!one_tail!" equ "" (
+        echo EXITED
+        REM exit /b
+        goto :eof
+    )
+    
+    echo !one_tail! > "!has_encaps_file!"
+
+
+    if "!one_tail!" equ "!name!" (
+        set one_tail=
+    )
+
+
+    set test=
+    for /f "tokens=1 delims=%~2" %%i in ("!one_tail!") do (
+        set "test=%%i"
+    )
+
+    echo TEST "!test!" FROM ONE TAIL "!one_tail!"
+
+    set "is_nested=T"
+
+
+    rem I think this was a remant of an original test
+    rem     to identify name that has no encapsulators
+    rem if "!test!" equ "" (
+    rem     set "is_nested=F"
+    rem )
+
+    if "!test!" neq "!one_tail!" (
+        set "is_nested=F"
+    )
+
+    
+    echo !is_nested! > "!is_nested_file!"
+exit /b
+
+rem determine whether file is
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rem we CAN DELETE ALL OF THE CODE BELOW
+
 :curl
     set "name=%~1"
     set "sec_dirs=%~2"
     set "dest_dir=%~3"
+    set "ext=%~4"
+    set /a ct=0
+
+    rem echo "!name!"
+    set f=accepted_disk_ext_qty.txt
+    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!f!"
+    call :disk_count "!ext!" "!dest_dir!" "!f!"
+
+
+    for /f "tokens=*" %%i in (!dest_dir!\!f!) do (
+        set /a "ct=%%i"
+    )
+  
+    if !ct! equ 0 (
+        rem echo ZERO
+        exit /b
+    )
+
     call :kywd "{" "}" "%~1" "!sec_dirs!" "!dest_dir!"
 
 exit /b
+
 
 :sqr
     set "name=%~1"
     set "sec_dirs=%~2"
     set "dest_dir=%~3"
+    set /a ct=0
+
+    rem echo "!name!"
+    set f=accepted_disk_ext_qty.txt
+    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!f!"
+    call :disk_count "!ext!" "!dest_dir!" "!f!"
+
+
+    for /f "tokens=*" %%i in (!dest_dir!\!f!) do (
+        set /a "ct=%%i"
+    )
+    del "!dest_dir!\!f!"
+    rem echo ct "!ct!"
+    rem pause
+    rem exit /b
+  
+    if !ct! equ 0 (
+        exit /b
+    )
     call :kywd "[" "]" "%~1" "!sec_dirs!" "!dest_dir!"
 
 exit /b
@@ -36,9 +446,71 @@ exit /b
     set "name=%~1"
     set "sec_dirs=%~2"
     set "dest_dir=%~3"
+
+    set /a ct=0
+
+    rem echo "!name!"
+    set f=accepted_disk_ext_qty.txt
+    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!f!"
+    call :disk_count "!ext!" "!dest_dir!" "!f!"
+
+
+    for /f "tokens=*" %%i in (!dest_dir!\!f!) do (
+        set /a "ct=%%i"
+    )
+    del "!dest_dir!\!f!"
+    rem echo ct "!ct!"
+    rem pause
+    rem exit /b
+  
+    if !ct! equ 0 (
+        exit /b
+    )
     call :kywd "(" ")" "%~1" "!sec_dirs!" "!dest_dir!"
 
 exit /b
+
+
+
+
+:disk_count
+    set "ext=%~1"
+    set "dest_dir=%~2"
+    set "file=%~3"
+    set /a ct=0
+
+    if "!ext!" equ ".d88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".t88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".cmt" (
+        set /a ct+=1
+    )
+
+    echo !ct! > "!dest_dir!\!file!"
+exit /b
+
+:disk_count_
+    set "ext=%~1"
+    rem set "dest_dir=%~2"
+    set "file=%~2"
+    set /a ct=0
+
+    if "!ext!" equ ".d88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".t88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".cmt" (
+        set /a ct+=1
+    )
+
+    echo !ct! > "!file!"
+exit /b
+
 
 :kywd
     set "name=%~3"
@@ -156,7 +628,6 @@ exit /b
     rem Collecting Labels from Group 1 and possibly 
     rem     non-lables appearing before the next group of
     rem     encapsulated labels.
-    rem 1-A
     for /f "tokens=2 delims=%~1" %%i in ("!name!") do (
         set "one_tail=%%i"
     )
@@ -211,7 +682,6 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
 
     rem Finding the first group of labels (encapsulated words)
     rem     in the directory or file name.
-    rem 1-B
     for /f "tokens=1 delims=%~2" %%i in ("!one_tail!") do (
         set "one=%%i"
     )
@@ -220,7 +690,6 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
     rem To account if the first group of encapsulated words 
     rem     is an example of a set of nested encapsulators
     rem     (eg. "this is a file (with (a nested) label).txt")
-    rem 1-C
     for /f "tokens=1 delims=%~1" %%i in ("!one!") do (
         set "one=%%i"
     )
@@ -236,7 +705,6 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
 
 
     rem          Find Group 2
-    rem 2-A
     for /f "tokens=3 delims=%~1" %%i in ("!name!") do (
         set "two_tail=%%i"
     )
@@ -262,7 +730,7 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
 
         exit /b
     )
-    rem 2-B
+
     for /f "tokens=1 delims=%~2" %%i in ("!two_tail!") do (
         set "two=%%i"
     )
@@ -286,7 +754,6 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
 
     
     rem                 Group 3
-    rem 3-A
     for /f "tokens=4 delims=%~1" %%i in ("!name!") do (
         set "three_tail=%%i"
     )
@@ -305,16 +772,15 @@ rem     filename ______ labels for all 3 groups ____ and their respective label 
     rem     both of which are unchanged, would require using differnet
     rem     token numbers to partition three_tail with the same 
     rem     delimiting character.
-    rem 3-B
     if "!is_nested!" equ "F" (
         set "three_tail=X)!three_tail!"
     )
    
-    rem 3-C
+
     if "!is_nested!" equ "T" (
          set "three_tail=!two_tail!"
     )
-    rem 3-D
+    
     for /f "tokens=2 delims=%~2" %%i in ("!three_tail!") do (
         set "three=%%i"
     )

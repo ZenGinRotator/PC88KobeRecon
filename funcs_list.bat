@@ -24,6 +24,7 @@ set "secnd_dirs=%~2"
 set encaptor=
 set encapted=
 set akeywd=
+set rkeywd=
 
 for /f "tokens=1 delims=|" %%i in ("!prim_dirs!") do (
     @ set "src=%%i"
@@ -71,6 +72,9 @@ for /f "tokens=9 delims=|" %%i in ("!secnd_dirs!") do (
 
 for /f "tokens=10 delims=|" %%i in ("!secnd_dirs!") do (
     set "akeywd=%%i"
+)
+for /f "tokens=11 delims=|" %%i in ("!secnd_dirs!") do (
+    set "rkeywd=%%i"
 )
 
 set "prelim_label=!prelim!_!label!"
@@ -133,6 +137,8 @@ for /d %%i in ("!src!\*") do (
     rem call "funcs_all_keywords.bat" :parenths "%%~nxi" "!secnd_dirs!" "!prnth!\!akd!"
     rem call "funcs_all_keywords.bat" :curl "%%~nxi" "!secnd_dirs!" "!sqr_brkt!\!akd!"
 
+    set "rkd=!rkeywd!\DIR"
+
     rem call :no_encaps_test "%~3\DIR" "%%~nxi"
     rem echo " --- %%~nxi ---"
     
@@ -184,13 +190,23 @@ for /d %%i in ("!src!\*") do (
         set "akf=!akeywd!\FILE"
         rem call "funcs_all_keywords.bat" :parenths "%%~nxj" "!secnd_dirs!" "!prnth!\!akf!"
         rem call "funcs_all_keywords.bat" :sqr "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!akf!"
-        call "funcs_all_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!akf!"
+        rem call "funcs_all_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!akf!"
+
+        set "rkf=!rkeywd!\FILE"
+        rem call "funcs_rom_keywords.bat" :parenths "%%~nxj" "!secnd_dirs!" "!prnth!\!rkf!" "%%~xj"
+        rem call "funcs_rom_keywords.bat" :sqr "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!rkf!" "%%~xj"
+        rem call "funcs_rom_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!rkf!" "%%~xj"
+        
+        call "funcs_rom_keywords.bat" :find_rom "%%~nxj" "!prim_dirs!" "!secnd_dirs!" "%%~xj"
+        echo PAUSE AT LIST
+        pause
 
         rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )
 
 )
-
+echo DONE
+PAUSE
 @ rem %~2 = LIST_MADE
 rem  echo > "%~2"
 exit /b
