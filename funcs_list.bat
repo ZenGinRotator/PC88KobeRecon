@@ -198,8 +198,8 @@ for /d %%i in ("!src!\*") do (
         rem call "funcs_rom_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!rkf!" "%%~xj"
         
         call "funcs_rom_keywords.bat" :find_rom "%%~nxj" "!prim_dirs!" "!secnd_dirs!" "%%~xj"
-        echo PAUSE AT LIST
-        pause
+        rem echo PAUSE AT LIST
+        rem pause
 
         rem call :no_encaps_test "%~3\FILE" "%%~nxj"
     )

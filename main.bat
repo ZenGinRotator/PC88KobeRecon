@@ -31,7 +31,7 @@ REM GROUPER/OBJECT/KEYWORDS/
 @ rem u_score: Traverse this directory to remove underscores
 @ rem          from directory and file names
 
-@ set "src=..\ARCHV_RECON2"
+@ set "src=..\ARCHV_RECON"
 @ set "u_scor=UNDERSCORES"
 @ set "prnth=PARENTHESES"
 @ set "sqr_brkt=SQUARE_BRACKETS"

@@ -46,14 +46,14 @@ rem determine whether file is .d88, .cmt, or .t88
     for /f "tokens=*" %%i in (!f!) do (
         set /a "ct=%%i"
     )
-    echo  ------------------- NAME "!name!" CT "!ct!" --------------------
+    echo  NAME "!name!" CT "!ct!" --------------------
     del "!f!"
   
     if !ct! equ 0 (
         exit /b
     )
 
-    call :name_ "!name!"
+    call :name_ "!name!" "!prim_dirs!" "!sec_dirs!"
     rem pause
     
     
@@ -81,6 +81,29 @@ rem determine whether file and directory name has (), {}, [], or does not have e
 
 :name_
     set "name=%~1"
+    set "prim_dirs=%~2"
+    set "sec_dirs=%~3"
+
+    set prnth=
+    set sqr_brkt=
+    set curl_brkt=
+    set rkeywd=
+    for /f "tokens=3 delims=|" %%i in ("!prim_dirs!") do (
+        set "prnth=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!prim_dirs!") do (
+        set "sqr_brkt=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!prim_dirs!") do (
+        set "curl_brkt=%%i"
+    )
+
+
+    for /f "tokens=11 delims=|" %%i in ("!sec_dirs!") do (
+        set "rkeywd=%%i"
+    )
+
+    
 
     rem use to identify whether we need to skip file or directory name when
     rem     the name has no encapsulators
@@ -106,10 +129,10 @@ rem determine whether file and directory name has (), {}, [], or does not have e
     )
     rem blank = ECHO is off.
     set "blnk=ECHO is off."
-    echo start "!name!"
-    echo parnet "!ptail!"
-    echo curly "!ctail!"
-    echo square "!stail!"
+    rem echo start "!name!"
+    rem echo parnet "!ptail!"
+    rem echo curly "!ctail!"
+    rem echo square "!stail!"
 
     del "%hep%"
     del "%hec%"
@@ -126,22 +149,22 @@ rem determine whether file and directory name has (), {}, [], or does not have e
         set /a qty+=1
     )
     if !qty! equ 3 (
-        echo NO ENCAPSULATORS
+        rem echo NO ENCAPSULATORS
         exit /b
     )
 
 
-    pause
+    rem pause
     if "!ptail!" neq "!blnk!" (
-        call :delim_it "!name!" "(" ")"
+        call :delim_it "!name!" "(" ")" "!prnth!\!rkeywd!"
     )
 
     if "!ctail!" neq "!blnk!" (
-        call :delim_it "!name!" "{" "}"
+        call :delim_it "!name!" "{" "}" "!curl_brkt!\!rkeywd!"
     )
 
     if "!stail!" neq "!blnk!" (
-        call :delim_it "!name!" "[" "]"
+        call :delim_it "!name!" "[" "]" "!sqr_brkt!\!rkeywd!"
     )
 
     
@@ -157,11 +180,13 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     rem 2 = left bound encapsulator
     rem 3 = right bound encapsulator
 
+    set "dest_dir=%~4"
+    rem echo DEST DIR "!dest_dir!"
+    rem pause
 
 
-    REM set inp=is_nested_pnth.txt
-    REM set inc=is_nested_curl.txt
-    REM set ins=is_nested_sqr.txt
+
+
 
     set nested=%inp%
 
@@ -192,6 +217,8 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     set two_tail=
     set three_tail=
 
+
+    rem Guaranteed to have at least 1 group of labels
     
     rem 1-A
     for /f "tokens=2 delims=%~2" %%i in ("!name!") do (
@@ -206,6 +233,9 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set "one=%%i"
     )
 
+    rem echo ONE "!one!"
+    call :save_group "!dest_dir!" "!one!"
+
 
     rem 2-A
     for /f "tokens=3 delims=%~2" %%i in ("!name!") do (
@@ -216,8 +246,19 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set "two=%%i"
     )
 
+    rem echo TWO TAIL "!two_tail!"
+    rem echo TWO "!two!"
+    
+    rem If two tail is empty, 
+    rem save group 1,
+    rem return
 
-
+    if "!two!" equ "" (
+        exit /b
+    )
+     
+    call :save_group "!dest_dir!" "!two!"
+    
 
 
     if "!is_nested!" equ "T" (
@@ -231,6 +272,7 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     for /f "tokens=4 delims=%~2" %%i in ("!name!") do (
         set "three_tail=%%i"
     )
+
     rem 3-B
     if "!is_nested!" equ "F" (
         set "three_tail=X)!three_tail!"
@@ -240,16 +282,28 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set "three_tail=!two_tail!"
     )
 
-
-
-
-
-
     rem 3-D
     for /f "tokens=2 delims=%~3" %%i in ("!three_tail!") do (
         set "three=%%i"
     )
 
+
+
+rem echo THREE TAIL "!three_tail!"
+    rem echo THREE "!three!"
+    rem If three tail is empty,
+    rem     save group 2
+    rem     return 
+
+    if "!three!" equ "" (
+        exit /b
+    )
+
+    call :save_group "!dest_dir!" "!three!"
+
+
+    rem Might not need if collecting file names and sorting those names by 
+    rem     indvidual groups 1, 2, or 3
     rem Removing unwanted spaces from blank keywords
     set "sp_three= !three!"
     set "sp_two= !two!"
@@ -261,21 +315,38 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set sp_two=
     )
 
-    rem Need to fix nested
+    rem Need to fix nested?
     rem (x (y) z) outputs x  y  z and not x y z
     rem need to remove the spaces when we do the 
     rem     search through all words in x, y, and z
 
-    set "c=!one!!sp_two!!sp_three!"
-     echo is nested "!is_nested!" 
-    echo c "%~2 %~3" "!c!"
-    rem pause
+    rem set "c=!one!!sp_two!!sp_three!"
+rem      echo is nested "!is_nested!" 
+    rem echo c "%~2 %~3" "!c!"
+    rem set "d=!one! !two! !three!"
+    rem echo d "!d!"
+    rem echo e "!one!" - "!sp_two!" - "!sp_three!"
+
+    rem Use one two three as indicated in echo f below
+    rem echo f "!one!" - "!two!" - "!three!"
+
+    rem Call :save_group on one, two, and three,
+    rem    
+rem pause
 
 exit /b
 
 rem Delimit file or directory name with {, [, or (
 rem if not delimited, skip the file or directory name
 rem otherwise save group 1, 2, and possibly 3 in the directory or file name
+
+rem ROM_KEYWORDS
+REM /INDIV_GROUP
+REM /All_GROUP
+rem Save by individual group (list of names and categorized names containing files)
+rem save by all groups combined together
+
+rem Need to find music in name title that is non-encapsulated
 :delim_into_file
     rem 1: left bound char
     rem 2: token
@@ -290,19 +361,19 @@ rem otherwise save group 1, 2, and possibly 3 in the directory or file name
         rem echo "%%i"
         set "one_tail=%%i"
     )
-    echo FIRST ONE TAIL "!one_tail!"
+    rem echo FIRST ONE TAIL "!one_tail!"
     echo !one_tail! > "!has_encaps_file!"
     
     
     
     rem stop this iteration
     if "!one_tail!" equ "" (
-        echo EXITED
-        REM exit /b
-        goto :eof
+        rem echo EXITED
+        exit /b
+        rem goto :eof
     )
     
-    echo !one_tail! > "!has_encaps_file!"
+    rem echo !one_tail! > "!has_encaps_file!"
 
 
     if "!one_tail!" equ "!name!" (
@@ -315,7 +386,7 @@ rem otherwise save group 1, 2, and possibly 3 in the directory or file name
         set "test=%%i"
     )
 
-    echo TEST "!test!" FROM ONE TAIL "!one_tail!"
+    rem echo TEST "!test!" FROM ONE TAIL "!one_tail!"
 
     set "is_nested=T"
 
@@ -334,9 +405,87 @@ rem otherwise save group 1, 2, and possibly 3 in the directory or file name
     echo !is_nested! > "!is_nested_file!"
 exit /b
 
+
+:disk_count_
+    set "ext=%~1"
+    rem set "dest_dir=%~2"
+    set "file=%~2"
+    set /a ct=0
+
+    if "!ext!" equ ".d88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".t88" (
+        set /a ct+=1
+    )
+    if "!ext!" equ ".cmt" (
+        set /a ct+=1
+    )
+
+    echo !ct! > "!file!"
+exit /b
+
 rem determine whether file is
 
+:save_group
+    set "dest_dir=%~1"
+    set "group=%~2"
+    
+    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!group!"
+exit /b
 
+
+
+:target_in_group
+    set "group=%~1"
+
+
+    set /a qty=0
+    set a1=
+    set a2=
+    set a3=
+    set a4=
+    set a5=
+    set a6=
+    set a7=
+    set a8=
+    set a9=
+    set a10=
+
+    for /f "tokens=1 delims= " %%i in ("!labels!") do (
+        set "a1=%%i"
+    )
+    for /f "tokens=2 delims= " %%i in ("!labels!") do (
+        set "a2=%%i"
+    )
+    for /f "tokens=3 delims= " %%i in ("!labels!") do (
+        set "a3=%%i"
+    )
+    for /f "tokens=4 delims= " %%i in ("!labels!") do (
+        set "a4=%%i"
+    )
+    for /f "tokens=5 delims= " %%i in ("!labels!") do (
+        set "a5=%%i"
+    )
+    for /f "tokens=6 delims= " %%i in ("!labels!") do (
+        set "a6=%%i"
+    )
+    for /f "tokens=7 delims= " %%i in ("!labels!") do (
+        set "a7=%%i"
+    )
+    for /f "tokens=8 delims= " %%i in ("!labels!") do (
+        set "a8=%%i"
+    )
+    for /f "tokens=9 delims= " %%i in ("!labels!") do (
+        set "a9=%%i"
+    )
+    for /f "tokens=10 delims= " %%i in ("!labels!") do (
+        set "a10=%%i"
+    )
+
+
+
+exit /b
 
 
 
@@ -492,24 +641,6 @@ exit /b
     echo !ct! > "!dest_dir!\!file!"
 exit /b
 
-:disk_count_
-    set "ext=%~1"
-    rem set "dest_dir=%~2"
-    set "file=%~2"
-    set /a ct=0
-
-    if "!ext!" equ ".d88" (
-        set /a ct+=1
-    )
-    if "!ext!" equ ".t88" (
-        set /a ct+=1
-    )
-    if "!ext!" equ ".cmt" (
-        set /a ct+=1
-    )
-
-    echo !ct! > "!file!"
-exit /b
 
 
 :kywd
