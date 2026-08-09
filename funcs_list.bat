@@ -21,10 +21,6 @@ set "secnd_dirs=%~2"
 @ set curl_brkt=
 @ set exts=
 @ set compl=
-set encaptor=
-set encapted=
-set akeywd=
-set rkeywd=
 
 for /f "tokens=1 delims=|" %%i in ("!prim_dirs!") do (
     @ set "src=%%i"
@@ -51,6 +47,15 @@ for /f "tokens=7 delims=|" %%i in ("!prim_dirs!") do (
 set quan=
 set prelim=
 set label=
+set encaptor=
+set encapted=
+set akeywd=
+set rkeywd=
+set lst_o=
+set lst_anfl=
+set indv_grp=
+set cmbo_grp=
+
 for /f "tokens=1 delims=|" %%i in ("!secnd_dirs!") do (
     set "quan=%%i"
 )
@@ -75,6 +80,18 @@ for /f "tokens=10 delims=|" %%i in ("!secnd_dirs!") do (
 )
 for /f "tokens=11 delims=|" %%i in ("!secnd_dirs!") do (
     set "rkeywd=%%i"
+)
+for /f "tokens=12 delims=|" %%i in ("!secnd_dirs!") do (
+    set "lst_o=%%i"
+)
+for /f "tokens=13 delims=|" %%i in ("!secnd_dirs!") do (
+    set "lst_anfl=%%i"
+)
+for /f "tokens=14 delims=|" %%i in ("!secnd_dirs!") do (
+    set "indv_grp=%%i"
+)
+for /f "tokens=15 delims=|" %%i in ("!secnd_dirs!") do (
+    set "cmbo_grp=%%i"
 )
 
 set "prelim_label=!prelim!_!label!"

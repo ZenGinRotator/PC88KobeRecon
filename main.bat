@@ -31,11 +31,11 @@ REM GROUPER/OBJECT/KEYWORDS/
 @ rem u_score: Traverse this directory to remove underscores
 @ rem          from directory and file names
 
-@ set "src=..\ARCHV_RECON"
+@ set "src=..\ARCHV_RECON2"
 @ set "u_scor=UNDERSCORES"
-@ set "prnth=PARENTHESES"
-@ set "sqr_brkt=SQUARE_BRACKETS"
-@ set "curl_brkt=CURLY_BRACKETS"
+@ set "prnth=PARENTHESES2"
+@ set "sqr_brkt=SQUARE_BRACKETS2"
+@ set "curl_brkt=CURLY_BRACKETS2"
 @ set "exts=EXTENSIONS"
 @ set "cmpltd=COMPLETE"
 set "quan=QUANTITIES"
@@ -49,6 +49,10 @@ set "labl=LABELS"
 set "prelm=PRELIMINARY"
 set "akeywd=ALL_KEYWORDS"
 set "rkeywd=ROM_KEYWORDS"
+set "lst_o=LISTED_ONLY"
+set "lst_anfl=LISTED_AND_FILE"
+set "indv_grp=INDIV_GROUP"
+set "cmbo_grp=COMBO_GROUP"
 rem parentheses/quantity
     rem file
         rem singles 
@@ -63,12 +67,13 @@ rem parentheses/quantity
 
 REM
 @ set "args=%src%|%u_scor%|%prnth%|%sqr_brkt%|%curl_brkt%|%exts%|%cmpltd%"
-set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%|%encapted%|%akeywd%|%rkeywd%"
+set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%|%encapted%|%akeywd%|%rkeywd%|%lst_o%|%lst_anfl%|%indv_grp%|%cmbo_grp%"
 @ set "lm=LIST_MADE"
 @ set "ers=ERRORS"
 set "no_encaps=NO_ENCAPSULATED"
 
 rem TESTING NO TOKENS TO FIND RESULT - RETURN ALL STATEMENT OR NOTHING?
+
 set "a=hiby"
 set aone=
 set atwo=
@@ -92,6 +97,24 @@ echo A "!a!" "!aone!" "!atwo!"
 echo B "!b!" "!bone!" "!btwo!"
 rem pause
 rem exit /b
+set "ab= a b|"
+set "ba=b a "
+
+echo !ab! > "disk.txt"
+for /f "tokens=*" %%i in (disk.txt) do (
+    echo "%%i"
+    set "ab=%%i"
+)
+for /f "tokens=1 delims=|" %%i in ("!ab!") do (
+    set "ab=%%i"
+)
+
+echo "!ab!"
+rem md "!ab!"
+md "!ab!"
+md "!ba!"
+rem pause
+rem goto :eof
 
 rem PAUSE
 rem goto :eof

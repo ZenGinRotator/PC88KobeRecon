@@ -28,6 +28,25 @@ rem 4. sort directory or file names by Groups 1, 2, 3, or none (when there are n
 rem need d88 t88 or .cmt file extensions only -- use counter > 0 accept, equ 0 -> reject
 
 
+rem ROM_KEYWORDS
+REM /INDIV_GROUP/LISTED_ONLY/<label 1, 2, or 3> **
+REM /INDIV_GROUP/LSITED_AND_FILE/<label 1, 2, or 3>/<disk with <label 1, 2, or 3>> -- required to determine label of highest priority
+
+
+REM /COMBO_GROUP/LISTED_ONLY/<label 1 and label 2 || label1 label2 label3>
+REM /COMBO_GROUP/LISTED_AND_FILE/<label 1 and label 2 || label1 label2 label3>/<disk with <label1> <label2> <label3>> -- required to determine label of highest priority
+rem ** partially done
+
+
+rem Save by individual group (list of names and categorized names containing files)
+rem save by all groups combined together
+
+rem Need to find music in name title that is non-encapsulated
+
+
+
+
+
 rem determine whether file is .d88, .cmt, or .t88
 :find_rom
 
@@ -46,6 +65,11 @@ rem determine whether file is .d88, .cmt, or .t88
     for /f "tokens=*" %%i in (!f!) do (
         set /a "ct=%%i"
     )
+
+    set brk=^
+
+
+    echo "!brk!"
     echo  NAME "!name!" CT "!ct!" --------------------
     del "!f!"
   
@@ -156,21 +180,20 @@ rem determine whether file and directory name has (), {}, [], or does not have e
 
     rem pause
     if "!ptail!" neq "!blnk!" (
-        call :delim_it "!name!" "(" ")" "!prnth!\!rkeywd!"
+        call :delim_it "!name!" "(" ")" "!prim_dirs!" "!sec_dirs!"
     )
 
     if "!ctail!" neq "!blnk!" (
-        call :delim_it "!name!" "{" "}" "!curl_brkt!\!rkeywd!"
+        call :delim_it "!name!" "{" "}" "!prim_dirs!" "!sec_dirs!"
     )
 
     if "!stail!" neq "!blnk!" (
-        call :delim_it "!name!" "[" "]" "!sqr_brkt!\!rkeywd!"
+        call :delim_it "!name!" "[" "]" "!prim_dirs!" "!sec_dirs!"
     )
 
     
     rem pause
 exit /b
-
 
 
 
@@ -180,22 +203,64 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     rem 2 = left bound encapsulator
     rem 3 = right bound encapsulator
 
-    set "dest_dir=%~4"
+    set "sec_dirs=%~5"
+
+    set prnth=
+    set sqr_brkt=
+    set curl_brkt=
+    for /f "tokens=3 delims=|" %%i in ("!prim_dirs!") do (
+        set "prnth=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!prim_dirs!") do (
+        set "sqr_brkt=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!prim_dirs!") do (
+        set "curl_brkt=%%i"
+    )
+
+    set rkeywd=
+    set lst_o=
+    set lst_anfl=
+    set indv_grp=
+    set cmbo_grp=
+
+    for /f "tokens=11 delims=|" %%i in ("!sec_dirs!") do (
+        set "rkeywd=%%i"
+    )
+
+    for /f "tokens=12 delims=|" %%i in ("!sec_dirs!") do (
+        set "lst_o=%%i"
+    )
+    for /f "tokens=13 delims=|" %%i in ("!sec_dirs!") do (
+        set "lst_anfl=%%i"
+    )
+    for /f "tokens=14 delims=|" %%i in ("!sec_dirs!") do (
+        set "indv_grp=%%i"
+    )
+    for /f "tokens=15 delims=|" %%i in ("!sec_dirs!") do (
+        set "cmbo_grp=%%i"
+    )
     rem echo DEST DIR "!dest_dir!"
     rem pause
+    
 
-
-
-
-
+    set "dest_dir=!prnth!\!rkeywd!"
     set nested=%inp%
-
+    rem !prnth!\!rkeywd!
+    rem !curl_brkt!\!rkeywd!
+    rem !sqr_brkt!\!rkeywd!
     if "%~2" equ "{" (
         set nested=%inc%
+        set "dest_dir=!curl_brkt!\!rkeywd!"
     )
     if "%~2" equ "[" (
         set nested=%ins%
+        set "dest_dir=!sqr_brkt!\!rkeywd!"
     )
+
+    rem call :echo_dirs "!prim_dirs!" "!sec_dirs!"
+    rem pause
+    rem exit /b
 
     set is_nested=
     for /f "tokens=*" %%i in (!nested!) do (
@@ -233,8 +298,12 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set "one=%%i"
     )
 
-    rem echo ONE "!one!"
-    call :save_group "!dest_dir!" "!one!"
+
+    call :save_group_and_file "!dest_dir!\!indv_grp!" "!lst_o!" "!lst_anfl!" "!one!" "!name!"
+    
+    
+    
+    
 
 
     rem 2-A
@@ -252,13 +321,12 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     rem If two tail is empty, 
     rem save group 1,
     rem return
-
+    REM echo ONE "!one!" TWO "!two!"
     if "!two!" equ "" (
         exit /b
     )
      
-    call :save_group "!dest_dir!" "!two!"
-    
+    call :save_group_and_file "!dest_dir!\!indv_grp!" "!lst_o!" "!lst_anfl!" "!two!" "!name!"
 
 
     if "!is_nested!" equ "T" (
@@ -289,50 +357,46 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
 
 
 
-rem echo THREE TAIL "!three_tail!"
+
+
+    rem echo THREE TAIL "!three_tail!"
     rem echo THREE "!three!"
     rem If three tail is empty,
     rem     save group 2
     rem     return 
-
     if "!three!" equ "" (
+        REM echo COMBO ON ONE AND TWO
+        set "combo=!one! !two!"
+        call :save_group_and_file "!dest_dir!\!cmbo_grp!" "!lst_o!" "!lst_anfl!" "!combo!" "!name!"
         exit /b
     )
 
-    call :save_group "!dest_dir!" "!three!"
-
-
-    rem Might not need if collecting file names and sorting those names by 
-    rem     indvidual groups 1, 2, or 3
-    rem Removing unwanted spaces from blank keywords
-    set "sp_three= !three!"
-    set "sp_two= !two!"
-    if "!sp_three!" equ " " (
-        set sp_three=
+    
+    rem Remove space before three (eg: " this is a third label with a starting empty space")
+    set "three=!three!|"
+    echo !three! > "disk.txt"
+    for /f "tokens=*" %%i in (disk.txt) do (
+        set "three=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!three!") do (
+        set "three=%%i"
     )
 
-    if "!sp_two!" equ " " (
-        set sp_two=
+   
+   
+    call :save_group_and_file "!dest_dir!\!indv_grp!" "!lst_o!" "!lst_anfl!" "!three!" "!name!"
+    REM ECHO COMBO ON ONE, TWO, AND THREE
+
+
+    set "combo=!one! !two! !three!"
+    if "!is_nested!" equ "T" (
+        set "combo=!one!!two! !three!"
     )
 
-    rem Need to fix nested?
-    rem (x (y) z) outputs x  y  z and not x y z
-    rem need to remove the spaces when we do the 
-    rem     search through all words in x, y, and z
+    call :save_group_and_file "!dest_dir!\!cmbo_grp!" "!lst_o!" "!lst_anfl!" "!combo!" "!name!"
+    
+    
 
-    rem set "c=!one!!sp_two!!sp_three!"
-rem      echo is nested "!is_nested!" 
-    rem echo c "%~2 %~3" "!c!"
-    rem set "d=!one! !two! !three!"
-    rem echo d "!d!"
-    rem echo e "!one!" - "!sp_two!" - "!sp_three!"
-
-    rem Use one two three as indicated in echo f below
-    rem echo f "!one!" - "!two!" - "!three!"
-
-    rem Call :save_group on one, two, and three,
-    rem    
-rem pause
 
 exit /b
 
@@ -340,13 +404,6 @@ rem Delimit file or directory name with {, [, or (
 rem if not delimited, skip the file or directory name
 rem otherwise save group 1, 2, and possibly 3 in the directory or file name
 
-rem ROM_KEYWORDS
-REM /INDIV_GROUP
-REM /All_GROUP
-rem Save by individual group (list of names and categorized names containing files)
-rem save by all groups combined together
-
-rem Need to find music in name title that is non-encapsulated
 :delim_into_file
     rem 1: left bound char
     rem 2: token
@@ -425,15 +482,32 @@ exit /b
     echo !ct! > "!file!"
 exit /b
 
-rem determine whether file is
 
-:save_group
-    set "dest_dir=%~1"
-    set "group=%~2"
-    
-    call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!group!"
+
+
+
+:save_group_and_file
+    set "root=%~1"
+    set "l_only=%~2"
+    set "l_anfl=%~3"
+    set "group=%~4"
+    set "name=%~5"
+    echo ------------------------------------------------------------------------------------
+    echo "!root!\!l_only!" has "!group!"
+    if not exist "!root!\!l_only!\!group!" (
+        echo "!root!\!l_anfl!\!group!" has "!name!"
+    )
+    rem pause
+    rem echo SAVE THE INDIV "!indiv_this!" LIST ONLY AT  "!root_dir!\!indv_grp!\!lst_o!"
+    exit /b    
+    rem call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!group!"
 exit /b
 
+
+:save_combo_group
+    set "dest_dir=%~1"
+    set ""
+exit /b
 
 
 :target_in_group
@@ -485,6 +559,55 @@ exit /b
 
 
 
+exit /b
+
+
+:echo_dirs
+    set "prim_dirs=%~1"
+    set "sec_dirs=%~2"
+
+    set prnth=
+    set sqr_brkt=
+    set curl_brkt=
+    for /f "tokens=3 delims=|" %%i in ("!prim_dirs!") do (
+        set "prnth=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!prim_dirs!") do (
+        set "sqr_brkt=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!prim_dirs!") do (
+        set "curl_brkt=%%i"
+    )
+
+    set rkeywd=
+    set lst_o=
+    set lst_anfl=
+    set indv_grp=
+    set cmbo_grp=
+
+    for /f "tokens=11 delims=|" %%i in ("!sec_dirs!") do (
+        set "rkeywd=%%i"
+    )
+
+    for /f "tokens=12 delims=|" %%i in ("!sec_dirs!") do (
+        set "lst_o=%%i"
+    )
+    for /f "tokens=13 delims=|" %%i in ("!sec_dirs!") do (
+        set "lst_anfl=%%i"
+    )
+    for /f "tokens=14 delims=|" %%i in ("!sec_dirs!") do (
+        set "indv_grp=%%i"
+    )
+    for /f "tokens=15 delims=|" %%i in ("!sec_dirs!") do (
+        set "cmbo_grp=%%i"
+    )
+
+    echo DEST DIR "!dest_dir!"
+    echo RKEYWORD "!rkeywd!"
+    echo L only "!lst_o!"
+    echo LAF "!lst_anfl!"
+    echo INDV GRP "!indv_grp!"
+    echo COMBO GRP "!cmbo_grp!"
 exit /b
 
 
@@ -733,8 +856,6 @@ exit /b
     set "sec_dirs=%~4"
     set "dest_dir=%~5"
     set "is_nested=%~6"
-
-    echo NAME "!name!"
     
 
     rem A file or directory name can have 0 or up to 3
