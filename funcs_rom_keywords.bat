@@ -281,7 +281,64 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     set one_tail=
     set two_tail=
     set three_tail=
+    echo TEST METHOD
 
+    echo  OUTCOME
+
+    rem Finding non-nested outcomes
+    for /f "tokens=2 delims=(" %%i in ("!name!") do (
+        set "one_tail=%%i"
+    )
+
+    set nested_twotail=
+    for /f "tokens=3 delims=(" %%i in ("!name!") do (
+        set "two_tail=%%i"
+    )
+
+    set nested_threetail=
+    for /f "tokens=4 delims=(" %%i in ("!name!") do (
+        set "three_tail=%%i"
+    )
+    
+    rem Change all to receive correct outputs for non-nested labels
+    set "one_tail=)!one_tail!"
+    set "two_tail=)!two_tail!"
+    set "three_tail=)!three_tail!"
+    
+
+    for /f "tokens=1 delims=)" %%i in ("!one_tail!") do (
+        set "one=%%i"
+    )
+    for /f "tokens=1 delims=)" %%i in ("!two_tail!") do (
+        set "two=%%i"
+    )
+    for /f "tokens=1 delims=)" %%i in ("!three_tail!") do (
+        set "three=%%i"
+    )
+
+ 
+    rem Finding nested outcomes
+    set "two_tail=x)!two_tail!"
+    
+    for /f "tokens=3 delims=)" %%i in ("!two_tail!") do (
+        set "nested_three=%%i"
+    )
+    echo FOUND NESTED THREE "!nested_three!"
+    rem REQUIRED: need to make this blank if we receive a portion of file
+    rem     name beyond one_tail (eg. "x) end of file name.d88")
+    rem     or portion of file name beyond
+    rem     two_tail (eg. "y) end of file name.d88")
+    if "!is_nested!" equ "F" (
+        set nested_three=
+    )
+
+
+    echo one "!one!"
+    echo two "!two!"
+    echo three "!three!"
+    echo nested three "!nested_three!"
+    pause
+    exit /b
 
     rem Guaranteed to have at least 1 group of labels
     
