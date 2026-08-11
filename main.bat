@@ -73,6 +73,40 @@ set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%|%enc
 set "no_encaps=NO_ENCAPSULATED"
 
 rem TESTING NO TOKENS TO FIND RESULT - RETURN ALL STATEMENT OR NOTHING?
+call :print
+
+call :out "something has"
+set xxx=
+for /f "tokens=1" %%i in (out.txt) do (
+    set "xxx=%%i"
+)
+echo XXX "!xxx!"
+set "tok=2"
+set r=
+for /f "tokens=2 delims= " %%i in ("something has") do (
+    set "r=%%i"
+)
+
+echo r "!r!"
+call :something_has "2"
+
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y(x x (y y) z z) xxxx (a a (b b) c c)"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) h (y y ) gg (z z)"
+ echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) h (y y )"
+
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x)"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) is (a a (b b) c c)"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(a a (b b) c c) sss (x x)"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(a a (b b) c c) sss (x x) fart (y y y) blob (c) dude (d  d  d) Y(x x (y y) z z) xxxx (a a (b b) c c) Y(x x (y y) z z) xxxx (a a (b b) c c) Y(x x (y y) z z) xxxx (a a (b b) c c) quad (w w w w) xxx (a a (b b) (c d) (e f) g h)"
+
+ pause
+ goto :eof
 
 set "a=hiby"
 set aone=
@@ -169,4 +203,38 @@ goto :eof
 
 :pause
     echo .... PROCESSING. PLEASE WAIT.....
+exit /b
+
+:print
+    echo PRINT
+    if not exist "print.txt" (
+        echo 0 > "print.txt"
+    )
+
+    set /a ct=0
+    for /f "tokens=*" %%i in (print.txt) do (
+        set /a ct=%%i
+    )
+
+    if !ct! equ 5 (
+        echo FINISHED
+        exit /b
+    )
+    set /a ct+=1
+    echo !ct! > "print.txt"
+    call :print
+exit /b
+
+:out
+    echo %~1 > "out.txt"
+exit /b
+
+:something_has
+    set r=
+    for /f "tokens=%~1 delims= " %%i in ("soemthing has") do (
+        set "r=%%i"
+    )
+
+    echo R "!r!"
+
 exit /b

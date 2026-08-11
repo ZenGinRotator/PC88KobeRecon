@@ -70,7 +70,7 @@ rem determine whether file is .d88, .cmt, or .t88
 
 
     echo "!brk!"
-    echo  NAME "!name!" CT "!ct!" --------------------
+    echo  NAME "!name!" CT "!ct!" ****************************
     del "!f!"
   
     if !ct! equ 0 (
@@ -134,9 +134,9 @@ rem determine whether file and directory name has (), {}, [], or does not have e
 
 
     rem nested flag
-    call :delim_into_file "(" ")" "!name!" "%hep%" "%inp%"
-    call :delim_into_file "{" "}" "!name!" "%hec%" "%inc%"
-    call :delim_into_file "[" "]" "!name!" "%hes%" "%ins%"
+    call :encaps_check "(" ")" "!name!" "%hep%" "%inp%"
+    call :encaps_check "{" "}" "!name!" "%hec%" "%inc%"
+    call :encaps_check "[" "]" "!name!" "%hes%" "%ins%"
 
     set ptail=
     set ctail=
@@ -151,6 +151,8 @@ rem determine whether file and directory name has (), {}, [], or does not have e
     for /f "tokens=*" %%i in (%hes%) do (
         set "stail=%%i"
     )
+
+    echo ONE TAIL "!ptail!" **********************************
     rem blank = ECHO is off.
     set "blnk=ECHO is off."
     rem echo start "!name!"
@@ -263,15 +265,11 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     rem exit /b
 
     set is_nested=
-    for /f "tokens=*" %%i in (!nested!) do (
+    for /f "tokens=1" %%i in (!nested!) do (
         set "is_nested=%%i"
     )
+    echo IS NESTED "!is_nested!"
 
-
-    rem removing the appended space character after reading is_nested from file
-    for /f "tokens=1 delims= " %%i in ("!is_nested!") do (
-        set "is_nested=%%i"
-    )
     
     del "!nested!"
 
@@ -285,12 +283,16 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
 
     echo  OUTCOME
 
+    rem !!! NEED TO CHANGE DELIM CHARACTERS SO THEY ARE (, [, OR (
+
     rem Finding non-nested outcomes
     for /f "tokens=2 delims=(" %%i in ("!name!") do (
         set "one_tail=%%i"
     )
 
-    set nested_twotail=
+    echo ONE TAIL "!one_tail!" ****************************
+
+
     for /f "tokens=3 delims=(" %%i in ("!name!") do (
         set "two_tail=%%i"
     )
@@ -330,6 +332,16 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     rem     two_tail (eg. "y) end of file name.d88")
     if "!is_nested!" equ "F" (
         set nested_three=
+    )
+
+    set "three=!nested_three!"
+    echo !three! > "three.txt"
+    for /f "tokens=1" %%i in (three.txt) do (
+        set "three=%%i"
+    )
+
+    if "!three!" equ "ECHO" (
+        set three=
     )
 
 
@@ -457,11 +469,329 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
 
 exit /b
 
+
+
+:is_or_not_nested   
+    setlocal
+    rem * has to be incremented
+    set "left_token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+
+
+    set "right_token=1"
+    
+    set "phrase=%~4"
+    
+    set tail=
+    call :delim_with_char "!left_token!" "!left_char!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "tail=%%i"
+    )
+    rem echo TAIL "!tail!"
+    call :delim_with_char "!right_token!" "!right_char!" "!tail!"
+    set head=
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "head=%%i"
+    )
+
+    set "is_nested=T"
+    rem echo HEAD "!head!" 
+    rem echo head "!head!"
+    rem echo tail "!tail!"
+    if "!head!" neq "!tail!" (
+        set "is_nested=F"
+    )
+
+    echo !is_nested! > "is_nested.txt"
+    set nxt=
+    for /f "tokens=1 delims=|" %%i in (ones.txt) do (
+        set "nxt=%%i"
+    )
+    echo "!nxt!" IS NESTED "!is_nested!"
+    endlocal
+exit /b
+
+:new_token_val
+    setlocal
+    set /a token=%~1
+    rem echo Orig val "!token!"
+
+    set is_nested=
+    for /f "tokens=1" %%i in (is_nested.txt) do (
+        set "is_nested=%%i"
+    )
+
+    if "!is_nested!" equ "F" (
+        set /a token+=1
+        echo !token! > "token_val.txt"
+        exit /b
+    )
+    set /a token+=2
+    rem echo newval "!token!"
+    echo !token! > "token_val.txt"
+    endlocal
+exit /b
+
+
+:delim_with_char
+    setlocal
+    rem %~1: token
+    rem %~2: delim char (eg. [, (, {, ], ), or })
+    set "phrase=%~3"
+    rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
+    set d=
+    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
+        set "d=%%i"
+    )
+
+    set "d=!d!|"
+    echo !d! > "delimited.txt"
+    endlocal
+exit /b
+
+
+:traverse
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+
+    echo name "!name!" --------------------------------------------------
+
+    set "a=A"
+    echo !a! > "next.txt"
+    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
+    set brk=^
+
+
+
+    set ones=
+    for /f "tokens=*" %%i in (ones.txt) do (
+        set "ones=!ones!!brk!%%i"
+    )
+    echo ONES.txt
+    ECHO "!ones!"
+    del "ones.txt"
+
+
+    rem Records the tokens used to find all encapsulated lables
+    rem Use this list of tokens to find non-encapsulated words,
+    rem     - non-encapsulated words can contain "music" or "Music", 
+    rem         or any other derivations of importance that we 
+    rem         could use for sorting disk files with extensions
+    rem         .cmt, .d88, .t88
+    rem To find tokens required for collecting non-encapsulated words,
+    rem     for every token value in this list (except the last token value),
+    rem         subtract that token value by 1 
+    rem         (eg. 5 - 1 = 4, and use right bound character ), ], or })
+    set tokens_=
+    for /f "tokens=*" %%i in (tokens.txt) do (
+        set "tokens_=!tokens_!!brk!%%i"
+    )
+    echo tokens.txt
+    echo "!tokens_!"
+    del "tokens.txt"
+
+    endlocal
+exit /b
+
+:at_group
+    setlocal
+
+    rem echo calling AT_GROUP NAME "!name!"
+    set next=
+    for /f "tokens=1 delims=|" %%i in (next.txt) do (
+        set "next=%%i"
+    )
+    rem echo NEXT "!next!"
+
+    if "!next!" equ " " (
+        rem echo ENDED NAME "!name!"
+        exit /b
+    )
+
+    rem     echo !next! > "next.txt"
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+
+    rem Write tokens for encapsulators
+    call :write_tokens "!token!"
+
+
+    set is_nested=
+
+    rem  ** "(" and ")" are arguments **
+    call :is_or_not_nested "!token!" "!left_char!" "!right_char!" "!name!"
+
+    rem echo NEED A FUNCTION CALL TO GO THROUGH THE GROUP
+    call :delimit_group "!token!" "!left_char!" "!right_char!" "!name!"
+   
+   
+
+
+    call :new_token_val "!token!"
+    rem echo old token "!token!"
+
+    set add_token=
+    for /f "tokens=1" %%i in (token_val.txt) do (
+        set "add_token=%%i"
+    )
+    rem echo the add token !add_token!
+    
+    rem echo old token "!token!"
+    set /a token=!add_token!
+    rem echo new token "!token!"
+    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
+
+    endlocal
+exit /b
+
+
+
+:write_ones
+    set "new=%~1"
+    set brk=^
+
+
+    set "new_one=%~1"
+    set old=
+    for /f "tokens=*" %%i in (ones.txt) do (
+        set "old=!old!!brk!%%i"
+    )
+    set "old=!old!!brk!!new!"
+    rem echo OLD "!old!"
+    echo !old! > "ones.txt"
+
+exit /b
+
+:write_tokens
+    set "token=%~1"
+    set brk=^
+
+
+    set old=
+    for /f "tokens=*" %%i in (tokens.txt) do (
+        set "old=!old!!brk!%%i"
+    )
+    set "old=!old!!brk!!token!"
+    echo !old! > "tokens.txt"
+exit /b
+
+rem copy code begginging at line 290~
+:delimit_group
+    setlocal 
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    set "right_token=1"
+   
+    call :delim_with_char "!token!" "!left_char!" "!name!"
+    set one_tail=
+    set two_tail=
+    set three_tail=
+    
+
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "one_tail=%%i"
+    )
+
+    set /a token+=1
+    call :delim_with_char "!token!" "!left_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "two_tail=%%i"
+    )   
+
+
+    set /a token+=1
+    call :delim_with_char "!token!" "!left_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "three_tail=%%i"
+    )   
+    
+    set "one_tail=)!one_tail!"
+    set "two_tail=)!two_tail!"
+    set "three_tail=)!three_tail!"
+
+    if "!is_nested!" equ "T" (
+        set "two_tail=X)!two_tail!"
+    )
+
+    call :delim_with_char "1" "!right_char!" "!one_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "one=%%i"
+    )
+    call :delim_with_char "1" "!right_char!" "!two_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "two=%%i"
+    )
+    call :delim_with_char "1" "!right_char!" "!three_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "three=%%i"
+    )
+
+
+    set is_nested=
+    for /f "tokens=1" %%i in (is_nested.txt) do (
+        set "is_nested=%%i"
+    )
+
+
+    if "!one!" equ " " (
+        set "one=!one!|"
+        echo !one! > "next.txt"
+        exit /b
+    )
+
+    if "!is_nested!" equ "F" (
+    rem if "!one!" equ "" (
+        echo !head! > "head.txt"
+        
+        rem echo ------one "!one!"
+        call :write_ones "!one!"
+        rem echo ------two "!two!"
+        rem echo ----three "!three!"
+        exit /b
+    )
+
+
+    rem for finding third labels within the nested group
+    set "two_tail=x)!two_tail!"
+
+    call :delim_with_char "3" "!right_char!" "!two_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "three=%%i"
+    )
+
+    rem Removing unwanted portions captured by three
+    if "!is_nested!" equ "F" (
+        set three=
+    )
+    
+    rem echo ------one "!one!"
+    rem echo ------two "!two!"
+    rem echo ------three "!three!"
+
+    
+    echo !one! > "next.txt"
+
+    set "one=!one!!two!!three!"
+    call :write_ones "!one!"
+    endlocal
+exit /b
+
+
+
+
 rem Delimit file or directory name with {, [, or (
 rem if not delimited, skip the file or directory name
 rem otherwise save group 1, 2, and possibly 3 in the directory or file name
 
-:delim_into_file
+:encaps_check
     rem 1: left bound char
     rem 2: token
     rem 3: name
@@ -480,7 +810,8 @@ rem otherwise save group 1, 2, and possibly 3 in the directory or file name
     
     
     
-    rem stop this iteration
+    rem stop this function but does not stop iteration on the current name
+    rem does the name have or have not at least 1 encasulated group
     if "!one_tail!" equ "" (
         rem echo EXITED
         exit /b
@@ -495,6 +826,9 @@ rem otherwise save group 1, 2, and possibly 3 in the directory or file name
     )
 
 
+    rem This is a  test for checking nested encapsulators in first group
+    rem Should revise so that we check for nested encapsulators among all groups.
+    rem Should move this nested/non-nested test elsewhere
     set test=
     for /f "tokens=1 delims=%~2" %%i in ("!one_tail!") do (
         set "test=%%i"
