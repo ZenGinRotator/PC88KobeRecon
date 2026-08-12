@@ -471,6 +471,18 @@ exit /b
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 :is_or_not_nested   
     setlocal
     rem * has to be incremented
@@ -677,6 +689,7 @@ exit /b
 
 
 :write_ones
+    setlocal
     set "new=%~1"
     set brk=^
 
@@ -689,10 +702,11 @@ exit /b
     set "old=!old!!brk!!new!"
     rem echo OLD "!old!"
     echo !old! > "ones.txt"
-
+    endlocal
 exit /b
 
 :write_tokens
+    setlocal
     set "token=%~1"
     set brk=^
 
@@ -703,6 +717,7 @@ exit /b
     )
     set "old=!old!!brk!!token!"
     echo !old! > "tokens.txt"
+    endlocal
 exit /b
 
 rem copy code begginging at line 290~
@@ -807,6 +822,18 @@ rem copy code begginging at line 290~
     call :write_ones "!one!"
     endlocal
 exit /b
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
