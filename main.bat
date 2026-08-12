@@ -90,6 +90,9 @@ for /f "tokens=2 delims= " %%i in ("something has") do (
 echo r "!r!"
 call :something_has "2"
 
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
+ pause
+ goto :eof
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y(x x (y y) z z) xxxx (a a (b b) c c)"
 echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) h (y y ) gg (z z)"

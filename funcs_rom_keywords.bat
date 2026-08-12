@@ -488,7 +488,10 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
         set "tail=%%i"
     )
-    rem echo TAIL "!tail!"
+     echo TAIL "!tail!"
+    if "!tail!" equ " " (
+        exit /b
+    )
     call :delim_with_char "!right_token!" "!right_char!" "!tail!"
     set head=
     for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
@@ -563,6 +566,17 @@ exit /b
     set "a=A"
     echo !a! > "next.txt"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
+
+    set delimited=
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "delimited=%%i"
+    )
+    if "!delimited!" equ " " (
+        del "delimited.txt"
+        exit /b
+    )
+
+
     set brk=^
 
 
@@ -593,6 +607,7 @@ exit /b
     echo tokens.txt
     echo "!tokens_!"
     del "tokens.txt"
+    del "delimited.txt"
 
     endlocal
 exit /b
@@ -626,6 +641,15 @@ exit /b
 
     rem  ** "(" and ")" are arguments **
     call :is_or_not_nested "!token!" "!left_char!" "!right_char!" "!name!"
+
+    set delimited=
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "delimited=%%i"
+    )
+
+    if "!delimited!" equ " " (
+        exit /b
+    )
 
     rem echo NEED A FUNCTION CALL TO GO THROUGH THE GROUP
     call :delimit_group "!token!" "!left_char!" "!right_char!" "!name!"
