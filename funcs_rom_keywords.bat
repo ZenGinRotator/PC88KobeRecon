@@ -7,6 +7,9 @@ set hes=has_encaps_sqr.txt
 set inp=is_nested_pnth.txt
 set inc=is_nested_curl.txt
 set ins=is_nested_sqr.txt
+
+set grptxt=group.txt
+set delimtxt=delimited.txt
 set brk=^
 
 
@@ -594,12 +597,12 @@ exit /b
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
     set grp=
-    for /f "tokens=*" %%i in (group.txt) do (
+    for /f "tokens=*" %%i in (%grptxt%) do (
         set "grp=!grp!!brk!%%i"
     )
-    echo GROUP ******** "!grp!"
-    del "group.txt"
-    del "delimited.txt"
+   
+    del "%grptxt%"
+    del "%delimtxt%"
     
 
 
@@ -675,7 +678,7 @@ exit /b
     set three_tail=
     
 
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one_tail=%%i"
     )
     
@@ -683,7 +686,7 @@ exit /b
 
 
     call :delim_with_char "1" "!right_char!" "!one_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one=%%i"
     )
 
@@ -722,18 +725,18 @@ exit /b
     set "save=!two!"
 
     call :delim_with_char "2" "!right_char!" "!one_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "alt=%%i"
     )
     call :delim_with_char "3" "!right_char!" "!one_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "al2=%%i"
     )
 
     echo ALT "!alt!"
 
     
-    echo !save! > "delimited.txt"
+    echo !save! > "%delimtxt%"
     rem echo --ONE "!one!"
 
     if "!one!" equ "!one_tail!" (
@@ -752,7 +755,7 @@ exit /b
         rem set /a token+=1
         call :delim_with_char "!token!" "!right_char!" "!name!"
         set bridge=
-        for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "bridge=%%i"
         )
         echo bridge "!bridge!"
@@ -763,7 +766,7 @@ exit /b
        
        
         call :delim_with_char "1" "!left_char!" "!bridge!"
-        for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "bridge=%%i"
         )
         echo new bridge "!bridge!"
@@ -791,7 +794,7 @@ rem ECHO FUNCTION DELIM_WITH_CHAR
     )
 
     set "d=!d!|"
-    echo !d! > "delimited.txt"
+    echo !d! > "%delimtxt%"
     endlocal
 exit /b
 
@@ -839,14 +842,14 @@ exit /b
     del "ones.txt"
 
     set old=
-    if exist group.txt (
-    for /f "tokens=*" %%i in (group.txt) do (
-        set "old=!old!!brk!%%i"
-    )
+    if exist %grptxt% (
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            set "old=!old!!brk!%%i"
+        )
     )
     
     set "old=!old!!brk!!old_o!"
-    echo !old! > "group.txt"
+    echo !old! > "%grptxt%"
     
     endlocal
 exit /b
@@ -883,20 +886,20 @@ rem copy code begginging at line 290~
     set three_tail=
     
 
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one_tail=%%i"
     )
 
     set /a token+=1
     call :delim_with_char "!token!" "!left_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "two_tail=%%i"
     )   
 
 
     set /a token+=1
     call :delim_with_char "!token!" "!left_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "three_tail=%%i"
     )   
     
@@ -909,15 +912,15 @@ rem copy code begginging at line 290~
     )
 
     call :delim_with_char "1" "!right_char!" "!one_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one=%%i"
     )
     call :delim_with_char "1" "!right_char!" "!two_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "two=%%i"
     )
     call :delim_with_char "1" "!right_char!" "!three_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "three=%%i"
     )
 
@@ -950,7 +953,7 @@ rem copy code begginging at line 290~
     set "two_tail=x)!two_tail!"
 
     call :delim_with_char "3" "!right_char!" "!two_tail!"
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "three=%%i"
     )
 
