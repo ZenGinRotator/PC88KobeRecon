@@ -10,6 +10,9 @@ set ins=is_nested_sqr.txt
 
 set grptxt=group.txt
 set delimtxt=delimited.txt
+set toktxt=tokens.txt
+set nxtxt=next.txt
+set onstxt=ones.txt
 set brk=^
 
 
@@ -593,14 +596,15 @@ exit /b
     echo name "!name!" --------------------------------------------------
 
     set "a=A"
-    echo !a! > "next.txt"
+    echo !a! > "%nxtxt%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
     set grp=
     for /f "tokens=*" %%i in (%grptxt%) do (
         set "grp=!grp!!brk!%%i"
     )
-   
+    echo --- GRUPS ----
+    ECHO !grp!
     del "%grptxt%"
     del "%delimtxt%"
     
@@ -609,13 +613,13 @@ exit /b
     rem tokens for non-encapsulated words
     echo LOOK FOR TOKENS
     set tokens_=
-    for /f "tokens=*" %%i in (tokens.txt) do (
+    for /f "tokens=*" %%i in (%toktxt%) do (
         set "tokens_=!tokens_!!brk!%%i"
     )
-    rem echo tokens.txt
+   
     rem echo "!tokens_!"
-    del "tokens.txt"
-    del "next.txt"
+    del "%toktxt%"
+    del "%nxtxt%"
 pause
     endlocal
 exit /b
@@ -628,7 +632,7 @@ exit /b
     rem echo  FUNCTION ---- AT_GROUPU:
     rem echo calling AT_GROUP NAME "!name!"
     set next=
-    for /f "tokens=1 delims=|" %%i in (next.txt) do (
+    for /f "tokens=1 delims=|" %%i in (%nxtxt%) do (
         set "next=%%i"
     )
     echo NEXT "!next!" TOKEN "!token!"
@@ -638,7 +642,7 @@ exit /b
         exit /b
     )
 
-    rem     echo !next! > "next.txt"
+  
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
@@ -692,7 +696,7 @@ exit /b
 
     if "!one!" equ " " (
         set "one=!one!|"
-        echo !one! > "next.txt"
+        echo !one! > "%nxtxt%"
         exit /b
     )
 
@@ -702,12 +706,12 @@ exit /b
 
    
     
-    echo !one! > "next.txt"
+    echo !one! > "%nxtxt%"
 
     
     set "test=)!one!) "
     
-     if not exist ones.txt (
+     if not exist %onstxt% (
          if "!test!" equ "!one_tail!" (
             rem pause
             rem if !qty! equ 2 (
@@ -740,9 +744,6 @@ exit /b
     rem echo --ONE "!one!"
 
     if "!one!" equ "!one_tail!" (
-        set two=
-        rem transfer single item from ones.txt to group
-        set item=
         call :write_group
     )
 
@@ -818,8 +819,8 @@ exit /b
 
     set "new_one=%~1"
     set old=
-    if exist ones.txt (
-    for /f "tokens=*" %%i in (ones.txt) do (
+    if exist %onstxt% (
+    for /f "tokens=*" %%i in (%onstxt%) do (
         set "old=!old!%%i"
     )
     )
@@ -827,7 +828,7 @@ exit /b
     rem echo OLD "!old!"
     rem echo
     rem echo "OLLLLD" "!old!"
-    echo !old! > "ones.txt"
+    echo !old! > "%onstxt%"
     endlocal
 exit /b
 
@@ -836,10 +837,10 @@ exit /b
     
     set old_o=
     
-    for /f "tokens=*" %%i in (ones.txt) do (
+    for /f "tokens=*" %%i in (%onstxt%) do (
         set "old_o=%%i"
     )
-    del "ones.txt"
+    del "%onstxt%"
 
     set old=
     if exist %grptxt% (
@@ -861,13 +862,13 @@ exit /b
 
 
     set old=
-    if exist tokens.txt (
-    for /f "tokens=*" %%i in (tokens.txt) do (
+    if exist %toktxt% (
+    for /f "tokens=*" %%i in (%toktxt%) do (
         set "old=!old!!brk!%%i"
     )
     )
     set "old=!old!!brk!!token!"
-    echo !old! > "tokens.txt"
+    echo !old! > "%toktxt%"
     endlocal
 exit /b
 
@@ -933,7 +934,7 @@ rem copy code begginging at line 290~
 
     if "!one!" equ " " (
         set "one=!one!|"
-        echo !one! > "next.txt"
+        echo !one! > "%nxtxt%"
         exit /b
     )
 
@@ -967,7 +968,7 @@ rem copy code begginging at line 290~
     rem echo ------three "!three!"
 
     
-    echo !one! > "next.txt"
+    echo !one! > "%nxtxt%"
 
     set "one=!one!!two!!three!"
     call :write_ones "!one!"
