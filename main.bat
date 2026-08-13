@@ -73,40 +73,42 @@ set "args2=%quan%|%zeros%|%singl%|%doubl%|%tripl%|%encaptor%|%prelm%|%labl%|%enc
 set "no_encaps=NO_ENCAPSULATED"
 
 rem TESTING NO TOKENS TO FIND RESULT - RETURN ALL STATEMENT OR NOTHING?
-call :print
+REM call :print
 
-call :out "something has"
+REM call :out "something has"
 set xxx=
 for /f "tokens=1" %%i in (out.txt) do (
     set "xxx=%%i"
 )
-echo XXX "!xxx!"
+REM echo XXX "!xxx!"
 set "tok=2"
 set r=
 for /f "tokens=2 delims= " %%i in ("something has") do (
     set "r=%%i"
 )
 
-echo r "!r!"
-call :something_has "2"
+REM echo r "!r!"
+rem call :something_has "2"
+set vvv=
+    for /f "tokens=2 delims=(" %%i in ("some") do (
+        echo  vvv "%%i"
+        set "vvv=%%%i"
+    )
+     for /f "tokens=1 delims=(" %%i in ("some(") do (
+       rem echo "%%i"
+        set "t=%%i"
+    )
 
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
+    echo vvv "!vvv!"
+    echo t "!t!"
+    echo f
  pause
- goto :eof
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y(x x (y y) z z) xxxx (a a (b b) c c)"
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) h (y y ) gg (z z)"
- echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) h (y y )"
-
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x)"
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(x x) is (a a (b b) c c)"
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(a a (b b) c c) sss (x x)"
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "X(a a (b b) c c) sss (x x) fart (y y y) blob (c) dude (d  d  d) Y(x x (y y) z z) xxxx (a a (b b) c c) Y(x x (y y) z z) xxxx (a a (b b) c c) Y(x x (y y) z z) xxxx (a a (b b) c c) quad (w w w w) xxx (a a (b b) (c d) (e f) g h)"
+ rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
+ rem pause
+ rem goto :eof
+rem call :all_bridges
+rem call :no_bridges
+call :neighb
 
  pause
  goto :eof
@@ -241,3 +243,73 @@ exit /b
     echo R "!r!"
 
 exit /b
+
+:all_bridges
+setlocal
+ set "a1=(a a (b b) c c)"
+ set "d1=(double)"
+ set "s1=(single)"
+ set "e1=(e e (f f) (g g) h h)"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !s1! B !e1!.d88"
+ echo ----------------------------------------------------------------------
+  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !s1! B !e1!X.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !e1! B !s1!.d88"
+ echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !e1! B !s1!X.d88"
+echo ----------------------------------------------------------------------
+call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !s1! B !e1!.d88"
+echo ----------------------------------------------------------------------
+call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !s1! B !e1!X.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !e1! B !s1!.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !e1! B !s1!X.d88"
+
+endlocal
+exit /b
+
+:no_bridges
+setlocal
+ set "a1=(a a (b b) c c)"
+ set "d1=(double)"
+ set "s1=(single)"
+ set "e1=(e e (f f) (g g) h h)"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1!  !d1! !s1! !e1!.d88"
+ echo ----------------------------------------------------------------------
+  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1!  !d1! !s1! !e1!X.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1!  !d1! !e1! !s1!.d88"
+ echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1!  !d1! !e1! !s1!X.d88"
+echo ----------------------------------------------------------------------
+call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !s1! !e1!.d88"
+echo ----------------------------------------------------------------------
+call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !s1! !e1!X.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !e1! !s1!.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !e1! !s1!X.d88"
+
+endlocal
+exit /b
+
+:neighb
+
+setlocal
+ set "a1=(a a (b b) c c)"
+ set "d1=(double)"
+ set "s1=(single)"
+ set "e1=(e e (f f) (g g) h h)"
+
+
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! !s1! !e1! !a1!.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! !s1! !e1! !a1!X.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !e1! E !d1! B !s1!.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !e1! E !d1! B !s1!X.d88"
+
+endlocal
+exit /b 

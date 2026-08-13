@@ -7,6 +7,8 @@ set hes=has_encaps_sqr.txt
 set inp=is_nested_pnth.txt
 set inc=is_nested_curl.txt
 set ins=is_nested_sqr.txt
+set brk=^
+
 
 
 call %*
@@ -66,7 +68,7 @@ rem determine whether file is .d88, .cmt, or .t88
         set /a "ct=%%i"
     )
 
-    set brk=^
+   
 
 
     echo "!brk!"
@@ -549,21 +551,33 @@ exit /b
 exit /b
 
 
-:delim_with_char
-    setlocal
-    rem %~1: token
-    rem %~2: delim char (eg. [, (, {, ], ), or })
-    set "phrase=%~3"
-    rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
-    set d=
-    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
-        set "d=%%i"
-    )
 
-    set "d=!d!|"
-    echo !d! > "delimited.txt"
-    endlocal
-exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 :traverse
@@ -579,60 +593,42 @@ exit /b
     echo !a! > "next.txt"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
-    set delimited=
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
-        set "delimited=%%i"
+    set grp=
+    for /f "tokens=*" %%i in (group.txt) do (
+        set "grp=!grp!!brk!%%i"
     )
-    if "!delimited!" equ " " (
-        del "delimited.txt"
-        exit /b
-    )
+    echo GROUP ******** "!grp!"
+    del "group.txt"
+    del "delimited.txt"
+    
 
 
-    set brk=^
-
-
-
-    set ones=
-    for /f "tokens=*" %%i in (ones.txt) do (
-        set "ones=!ones!!brk!%%i"
-    )
-    echo ONES.txt
-    ECHO "!ones!"
-    del "ones.txt"
-
-
-    rem Records the tokens used to find all encapsulated lables
-    rem Use this list of tokens to find non-encapsulated words,
-    rem     - non-encapsulated words can contain "music" or "Music", 
-    rem         or any other derivations of importance that we 
-    rem         could use for sorting disk files with extensions
-    rem         .cmt, .d88, .t88
-    rem To find tokens required for collecting non-encapsulated words,
-    rem     for every token value in this list (except the last token value),
-    rem         subtract that token value by 1 
-    rem         (eg. 5 - 1 = 4, and use right bound character ), ], or })
+    rem tokens for non-encapsulated words
+    echo LOOK FOR TOKENS
     set tokens_=
     for /f "tokens=*" %%i in (tokens.txt) do (
         set "tokens_=!tokens_!!brk!%%i"
     )
-    echo tokens.txt
-    echo "!tokens_!"
+    rem echo tokens.txt
+    rem echo "!tokens_!"
     del "tokens.txt"
-    del "delimited.txt"
-
+    del "next.txt"
+pause
     endlocal
 exit /b
 
-:at_group
-    setlocal
 
+
+:at_group
+    rem echo AT_GROUP token: "!token!"
+    setlocal
+    rem echo  FUNCTION ---- AT_GROUPU:
     rem echo calling AT_GROUP NAME "!name!"
     set next=
     for /f "tokens=1 delims=|" %%i in (next.txt) do (
         set "next=%%i"
     )
-    rem echo NEXT "!next!"
+    echo NEXT "!next!" TOKEN "!token!"
 
     if "!next!" equ " " (
         rem echo ENDED NAME "!name!"
@@ -649,38 +645,10 @@ exit /b
     call :write_tokens "!token!"
 
 
-    set is_nested=
-
-    rem  ** "(" and ")" are arguments **
-    call :is_or_not_nested "!token!" "!left_char!" "!right_char!" "!name!"
-
-    set delimited=
-    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
-        set "delimited=%%i"
-    )
-
-    if "!delimited!" equ " " (
-        exit /b
-    )
-
-    rem echo NEED A FUNCTION CALL TO GO THROUGH THE GROUP
-    call :delimit_group "!token!" "!left_char!" "!right_char!" "!name!"
+  
+    call :delimit_group2 "!token!" "!left_char!" "!right_char!" "!name!"
    
-   
-
-
-    call :new_token_val "!token!"
-    rem echo old token "!token!"
-
-    set add_token=
-    for /f "tokens=1" %%i in (token_val.txt) do (
-        set "add_token=%%i"
-    )
-    rem echo the add token !add_token!
-    
-    rem echo old token "!token!"
-    set /a token=!add_token!
-    rem echo new token "!token!"
+    set /a token+=1 
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
     endlocal
@@ -688,32 +656,212 @@ exit /b
 
 
 
+
+
+:delimit_group2
+
+    
+    rem echo FUNCTION DELIM_GROUP_2
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    set "right_token=1"
+    echo ----------------- **** ----------------- "!token!"
+    call :delim_with_char "!token!" "!left_char!" "!name!"
+    set one_tail=
+    set two_tail=
+    set three_tail=
+    
+
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "one_tail=%%i"
+    )
+    
+    set "one_tail=)!one_tail!"
+
+
+    call :delim_with_char "1" "!right_char!" "!one_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "one=%%i"
+    )
+
+    if "!one!" equ " " (
+        set "one=!one!|"
+        echo !one! > "next.txt"
+        exit /b
+    )
+
+
+    echo ONE "!one!"
+    echo one tail "!one_tail!"
+
+   
+    
+    echo !one! > "next.txt"
+
+    
+    set "test=)!one!) "
+    
+     if not exist ones.txt (
+         if "!test!" equ "!one_tail!" (
+            rem pause
+            rem if !qty! equ 2 (
+              call :write_ones "!one!"
+            call :write_group
+            exit /b
+         ) 
+    )
+    rem pause
+
+    call :write_ones "!one!"
+
+
+    rem echo READ TWO "!two!"
+    set "save=!two!"
+
+    call :delim_with_char "2" "!right_char!" "!one_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "alt=%%i"
+    )
+    call :delim_with_char "3" "!right_char!" "!one_tail!"
+    for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+        set "al2=%%i"
+    )
+
+    echo ALT "!alt!"
+
+    
+    echo !save! > "delimited.txt"
+    rem echo --ONE "!one!"
+
+    if "!one!" equ "!one_tail!" (
+        set two=
+        rem transfer single item from ones.txt to group
+        set item=
+        call :write_group
+    )
+
+    rem echo ALT "!alt!"
+    rem echo ALT2 "!alt2!"
+    if "!alt!" neq " " (
+        rem Need to account for bridge wwhen this variable might contain
+        rem     information that should be ignored.
+
+        rem set /a token+=1
+        call :delim_with_char "!token!" "!right_char!" "!name!"
+        set bridge=
+        for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+            set "bridge=%%i"
+        )
+        echo bridge "!bridge!"
+        set stop=
+        for /f "tokens=2 delims=." %%i in ("!bridge!") do (
+            set "stop=%%i"
+        )
+       
+       
+        call :delim_with_char "1" "!left_char!" "!bridge!"
+        for /f "tokens=1 delims=|" %%i in (delimited.txt) do (
+            set "bridge=%%i"
+        )
+        echo new bridge "!bridge!"
+        if "!bridge!" equ "!alt!" (
+            set alt=
+        )
+        
+        call :write_ones "!alt!"
+        call :write_group
+    )
+    
+    endlocal
+exit /b
+
+:delim_with_char
+rem ECHO FUNCTION DELIM_WITH_CHAR
+    setlocal
+    rem %~1: token
+    rem %~2: delim char (eg. [, (, {, ], ), or })
+    set "phrase=%~3"
+    rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
+    set d=
+    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
+        set "d=%%i"
+    )
+
+    set "d=!d!|"
+    echo !d! > "delimited.txt"
+    endlocal
+exit /b
+
+
+:write_s
+    setlocal
+    set "item=%~1"
+    set s=
+    rem for /f "tokens=*" %%i in (s.txt) do (
+rem         set "s=!s! "
+    rem )
+    endlocal
+exit /b
+
 :write_ones
+
     setlocal
     set "new=%~1"
-    set brk=^
+ rem ECHO FUNCTION WRITE_ONES "!new!"   
 
 
     set "new_one=%~1"
     set old=
+    if exist ones.txt (
     for /f "tokens=*" %%i in (ones.txt) do (
+        set "old=!old!%%i"
+    )
+    )
+    set "old=!old!!new!"
+    rem echo OLD "!old!"
+    rem echo
+    rem echo "OLLLLD" "!old!"
+    echo !old! > "ones.txt"
+    endlocal
+exit /b
+
+:write_group
+    setlocal
+    
+    set old_o=
+    
+    for /f "tokens=*" %%i in (ones.txt) do (
+        set "old_o=%%i"
+    )
+    del "ones.txt"
+
+    set old=
+    if exist group.txt (
+    for /f "tokens=*" %%i in (group.txt) do (
         set "old=!old!!brk!%%i"
     )
-    set "old=!old!!brk!!new!"
-    rem echo OLD "!old!"
-    echo !old! > "ones.txt"
+    )
+    
+    set "old=!old!!brk!!old_o!"
+    echo !old! > "group.txt"
+    
     endlocal
 exit /b
 
 :write_tokens
     setlocal
     set "token=%~1"
-    set brk=^
+   
 
 
     set old=
+    if exist tokens.txt (
     for /f "tokens=*" %%i in (tokens.txt) do (
         set "old=!old!!brk!%%i"
+    )
     )
     set "old=!old!!brk!!token!"
     echo !old! > "tokens.txt"
