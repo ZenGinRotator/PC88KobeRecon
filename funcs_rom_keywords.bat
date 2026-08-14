@@ -11,7 +11,7 @@ set ins=is_nested_sqr.txt
 set grptxt=group.txt
 set delimtxt=delimited.txt
 set toktxt=tokens.txt
-set nxtxt=next.txt
+set encptd=encapsulated.txt
 set onstxt=ones.txt
 set brgtxt=bridges.txt
 set brk=^
@@ -596,8 +596,8 @@ exit /b
         if exist "%toktxt%" (
             del "%toktxt%"
         )
-        if exist "%nxtxt%" (
-            del "%nxtxt%"
+        if exist "%encptd%" (
+            del "%encptd%"
         )
         if exist "%onstxt%" (
             del "%onstxt%"
@@ -622,7 +622,8 @@ exit /b
     echo name "!name!" --------------------------------------------------
 
 
-    rem Collecting first part of file name that preceeds the encapsulated words
+    rem Collecting first part of file name that preceeds the first set of encapsulated words
+    rem eg. BRIDGE WORDS APPEAR BEFORE (this group) in the file name.
     call :delim_with_char "1" "!left_char!" "!name!"
     set init_bridge=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -632,7 +633,7 @@ exit /b
     call :write_bridge "!init_bridge!"
 
     set "a=A"
-    echo !a! > "%nxtxt%"
+    echo !a! > "%encptd%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
     set grp=
@@ -655,7 +656,7 @@ exit /b
    
     rem echo "!tokens_!"
     del "%toktxt%"
-    del "%nxtxt%"
+    del "%encptd%"
     set brdg=
     for /f "tokens=*" %%i in (%brgtxt%) do (
         set "brdg=!brdg!!brk!%%i"
@@ -672,13 +673,13 @@ exit /b
 
 :at_group
     setlocal
-    set next=
-    for /f "tokens=1 delims=|" %%i in (%nxtxt%) do (
-        set "next=%%i"
+    set next_encapped=
+    for /f "tokens=1 delims=|" %%i in (%encptd%) do (
+        set "next_encapped=%%i"
     )
    
-
-    if "!next!" equ " " (
+echo NEXT "!next_encapped!"
+    if "!next_encapped!" equ " " (
         exit /b
     )
 
@@ -729,7 +730,7 @@ exit /b
 
     if "!one!" equ " " (
         set "one=!one!|"
-        echo !one! > "%nxtxt%"
+        echo !one! > "%encptd%"
         exit /b
     )
 
@@ -739,7 +740,7 @@ exit /b
 
    
     
-    echo !one! > "%nxtxt%"
+    echo !one! > "%encptd%"
 
     
     set "non_nested_test=)!one!) "
@@ -776,7 +777,8 @@ exit /b
         set "last_nested=%%i"
     )
    
-
+    rem Words that exist in between encapsulated groups of words
+    rem eg. "This file name (has) BRIDGES (in between) THESE (groups) so save them."
     set bridge=
     call :delim_with_char "3" "!right_char!" "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -977,7 +979,7 @@ rem copy code begginging at line 290~
 
     if "!one!" equ " " (
         set "one=!one!|"
-        echo !one! > "%nxtxt%"
+        echo !one! > "%encptd%"
         exit /b
     )
 
@@ -1011,7 +1013,7 @@ rem copy code begginging at line 290~
     rem echo ------three "!three!"
 
     
-    echo !one! > "%nxtxt%"
+    echo !one! > "%encptd%"
 
     set "one=!one!!two!!three!"
     call :write_ones "!one!"
