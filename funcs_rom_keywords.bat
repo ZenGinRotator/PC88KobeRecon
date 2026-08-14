@@ -610,6 +610,77 @@ exit /b
     endlocal
 exit /b
 
+:other_encapped_check
+    setlocal
+    set "primary_left=%~1"
+    set "bridge=%~2"
+
+    set "opt1L=["
+    set "opt1R=]"
+
+    set "opt2L={"
+    set "opt2R=}"
+
+    if "!primary_left!" equ "{" (
+        set "opt1L=["
+        set "opt1R=]"
+
+        set "opt2L=("
+        set "opt2R=)"
+
+    )
+    if "!primary_left!" equ "[" (
+        set "opt1L=("
+        set "opt1R=)"
+
+        set "opt2L={"
+        set "opt2R=}"
+        
+    )
+
+    call :do_encapped_check "!opt1L!" "!opt1R!" "!bridge!"
+
+    call :do_encapped_check "!opt2L!" "!opt2R!" "!bridge!"
+
+
+    endlocal
+exit /b
+
+:do_encapped_check
+    setlocal
+    rem 1: left char
+    rem 2: right char
+    set "bridge=%~3"
+
+    rem MIGHT HAVE TO CALL TRAVERSE
+    rem !!! THIS CAUSES AN INFINITE LOOP BECAUSE
+    rem TRAVERSE calls DO_ENCAPPED_CHECK which calls TRAVERSE ... and so forth
+    REM call :traverse "2" "%~1" "%~2" "!bridge!"
+    REM pause
+    REM exit /b
+
+    call :delim_with_char "2" "%~1" "!bridge!"
+    set tail=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "tail=%%i"
+    )
+    echo TAIL "!tail!"
+
+    set wrd=
+    call :delim_with_char "1" "%~2" "!tail!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "wrd=%%i"
+    )
+
+    echo WORD "!wrd!"
+    if "!wrd!" equ " " (
+        echo NO ENCAPPED BRIDGE
+        exit /b
+    )
+    echo WE FOUND AN ENCAPSULATED BRIDGE !bridge! !! NEED TO EXCLUDE FROM BRIDGES.TXT
+    endlocal
+exit /b
+
 :traverse
     setlocal
 
@@ -621,6 +692,7 @@ exit /b
 
     echo name "!name!" --------------------------------------------------
 
+    
 
     rem Collecting first part of file name that preceeds the first set of encapsulated words
     rem eg. BRIDGE WORDS APPEAR BEFORE (this group) in the file name.
@@ -629,22 +701,34 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "init_bridge=%%i"
     )
+
+    echo INIT BRIDGE "!init_bridge!"
     
     call :write_bridge "!init_bridge!"
+
+
+    call :other_encapped_check "!left_char!" "!init_bridge!"
+
+
+
+
+
+
 
     set "a=A"
     echo !a! > "%encptd%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
 
-    set grp=
-    for /f "tokens=*" %%i in (%grptxt%) do (
-        set "grp=!grp!!brk!%%i"
+    if exist %grptxt% (
+        set grp=
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            set "grp=!grp!!brk!%%i"
+        )
+        echo --- GRUPS ----
+        ECHO !grp!
+        del "%grptxt%"
+        del "%delimtxt%"
     )
-    echo --- GRUPS ----
-    ECHO !grp!
-    del "%grptxt%"
-    del "%delimtxt%"
-    
 
 
     rem tokens for non-encapsulated words

@@ -250,7 +250,8 @@ setlocal
  set "d1=(double)"
  set "s1=(single)"
  set "e1=(e e (f f) (g g) h h)"
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !s1! B !e1!.d88"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "a b c d "
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y [fart] !a1! C !d1! E !s1! B !e1!.d88"
  echo ----------------------------------------------------------------------
   call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !s1! B !e1!X.d88"
 echo ----------------------------------------------------------------------
