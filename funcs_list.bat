@@ -214,7 +214,10 @@ for /d %%i in ("!src!\*") do (
         rem call "funcs_rom_keywords.bat" :sqr "%%~nxj" "!secnd_dirs!" "!sqr_brkt!\!rkf!" "%%~xj"
         rem call "funcs_rom_keywords.bat" :curl "%%~nxj" "!secnd_dirs!" "!curl_brkt!\!rkf!" "%%~xj"
         
-        call "funcs_rom_keywords.bat" :find_rom "%%~nxj" "!prim_dirs!" "!secnd_dirs!" "%%~xj"
+        rem call "funcs_rom_keywords.bat" :find_rom "%%~nxj" "!prim_dirs!" "!secnd_dirs!" "%%~xj"
+
+        rem --- RECURSIVE VERSION OF FINDING GROUPS AND BRIDGES IN FILE NAME
+        call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "%%~nxj"
         rem echo PAUSE AT LIST
         rem pause
 

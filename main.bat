@@ -106,12 +106,12 @@ set vvv=
  rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
  rem pause
  rem goto :eof
- call :all_bridges
- call :no_bridges
+call :all_bridges
+call :no_bridges
 call :neighb
 ECHO ---- DONE ----
- pause
- goto :eof
+  pause
+goto :eof
 
 set "a=hiby"
 set aone=

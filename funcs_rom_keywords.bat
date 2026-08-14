@@ -621,6 +621,16 @@ exit /b
 
     echo name "!name!" --------------------------------------------------
 
+
+    rem Collecting first part of file name that preceeds the encapsulated words
+    call :delim_with_char "1" "!left_char!" "!name!"
+    set init_bridge=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "init_bridge=%%i"
+    )
+    
+    call :write_bridge "!init_bridge!"
+
     set "a=A"
     echo !a! > "%nxtxt%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
@@ -705,8 +715,6 @@ exit /b
     
     call :delim_with_char "!token!" "!left_char!" "!name!"
     set one_tail=
-    
-
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one_tail=%%i"
     )
@@ -752,7 +760,7 @@ exit /b
 
 
     call :write_ones "!one!"
-    echo ONE TAIL -------- "!one_tail!"
+    rem echo ONE TAIL -------- "!one_tail!"
 
 
 
@@ -892,9 +900,9 @@ exit /b
 
     set old=
     if exist %toktxt% (
-    for /f "tokens=*" %%i in (%toktxt%) do (
-        set "old=!old!!brk!%%i"
-    )
+        for /f "tokens=*" %%i in (%toktxt%) do (
+            set "old=!old!!brk!%%i"
+        )
     )
     set "old=!old!!brk!!token!"
     echo !old! > "%toktxt%"
