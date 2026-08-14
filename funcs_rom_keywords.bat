@@ -633,7 +633,7 @@ exit /b
 
 
     rem tokens for non-encapsulated words
-    echo LOOK FOR TOKENS
+    REM echo LOOK FOR TOKENS
     set tokens_=
     for /f "tokens=*" %%i in (%toktxt%) do (
         set "tokens_=!tokens_!!brk!%%i"
@@ -714,67 +714,63 @@ exit /b
     )
 
 
-    echo      ONE "!one!"
-    echo one tail "!one_tail!"
+    rem echo      ONE "!one!"
+    rem echo one tail "!one_tail!"
 
    
     
     echo !one! > "%nxtxt%"
 
     
-    set "test=)!one!) "
-    echo     test "!test!"
+    set "non_nested_test=)!one!) "
+    rem echo     test "!non_nested_test!"
+    
+    rem Capturing non-nested groups (eg. (this is non-nested group))
+    rem     from file names
+    rem     "A file name with (non-nested group) in the file.d88" 
     
     if not exist %onstxt% (
-        if "!test!" equ "!one_tail!" (
+       if "!non_nested_test!" equ "!one_tail!" (
       
-            call :write_ones "!one!"
-            call :write_group
-            exit /b
-        ) 
+           call :write_ones "!one!"
+           call :write_group
+           exit /b
+       ) 
     )
 
 
     call :write_ones "!one!"
 
 
-  
 
+
+    rem Capturing labels within nested groups (eg. (This (is a) nested group))
+    
+
+    set last_nested=
     call :delim_with_char "2" "!right_char!" "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "alt=%%i"
+        set "last_nested==%%i"
     )
-    call :delim_with_char "3" "!right_char!" "!one_tail!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "al2=%%i"
-    )
+   
 
-    echo ALT "!alt!"
 
     
-  
 
-    if "!one!" equ "!one_tail!" (
-        call :write_group
-    )
 
-    rem echo ALT "!alt!"
-    rem echo ALT2 "!alt2!"
-    if "!alt!" neq " " (
-        rem Need to account for bridge wwhen this variable might contain
-        rem     information that should be ignored.
-
-        rem set /a token+=1
+    if "!last_nested=!" neq " " (
+       
+        rem Find any bridge words - words that exist in between groups of 
+        rem     of encapsulated words
+        rem     (eg. "This file (has) BRIDGE WORDS -- EXCLUDE THEM (in (between) groups) in the file")
+        
+        rem "This file has (a group with (word that are ) LAST_ENDED) in its name"
         call :delim_with_char "!token!" "!right_char!" "!name!"
         set bridge=
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "bridge=%%i"
         )
-        echo bridge "!bridge!"
-        set stop=
-        for /f "tokens=2 delims=." %%i in ("!bridge!") do (
-            set "stop=%%i"
-        )
+
        
        
         call :delim_with_char "1" "!left_char!" "!bridge!"
@@ -782,11 +778,13 @@ exit /b
             set "bridge=%%i"
         )
 
-        if "!bridge!" equ "!alt!" (
-            set alt=
+        rem A bridge word that appears after a non-nested group of words.
+        rem eg. (non-nested group) APPEARS BEFORE THESE BRIDGE WORDS/LAST_ENDED -- EXCLUDE (another group)
+        if "!bridge!" equ "!last_nested=!" (
+            set last_nested=
         )
         
-        call :write_ones "!alt!"
+        call :write_ones "!last_nested=!"
         call :write_group
     )
     

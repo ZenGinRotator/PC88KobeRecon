@@ -106,10 +106,10 @@ set vvv=
  rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
  rem pause
  rem goto :eof
-rem call :all_bridges
-rem call :no_bridges
+ call :all_bridges
+ call :no_bridges
 call :neighb
-
+ECHO ---- DONE ----
  pause
  goto :eof
 
@@ -265,6 +265,7 @@ echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !e1! B !s1!.d88"
 echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1! C !a1! E !e1! B !s1!X.d88"
+ echo ----------------------------------------------------------------------
 
 endlocal
 exit /b
@@ -290,6 +291,7 @@ echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !e1! !s1!.d88"
 echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !d1!  !a1! !e1! !s1!X.d88"
+ echo ----------------------------------------------------------------------
 
 endlocal
 exit /b
@@ -310,6 +312,7 @@ echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !e1! E !d1! B !s1!.d88"
 echo ----------------------------------------------------------------------
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !e1! E !d1! B !s1!X.d88"
+ echo ----------------------------------------------------------------------
 
 endlocal
 exit /b 
