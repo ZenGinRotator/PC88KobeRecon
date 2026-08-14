@@ -584,10 +584,32 @@ exit /b
 
 
 
+:delete_txts
+    setlocal
+        if exist "%grptxt%" (
+            del "%grptxt%"
+        )
+        if exist "%delimtxt%" (
+            del "%delimtxt%"
+        )
+        if exist "%toktxt%" (
+            del "%toktxt%"
+        )
+        if exist "%nxtxt%" (
+            del "%nxtxt%"
+        )
+        if exist "%onstxt%" (
+            del "%onstxt%"
+        )
 
+
+    endlocal
+exit /b
 
 :traverse
     setlocal
+
+    call :delete_txts
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
