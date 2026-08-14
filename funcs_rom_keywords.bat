@@ -13,6 +13,7 @@ set delimtxt=delimited.txt
 set toktxt=tokens.txt
 set nxtxt=next.txt
 set onstxt=ones.txt
+set brgtxt=bridges.txt
 set brk=^
 
 
@@ -601,6 +602,9 @@ exit /b
         if exist "%onstxt%" (
             del "%onstxt%"
         )
+        if exist "%brgtxt%" (
+            del "%brgtxt%"
+        )
 
 
     endlocal
@@ -642,6 +646,14 @@ exit /b
     rem echo "!tokens_!"
     del "%toktxt%"
     del "%nxtxt%"
+    set brdg=
+    for /f "tokens=*" %%i in (%brgtxt%) do (
+        set "brdg=!brdg!!brk!%%i"
+    )
+    echo -- BRIDGES --
+    echo !brdg!
+    del "%brgtxt%"
+
 pause
     endlocal
 exit /b
@@ -740,6 +752,7 @@ exit /b
 
 
     call :write_ones "!one!"
+    echo ONE TAIL -------- "!one_tail!"
 
 
 
@@ -754,7 +767,12 @@ exit /b
     )
    
 
-
+    set bridge=
+    call :delim_with_char "3" "!right_char!" "!one_tail!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
+        call :write_bridge "!bridge!"
+    )
     
 
 
@@ -766,7 +784,7 @@ exit /b
         
         rem "This file has (a group with (word that are ) LAST_ENDED) in its name"
         call :delim_with_char "!token!" "!right_char!" "!name!"
-        set bridge=
+        
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "bridge=%%i"
         )
@@ -782,6 +800,9 @@ exit /b
         rem eg. (non-nested group) APPEARS BEFORE THESE BRIDGE WORDS/LAST_ENDED -- EXCLUDE (another group)
         if "!bridge!" equ "!last_nested=!" (
             set last_nested=
+
+            rem save the bridges
+            call :write_bridge "!bridge!"
         )
         
         call :write_ones "!last_nested=!"
@@ -807,6 +828,20 @@ exit /b
     endlocal
 exit /b
 
+:write_bridge
+    setlocal
+    set "bridge=%~1"
+    set old=
+    if exist %brgtxt% (
+
+    
+    for /f "tokens=*" %%i in (%brgtxt%) do (
+        set "old=!old!!brk!%%i"
+    ))
+    set "old=!old!!brk!!bridge!"
+    echo !old! > "%brgtxt%"
+    endlocal
+exit /b
 
 
 :write_ones
