@@ -743,7 +743,9 @@ exit /b
 
     
     set "non_nested_test=)!one!) "
-    rem echo     test "!non_nested_test!"
+
+
+
     
     rem Capturing non-nested groups (eg. (this is non-nested group))
     rem     from file names
@@ -771,7 +773,7 @@ exit /b
     set last_nested=
     call :delim_with_char "2" "!right_char!" "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "last_nested==%%i"
+        set "last_nested=%%i"
     )
    
 
@@ -781,10 +783,10 @@ exit /b
         set "bridge=%%i"
         call :write_bridge "!bridge!"
     )
-    
 
+  
 
-    if "!last_nested=!" neq " " (
+    if "!last_nested!" neq " " (
        
         rem Find any bridge words - words that exist in between groups of 
         rem     of encapsulated words
@@ -806,14 +808,19 @@ exit /b
 
         rem A bridge word that appears after a non-nested group of words.
         rem eg. (non-nested group) APPEARS BEFORE THESE BRIDGE WORDS/LAST_ENDED -- EXCLUDE (another group)
-        if "!bridge!" equ "!last_nested=!" (
+        if "!bridge!" equ "!last_nested!" (
             set last_nested=
 
+
+            rem Check the bridge to see if it is encapsulated
+            rem     by other delimiting characters
+            rem If so, then exclude ??
             rem save the bridges
             call :write_bridge "!bridge!"
+
         )
         
-        call :write_ones "!last_nested=!"
+        call :write_ones "!last_nested!"
         call :write_group
     )
     
@@ -856,8 +863,7 @@ exit /b
 
     setlocal
     set "new=%~1"
-
-    set "new_one=%~1"
+    
     set old=
     if exist %onstxt% (
         for /f "tokens=*" %%i in (%onstxt%) do (
