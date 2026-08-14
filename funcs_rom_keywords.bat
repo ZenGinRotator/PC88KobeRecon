@@ -627,18 +627,14 @@ exit /b
 
 
 :at_group
-    rem echo AT_GROUP token: "!token!"
     setlocal
-    rem echo  FUNCTION ---- AT_GROUPU:
-    rem echo calling AT_GROUP NAME "!name!"
     set next=
     for /f "tokens=1 delims=|" %%i in (%nxtxt%) do (
         set "next=%%i"
     )
-    echo NEXT "!next!" TOKEN "!token!"
+   
 
     if "!next!" equ " " (
-        rem echo ENDED NAME "!name!"
         exit /b
     )
 
@@ -666,20 +662,15 @@ exit /b
 
 
 :delimit_group2
-
-    
-    rem echo FUNCTION DELIM_GROUP_2
     setlocal
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
     set "right_token=1"
-    echo ----------------- **** ----------------- "!token!"
+    
     call :delim_with_char "!token!" "!left_char!" "!name!"
     set one_tail=
-    set two_tail=
-    set three_tail=
     
 
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -701,7 +692,7 @@ exit /b
     )
 
 
-    echo ONE "!one!"
+    echo      ONE "!one!"
     echo one tail "!one_tail!"
 
    
@@ -710,23 +701,22 @@ exit /b
 
     
     set "test=)!one!) "
+    echo     test "!test!"
     
-     if not exist %onstxt% (
-         if "!test!" equ "!one_tail!" (
-            rem pause
-            rem if !qty! equ 2 (
-              call :write_ones "!one!"
+    if not exist %onstxt% (
+        if "!test!" equ "!one_tail!" (
+      
+            call :write_ones "!one!"
             call :write_group
             exit /b
-         ) 
+        ) 
     )
-    rem pause
+
 
     call :write_ones "!one!"
 
 
-    rem echo READ TWO "!two!"
-    set "save=!two!"
+  
 
     call :delim_with_char "2" "!right_char!" "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -740,8 +730,7 @@ exit /b
     echo ALT "!alt!"
 
     
-    echo !save! > "%delimtxt%"
-    rem echo --ONE "!one!"
+  
 
     if "!one!" equ "!one_tail!" (
         call :write_group
@@ -770,7 +759,7 @@ exit /b
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "bridge=%%i"
         )
-        echo new bridge "!bridge!"
+
         if "!bridge!" equ "!alt!" (
             set alt=
         )
@@ -783,7 +772,6 @@ exit /b
 exit /b
 
 :delim_with_char
-rem ECHO FUNCTION DELIM_WITH_CHAR
     setlocal
     rem %~1: token
     rem %~2: delim char (eg. [, (, {, ], ), or })
@@ -800,34 +788,20 @@ rem ECHO FUNCTION DELIM_WITH_CHAR
 exit /b
 
 
-:write_s
-    setlocal
-    set "item=%~1"
-    set s=
-    rem for /f "tokens=*" %%i in (s.txt) do (
-rem         set "s=!s! "
-    rem )
-    endlocal
-exit /b
 
 :write_ones
 
     setlocal
     set "new=%~1"
- rem ECHO FUNCTION WRITE_ONES "!new!"   
-
 
     set "new_one=%~1"
     set old=
     if exist %onstxt% (
-    for /f "tokens=*" %%i in (%onstxt%) do (
-        set "old=!old!%%i"
-    )
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            set "old=!old!%%i"
+        )
     )
     set "old=!old!!new!"
-    rem echo OLD "!old!"
-    rem echo
-    rem echo "OLLLLD" "!old!"
     echo !old! > "%onstxt%"
     endlocal
 exit /b
