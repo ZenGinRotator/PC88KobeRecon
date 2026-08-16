@@ -605,6 +605,9 @@ exit /b
         if exist "%brgtxt%" (
             del "%brgtxt%"
         )
+        if exist "change.txt" (
+            del "change.txt"
+        )
 
 
     endlocal
@@ -936,6 +939,7 @@ rem ECHO DELIM BRIDGE ---
         set "temp_head=%%i"
     )
     rem echo TEMP HEAD BEFORE "!temp_head!"
+    
     set "temp_head_before=!temp_head!"
     set "temp_head=!temp_head!!left_char!"
     rem echo TEMP HEAD AFTER "!temp_head!"
@@ -952,6 +956,69 @@ rem ECHO DELIM BRIDGE ---
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "head=%%i"
     )
+
+    echo TEMP HEAD BEFORE "!temp_head_before!"
+    set in=
+    set out=
+    call :delim_with_char "1" "!left_char!" "!temp_head_before!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "out=%%i"
+    )
+
+    call :delim_with_char "2" "!left_char!" "!temp_head_before!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "in=%%i"
+    )
+
+    set "this=!out!"
+    
+    set read=
+    for /f "tokens=1 delims=|" %%i in (change.txt) do (
+        set "read=%%i"
+    )
+    echo READ "!read!"
+
+    set /a chng=0
+    if "!read!" equ "T" (
+        set /a chng+=1
+    )
+
+    if "!out!" neq " " (
+        set /a chng+=1
+    )
+
+    if "!in!" equ " " (
+        set /a chng+=1
+    )
+
+    if !chng! equ 3 (
+        set "this=!in!"
+    )
+
+    
+
+    set /a chng=0
+    if "!out!" equ " " (
+        set /a chng+=1
+    )
+
+    if "!in!" neq " " (
+        set /a chng+=1
+    )
+
+    set "place=F|"
+    if !chng! equ 2 (
+        set "place=T|"
+    ) 
+    echo !place! > "change.txt"
+
+    echo OUT "!out!"
+    echo IN "!in!"
+
+    rem Need to add "this" to group by implementing a fix for it elsewhere
+    rem     eg. write this to encptd.txt file
+    echo THIS "!this!"
+    pause
 
     if "!temp_head_before!" equ " " (
         set "flag=DONE|"

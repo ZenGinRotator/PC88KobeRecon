@@ -99,13 +99,21 @@ set vvv=
         set "t=%%i"
     )
 
-    echo vvv "!vvv!"
-    echo t "!t!"
-    echo f
+    rem echo vvv "!vvv!"
+    rem echo t "!t!"
+    rem echo f
  pause
  rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
  rem pause
  rem goto :eof
+
+ set "isp_bar=is|phrase"
+set "isp_none=isphrase"
+echo VERIFY DELIMITING USING 
+call :v_bar "!isp_bar!"
+call :v_bar "!isp_none!"
+pause
+
 call :all_bridges
 call :no_bridges
 call :neighb
@@ -132,12 +140,12 @@ for /f "tokens=2 delims=|" %%i in ("!b!") do (
     set "btwo=%%i"
 )
 
-echo A "!a!" "!aone!" "!atwo!"
-echo B "!b!" "!bone!" "!btwo!"
+rem echo A "!a!" "!aone!" "!atwo!"
+rem echo B "!b!" "!bone!" "!btwo!"
 rem pause
 rem exit /b
-set "ab= a b|"
-set "ba=b a "
+rem set "ab= a b|"
+rem set "ba=b a "
 
 echo !ab! > "disk.txt"
 for /f "tokens=*" %%i in (disk.txt) do (
@@ -251,10 +259,12 @@ setlocal
  set "s1=(single)"
  set "e1=(e e (f f) (g g) h h)"
  rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "a b c d "
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] FART [x] [m m [n n] [o o] p p] BRO  !a1!"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] FART [x] [m m [n n] [o o] [p p] q q] BRO  !a1!"
  pause
- goto :eof
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! [E] !s1! B !e1!.d88"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] [x] [m m [n n] [o o] [p p] q q]  [m m [n n] [o o] [p p] q q] !a1!"
+ pause
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y [m m [n n] [o o] [p p] q q] BRO !a1! C !d1! [E] !s1! B !e1!.d88"
+ call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] [x] [m m [n n] [o o] [p p] q q] BRO [m m [n n] [o o] [p p] q q] !a1!"
  echo ----------------------------------------------------------------------
   call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y !a1! C !d1! E !s1! B !e1!X.d88"
 echo ----------------------------------------------------------------------
@@ -320,3 +330,24 @@ echo ----------------------------------------------------------------------
 
 endlocal
 exit /b 
+
+:v_bar
+    setlocal
+    set "phrase=%~1"
+    set token1=
+    set tokn2=
+    
+    for /f "tokens=1 delims=|" %%i in ("!phrase!") do (
+        set "token1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!phrase!") do (
+        set "token2=%%i"
+    )
+
+    echo ORIGIN "!phrase!"
+    echo TOKEN = 1 "!token1!"
+    echo TOKEN = 2 "!token2!"
+
+
+    endlocal
+exit /b
