@@ -645,224 +645,14 @@ exit /b
     rem  echo - "!opt2L!"
     rem pause
 
-    call :do_encapped_check "!opt1L!" "!opt1R!" "!bridge!" "!opt2L!" "!opt2R!"
-
-    call :do_encapped_check "!opt2L!" "!opt2R!" "!bridge!"
-
-
-    endlocal
-exit /b
-
-
-:do_encapped_check
-    setlocal
-    rem 1: left char
-    rem 2: right char
-    set "left_char=%~1"
-    set "right_char=%~2"
-    set "bridge=%~3"
-    set "optn_left_char=%~4"
-    set "optn_right_char=%~5"
-    
-    call :trial_other "!left_char!" "!right_char!" "!bridge!" "!optn_left_char!" "!optn_right_char!"
-
-    endlocal
-exit /b
-
-
-:trial_other
-    setlocal
-    set "left_char=%~1"
-    set "right_char=%~2"
-    set "bridge=%~3"
-    set "optn_left_char=%~4"
-    set "optn_right_char=%~5"
-
-
-    rem echo = "!left_char!"
-    rem echo = "!right_char!"
-    rem echo = "!bridge!"
-    
-
-     call :at_init_bridge "1" "!left_char!" "!right_char!" "!bridge!" "!optn_left_char!" "!optn_right_char!"
-     rem pause
-     
-     exit /b
-    echo TRIAL BRIDGE = "!bridge!"
-    call :delim_with_char "2" "%~1" "!bridge!"
-    set tail=
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "tail=%%i"
-    )
-    echo TAIL "!tail!"
-
-    set wrd=
-    call :delim_with_char "1" "%~2" "!tail!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "wrd=%%i"
-    )
-
-    echo WORD "!wrd!" - WA
-    if "!wrd!" equ " " (
-        echo NO ENCAPPED BRIDGE
-        exit /b
-    )
-    echo WE FOUND AN ENCAPSULATED BRIDGE !bridge! !! NEED TO EXCLUDE FROM BRIDGES.TXT
-    echo Goal to is to have bridges.txt only contain words that are non-encapsulated
-    echo so we can search among all of these words for disc- or music-related diskette files
-    echo Possibly save this encapsulated word for a different use
-    endlocal
-exit /b
-
-
-:traverse
-    setlocal
-
-    call :delete_txts
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-
-    echo name "!name!" -------------------------------------------------- 
-
-    
-
-    rem Collecting first part of file name that preceeds the first set of encapsulated words
-    rem eg. BRIDGE WORDS APPEAR BEFORE (this group) in the file name.
-    call :delim_with_char "1" "!left_char!" "!name!"
-    set init_bridge=
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "init_bridge=%%i"
-    )
-
-    rem echo INIT BRIDGE "!init_bridge!"
-    
-
-   
-    rem THIS REM BLOCK WORKS!! KEEP THIS
-     set "a=A"
-     echo !a! > "%encptd%"
-     call :other_encapped_check "!left_char!" "!init_bridge!"
-    REM echo ----- FINISHED OTHER CHECK --------
-
-    REM set bridges=
-    REM for /f "tokens=*" %%i in (%brgtxt%) do (
-    REM     set "bridges=!bridges!!brk!%%i"
-    REM )
-    REM echo INIT BRIDGES
-    REM ECHO !bridges!
-
-
-
-
-
-
-
-    
-    echo !a! > "%encptd%"
-    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
-
-    if exist %grptxt% (
-        set grp=
-        for /f "tokens=*" %%i in (%grptxt%) do (
-            set "grp=!grp!!brk!%%i"
-        )
-        echo --- GRUPS ----
-        ECHO !grp!
-        del "%grptxt%"
-        del "%delimtxt%"
-    )
-
-
-    rem tokens for non-encapsulated words
-    REM echo LOOK FOR TOKENS
-    set tokens_=
-    for /f "tokens=*" %%i in (%toktxt%) do (
-        set "tokens_=!tokens_!!brk!%%i"
-    )
-   
-    rem echo "!tokens_!"
-    del "%toktxt%"
+    call :at_init_bridge "1" "!opt1L!" "!opt1R!" "!bridge!"
     del "%encptd%"
-    set brdg=
-    for /f "tokens=*" %%i in (%brgtxt%) do (
-        set "brdg=!brdg!!brk!%%i"
-    )
-    echo -- BRIDGES --
-    echo !brdg!
-    del "%brgtxt%"
+    call :at_init_bridge "1" "!opt2L!" "!opt2R!" "!bridge!"
 
-pause
+
     endlocal
 exit /b
 
-
-
-:at_group
-    setlocal
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-    rem echo AT_GROUP FOR PRIMARY CHAR token "!token!"
-    
-
-
-
-    set next_encapped=
-    rem echo MINE AT GROUP NAME "!name!" LEFT CHAR "!left_char!"
-    
-    rem if !token! gtr 1 (
-    for /f "tokens=1 delims=|" %%i in (%encptd%) do (
-        set "next_encapped=%%i"
-    )
-    rem )
-   
-    rem echo NEXT "!next_encapped!" TOKEN "!token!" 
-    rem Need condition where token = 2 to indicate that we found the initial
-    rem     bridge (eg. group of words that preceed the first instance of our primary delimiting character )
-    rem     within the file name
-    rem Need to remove the undesired encasulated word from the initial bridge
-    rem if "!token!" equ "2" (
-    rem    call :other_encapped_check "!left_char!" "!next_encapped!"
-    rem )
-    rem if "!left_char!" neq "!primary_left!" (
-    rem     echo ---- mism atch ----
-    rem     call :write_bridge "!next_encapped!"
-    rem )
-
-
-    if "!next_encapped!" equ " " (
-        exit /b
-    )
-
-
-    rem added
-    rem if "!next_encapped!" equ "A " (
-    rem    exit /b
-    rem )
-    rem additional
-    rem if "!next_encapped!" equ "" (
-         rem exit /b
-    rem )
-
-
-
-  
-
-    rem Write tokens for encapsulators
-    call :write_tokens "!token!"
-
-
-  
-    call :delimit_group2 "!token!" "!left_char!" "!right_char!" "!name!"
-   
-    set /a token+=1 
-    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
-
-    endlocal
-exit /b
 
 :at_init_bridge
     setlocal
@@ -870,61 +660,38 @@ exit /b
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
-    set "optn_left_char=%~5"
-    set "optn_right_char=%~6"
-
+    rem set "optn_left_char=%~5"
+    rem set "optn_right_char=%~6"
+    rem echo AT INIT BRIDGE "!left_char!" "!right_char!"
 
     set next_encapped=
     for /f "tokens=1 delims=|" %%i in (%encptd%) do (
         set "next_encapped=%%i"
     )
-    rem echo AT_INIT_BRIDGE---- NEXT_ENCAPPTED "!next_encapped!" TOKEN "!token!"
-    rem echo "!optn_left_char!"
+   
 
     REM delimit next from any secondary left_chars
-    call :delim_with_char "1" "!optn_left_char!" "!next_encapped!"
+    call :delim_with_char "1" "!left_char!" "!next_encapped!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "next_encapped=%%i"
     )
+    rem echo "next encapped -> " "!next_encapped!"
      
-     
-     rem Might not need these if condition statments
-     rem They were part of the function call below that was previously moved.
-     rem echo "N" "!next_encapped!"
-    rem set /a exclude=0
-    rem if "!next_encapped!" equ "A " (
-    rem     set /a exclude+=1
-    rem )
-    rem if "!next_encapped!" equ "ECHO is off." (
-    rem    set /a exclude+=1
-    rem )
-
-    rem if "!next_encapped!" equ "DONE" (
-    rem     set /a exclude+=1
-    rem )
-
-    rem Moved this function call to differnet location to exclude unwanted 
-    rem     additions to bridge.txt
-    rem if !exclude! equ 0 (
-    rem     echo NXT "!next_encapped!"
-    rem     call :write_bridge "!next_encapped!"
-    rem )
-    
-    
     if "!next_encapped!" equ "DONE" (
         exit /b
     )
 
 
     
-    call :delimit_bridge "!token!" "!left_char!" "!right_char!" "!name!" "!optn_left_char!"
+    call :delimit_bridge "!token!" "!left_char!" "!right_char!" "!name!"
     rem ECHO BEFORE INCREMENT TOKEN "!token!"
     set /a token+=1
     rem ECHO AFTER INCREMENT TOKEN "!token!"
-    call :at_init_bridge "!token!" "!left_char!" "!right_char!" "!name!" "!optn_left_char!"
+    call :at_init_bridge "!token!" "!left_char!" "!right_char!" "!name!"
     
     endlocal
 exit /b
+
 
 
 :delimit_bridge
@@ -939,13 +706,18 @@ rem ECHO DELIM BRIDGE ---
     set "optn_left_char=%~5"
 
     set "right_token=1"
-
+    rem echo DELIM BRIDGE 
+    rem echo LEFT CHAR "!left_char!"
+    rem echo RIGHT CHRA "!right_char!"
+    rem echo TOKEN "!token!"
+    rem echo NAME "!name!"
     call :delim_with_char "!token!" "!right_char!" "!name!"
     set temp_head=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "temp_head=%%i"
     )
     rem echo TEMP HEAD BEFORE "!temp_head!"
+    rem pause
     
     set "temp_head_before=!temp_head!"
     set "temp_head=!temp_head!!left_char!"
@@ -979,8 +751,12 @@ rem ECHO DELIM BRIDGE ---
         set "in=%%i"
     )
 
+    
     set "this=!out!"
     
+rem echo IN "!in!" OUT "!out!"
+
+
     set read=
     for /f "tokens=1 delims=|" %%i in (change.txt) do (
         set "read=%%i"
@@ -1028,19 +804,176 @@ rem ECHO DELIM BRIDGE ---
 
     rem Need to add "this" to group by implementing a fix for it elsewhere
     rem     eg. write this to encptd.txt file
-    echo THIS "!this!"
-    call :write_bridge "!this!"
+    rem echo THIS "!this!"
+    rem call :write_bridge "!this!"
     rem pause
 
+    rem call :at_init_bridge "1" "!left_char!" "!right_char!" "!this!"
     if "!temp_head_before!" equ " " (
         set "flag=DONE|"
     )
-     
-    
+
+    rem echo "!left_char!" "!right_char!" "!this!"
+    call :write_bridge "!this!"
+    rem call :other_encapped_check 
+
+   
+   
+    rem A means to create an event that terminates the recursive function 
     echo !flag! > "%encptd%"
 
     endlocal
 exit /b
+
+
+:traverse
+    setlocal
+
+    call :delete_txts
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+
+    echo name "!name!" -------------------------------------------------- 
+
+    
+
+    rem Need to call traverse separately with "(, )", "[, ]", and "{, }"
+    rem Collecting first part of file name that preceeds the first set of encapsulated words
+    rem eg. BRIDGE WORDS APPEAR BEFORE (this group) in the file name.
+    call :delim_with_char "1" "!left_char!" "!name!"
+    set init_bridge=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "init_bridge=%%i"
+    )
+
+    rem echo INIT BRIDGE "!init_bridge!"
+    
+
+   
+    rem THIS REM BLOCK WORKS!! KEEP THIS
+     set "a=A"
+     echo !a! > "%encptd%"
+     call :other_encapped_check "!left_char!" "!init_bridge!"
+    REM echo ----- FINISHED OTHER CHECK --------
+
+    
+
+
+
+
+
+
+    
+    echo !a! > "%encptd%"
+    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
+
+    if exist %grptxt% (
+        set /a qty=0
+        set grp=
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            if !qty! equ 0 (
+                set "grp=!grp!%%i"
+            ) else (
+            set "grp=!grp!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+        echo --- GRUPS ----
+        ECHO !grp!
+        del "%grptxt%"
+        del "%delimtxt%"
+    )
+
+    echo "!brk!"
+
+    rem tokens for non-encapsulated words
+    REM echo LOOK FOR TOKENS
+    set tokens_=
+    for /f "tokens=*" %%i in (%toktxt%) do (
+        set "tokens_=!tokens_!!brk!%%i"
+    )
+   
+    rem echo "!tokens_!"
+    del "%toktxt%"
+    del "%encptd%"
+    set brdg=
+    if exist "%brgtxt%" (
+        set /a qty=0
+    for /f "tokens=*" %%i in (%brgtxt%) do (
+        if !qty! equ 0 (
+            set "brdg=!brdg!%%i"
+        ) else (
+        set "brdg=!brdg!!brk!%%i"
+        )
+        set /a qty+=1
+    )
+    )
+    echo -- BRIDGES --
+    echo !brdg!
+    del "%brgtxt%"
+
+pause
+    endlocal
+exit /b
+
+
+
+:at_group
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    rem echo AT_GROUP FOR PRIMARY CHAR token "!token!"
+    
+
+
+
+    set next_encapped=
+    rem echo MINE AT GROUP NAME "!name!" LEFT CHAR "!left_char!"
+    
+    rem if !token! gtr 1 (
+    for /f "tokens=1 delims=|" %%i in (%encptd%) do (
+        set "next_encapped=%%i"
+    )
+    rem )
+   
+
+
+    if "!next_encapped!" equ " " (
+        exit /b
+    )
+
+
+    rem added
+    rem if "!next_encapped!" equ "A " (
+    rem    exit /b
+    rem )
+    rem additional
+    rem if "!next_encapped!" equ "" (
+         rem exit /b
+    rem )
+
+
+
+  
+
+    rem Write tokens for encapsulators
+    call :write_tokens "!token!"
+
+
+  
+    call :delimit_group2 "!token!" "!left_char!" "!right_char!" "!name!"
+   
+    set /a token+=1 
+    call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
+
+    endlocal
+exit /b
+
+
 
 
 :delimit_group2
@@ -1193,7 +1126,7 @@ exit /b
     rem %~1: token
     rem %~2: delim char (eg. [, (, {, ], ), or })
     set "phrase=%~3"
-    rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
+     rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
     set d=
     for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
         set "d=%%i"
