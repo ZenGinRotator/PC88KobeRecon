@@ -886,22 +886,29 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "next_encapped=%%i"
     )
-    rem echo "N" "!next_encapped!"
-    set /a exclude=0
-    if "!next_encapped!" equ "A " (
-        set /a exclude+=1
-    )
-    if "!next_encapped!" equ "ECHO is off." (
-        set /a exclude+=1
-    )
+     
+     
+     rem Might not need these if condition statments
+     rem They were part of the function call below that was previously moved.
+     rem echo "N" "!next_encapped!"
+    rem set /a exclude=0
+    rem if "!next_encapped!" equ "A " (
+    rem     set /a exclude+=1
+    rem )
+    rem if "!next_encapped!" equ "ECHO is off." (
+    rem    set /a exclude+=1
+    rem )
 
-    if "!next_encapped!" equ "DONE" (
-        set /a exclude+=1
-    )
+    rem if "!next_encapped!" equ "DONE" (
+    rem     set /a exclude+=1
+    rem )
 
-    if !exclude! equ 0 (
-        call :write_bridge "!next_encapped!"
-    )
+    rem Moved this function call to differnet location to exclude unwanted 
+    rem     additions to bridge.txt
+    rem if !exclude! equ 0 (
+    rem     echo NXT "!next_encapped!"
+    rem     call :write_bridge "!next_encapped!"
+    rem )
     
     
     if "!next_encapped!" equ "DONE" (
@@ -957,7 +964,9 @@ rem ECHO DELIM BRIDGE ---
         set "head=%%i"
     )
 
-    echo TEMP HEAD BEFORE "!temp_head_before!"
+
+    rem Move this to a different function?
+    rem echo TEMP HEAD BEFORE "!temp_head_before!"
     set in=
     set out=
     call :delim_with_char "1" "!left_char!" "!temp_head_before!"
@@ -976,7 +985,7 @@ rem ECHO DELIM BRIDGE ---
     for /f "tokens=1 delims=|" %%i in (change.txt) do (
         set "read=%%i"
     )
-    echo READ "!read!"
+    rem echo READ "!read!"
 
     set /a chng=0
     if "!read!" equ "T" (
@@ -1009,50 +1018,24 @@ rem ECHO DELIM BRIDGE ---
     set "place=F|"
     if !chng! equ 2 (
         set "place=T|"
-    ) 
+    )
+
+    rem Make this a global constant
     echo !place! > "change.txt"
 
-    echo OUT "!out!"
-    echo IN "!in!"
+    rem echo OUT "!out!"
+    rem echo IN "!in!"
 
     rem Need to add "this" to group by implementing a fix for it elsewhere
     rem     eg. write this to encptd.txt file
     echo THIS "!this!"
-    pause
+    call :write_bridge "!this!"
+    rem pause
 
     if "!temp_head_before!" equ " " (
         set "flag=DONE|"
     )
-     rem if "!flag!" equ "!temp_head_before!" (
-        rem echo SAME**
-        rem  set "flag= v |"
-         rem if "!flag!" equ " " (
-         rem    set "flag=DONE"
-         rem )
-     rem )
-    rem if "!flag!" equ " " (
-        rem set "flag= v |"
-    rem )
-    
-    rem echo head before "!head!"
-    rem ECHO left char "!left_char!"
-    rem echo right char "!right_char!"
-     rem set "head=!right_char!!head!"
-     rem echo HEAD after "!head!" TOKEN ----- "!token!"
-     rem call :delim_with_char "1" "!right_char!" "!head!"
-     rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-     rem    set "head=%%i"
-    rem )
-    
-    
-    rem pause
-    rem if "!head!" equ "!name!" (
-    rem     set "head=!head!|"
-    rem     echo !head! > "%encptd%"
-    rem     exit /b
-    rem )
-    rem echo HEAD SENT TO NEXT.TXT "!head!"
-    rem pause
+     
     
     echo !flag! > "%encptd%"
 
@@ -1159,6 +1142,7 @@ rem echo one tail pause "!one_tail!"
         set "bridge=%%i"
         
     )
+
     call :write_bridge "!bridge!"
   
     rem echo ******************** last_nested "!last_nested!"
@@ -1192,6 +1176,7 @@ rem echo one tail pause "!one_tail!"
             rem     by other delimiting characters
             rem If so, then exclude ??
             rem save the bridges
+                
             call :write_bridge "!bridge!"
 
         )
