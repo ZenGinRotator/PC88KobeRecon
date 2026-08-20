@@ -695,7 +695,7 @@ exit /b
 
 
 :delimit_bridge
-rem ECHO DELIM BRIDGE ---
+
     setlocal
 
     rem %~1 = 1
@@ -703,7 +703,11 @@ rem ECHO DELIM BRIDGE ---
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
-    set "optn_left_char=%~5"
+    
+
+    rem ECHO DELIM BRIDGE --- "!bridge! !left_char! !right_char!"
+
+
 
     set "right_token=1"
     rem echo DELIM BRIDGE 
@@ -756,7 +760,7 @@ rem ECHO DELIM BRIDGE ---
     
 rem echo IN "!in!" OUT "!out!"
 
-
+    
     set read=
     for /f "tokens=1 delims=|" %%i in (change.txt) do (
         set "read=%%i"
@@ -813,17 +817,129 @@ rem echo IN "!in!" OUT "!out!"
         set "flag=DONE|"
     )
 
-    rem echo "!left_char!" "!right_char!" "!this!"
-    call :write_bridge "!this!"
-    rem call :other_encapped_check 
-
-   
+    
+    rem call :write_bridge "!this!"
+    rem echo THIS "!this!"
+    del "ef.txt"
+    call :at_this "1" "!left_char!" "!right_char!" "!this!"
+    call :at_this "1" "{" "}" "!this!"
+    echo THIS IS "!this!"
+    
    
     rem A means to create an event that terminates the recursive function 
     echo !flag! > "%encptd%"
 
     endlocal
 exit /b
+
+
+:at_this
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    
+    if "!name!" equ " " (
+        exit /b
+    )
+    echo AT THIS NAME "!name!" "!token!" "!left_char!" "!right_char!"
+    
+    set next_encapped=
+    if exist ef.txt (
+    for /f "tokens=1 delims=|" %%i in (ef.txt) do (
+        set "next_encapped=%%i"
+    )
+    )
+   ECHO ----- "NXT ENC" "!next_encapped!"
+
+    REM delimit next from any secondary left_chars
+    REM call :delim_with_char "1" "!left_char!" "!next_encapped!"
+    REM for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    REM     set "next_encapped=%%i"
+    REM )
+    rem echo "next encapped -> " "!next_encapped!"
+    rem When this does not include left_char
+    
+
+    rem "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it}  [ ]"
+    rem Possibilities for next_encapped
+    rem return the entirety of this when left_char does not exist
+    rem type 1: nc=Y Z, using lc=[ with token=1
+
+
+    rem return the entirety of this when left_char does exist,
+    rem type 2: nc=d d } FART, using lc={ with token=3
+
+    rem type 3: nc= " " or "ECHO is off." when iterated token cannot find any more partitions of name
+
+    rem     but token still needs to iterate through this
+    rem return next encapped as the token continuosly increases
+    rem return a next_encapped=" " or ECHO is off.
+
+     if "!next_encapped!" equ "ECHO is off." (
+        
+         exit /b
+     )
+
+     rem if "!next_encapped!" equ "" (
+     rem   exit /b
+     rem )
+     rem if "!next_encapped!" equ "X" (
+     rem     exit /b
+     rem )
+     echo ** WRITING ** "!next_encapped!"
+ call :write_bridge "!next_encapped!"
+
+     if "!next_encapped!" equ "DONE" (
+         exit /b
+     )
+    
+
+
+    call :delimit_this "!token!" "!left_char!" "!right_char!" "!name!"
+    set /a token+=1
+    call :at_this "!token!" "!left_char!" "!right_char!" "!name!"
+    endlocal
+exit /b
+
+:delimit_this
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+
+    call :delim_with_char "!token!" "!left_char!" "!name!"
+    set temp_head=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "temp_head=%%i"
+    )
+    echo ==================================TEMP HEAD "!temp_head!" "!token!" "!left_char!"
+    echo -------------- THIS "!name!"
+
+    if "!temp_head!" equ "!name!" (
+        echo !name! > "ef.txt"
+        exit /b
+    )
+
+    echo !temp_head! > "ef.txt"
+
+
+    endlocal
+exit /b
+
+
+
+
+
+:trav_parenth_curl_sqr
+    set "name=%~1"
+    call :traverse "2" "(" ")" "!name!"
+    call :traverse "2" "{" "}" "!name!"
+    call :traverse "2" "[" "]" "!name!"
+exit /b 
+
 
 
 :traverse
@@ -910,6 +1026,7 @@ exit /b
         set /a qty+=1
     )
     )
+    echo name "!name!" -------------------------------------------------- 
     echo -- BRIDGES --
     echo !brdg!
     del "%brgtxt%"
@@ -1150,11 +1267,9 @@ exit /b
             set /a item+=1
         )
     )
-    rem if !item! equ 0 (
-    rem     set "old=!bridge!"
-    rem ) else (
+  
     set "old=!old!!brk!!bridge!"
-    rem )
+  
     echo !old! > "%brgtxt%"
     endlocal
 exit /b

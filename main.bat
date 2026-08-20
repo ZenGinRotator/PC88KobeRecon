@@ -258,14 +258,9 @@ setlocal
  set "d1=(double)"
  set "s1=(single)"
  set "e1=(e e (f f) (g g) h h)"
- rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "a b c d "
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
- pause
- call "funcs_rom_keywords.bat" :traverse "2" "{" "}" "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
- pause
- 
- call "funcs_rom_keywords.bat" :traverse "2" "[" "]" "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
- pause
+
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
+
  goto :eof
  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] [x] [m m [n n] [o o] [p p] q q]  [m m [n n] [o o] [p p] q q] !a1!"
  pause
