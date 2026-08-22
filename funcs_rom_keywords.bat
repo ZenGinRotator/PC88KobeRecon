@@ -645,7 +645,9 @@ exit /b
     rem  echo - "!opt2L!"
     rem pause
 
-    echo ------------------------------------------------------------------------------------------------------------------------------------OPT 1 "!opt1L! !opt1R!" OPT 2 "!opt2L! !opt2R!"
+    echo PRIMARY "!primary_left!"
+    echo OPT 1 "!opt1L! !opt1R!"
+    echo OPT 2 "!opt2L! !opt2R!"
     REM echo BRIDGE "!bridge!"
     call :at_init_bridge "1" "!opt1L!" "!opt1R!" "!bridge!" "!opt2L!" "!opt2R!"
     del "%encptd%"
@@ -776,8 +778,10 @@ rem echo IN "!in!" OUT "!out!"
 
     
     set read=
+    if exist "change.txt" (
     for /f "tokens=1 delims=|" %%i in (change.txt) do (
         set "read=%%i"
+    )
     )
     rem echo READ "!read!"
 
@@ -1095,6 +1099,7 @@ exit /b
 
 :trav_parenth_curl_sqr
     set "name=%~1"
+    echo FILE "!name!"
     call :traverse "2" "(" ")" "!name!"
     call :traverse "2" "{" "}" "!name!"
     call :traverse "2" "[" "]" "!name!"
@@ -1111,7 +1116,7 @@ exit /b
     set "right_char=%~3"
     set "name=%~4"
 
-    echo name "!name!"  -------------------------------------------------- "!left_char!" "!right_char!"
+    
 
     
 
@@ -1186,12 +1191,12 @@ exit /b
         set /a qty+=1
     )
     )
-    echo name "!name!" -------------------------------------------------- 
+    
     echo -- BRIDGES --
     echo !brdg!
     del "%brgtxt%"
 
-
+    echo END TRAVERSE "!brk!"
     endlocal
 exit /b
 
