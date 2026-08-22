@@ -259,27 +259,28 @@ setlocal
  set "s1=(single)"
  set "e1=(e e (f f) (g g) h h)"
 
-call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z[x] { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
-
- goto :eof
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] [x] [m m [n n] [o o] [p p] q q]  [m m [n n] [o o] [p p] q q] !a1!"
- pause
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z[m m [n n] [o o] [p p] q q] BRO !a1! C !d1! [E] !s1! [Belly] B !e1!.d88"
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z [x] [x] [m m [n n] [o o] [p p] q q] BRO [m m [n n] [o o] [p p] q q] !a1!"
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z z y [x] S T { c c } { d d } FART {e e} [x] [m m [n n] [o o] [p p] q q] BRO  {fix it} !a1! [E E]"
+echo ----------------------------------------------------------------------
+ rem goto :eof
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z [x] [x] [m m [n n] [o o] [p p] q q]  [m m [n n] [o o] [p p] q q] !a1!"
  echo ----------------------------------------------------------------------
-  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1! C !d1! E !s1! B !e1!X.d88"
-echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1! C !d1! E !e1! B !s1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z[m m [n n] [o o] [p p] q q] BRO !a1! C !d1! [E] !s1! [Belly] B !e1!.d88"
  echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1! C !d1! E !e1! B !s1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z [x] [x] [m m [n n] [o o] [p p] q q] BRO [m m [n n] [o o] [p p] q q] !a1!"
+ echo ----------------------------------------------------------------------
+  call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr  "Y Z !a1! C !d1! E !s1! B !e1!X.d88"
 echo ----------------------------------------------------------------------
-call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! C !a1! E !s1! B !e1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr  "Y Z !a1! C !d1! E !e1! B !s1!.d88"
+ echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1! C !d1! E !e1! B !s1!X.d88"
 echo ----------------------------------------------------------------------
-call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! C !a1! E !s1! B !e1!X.d88"
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr  "Y Z !d1! C !a1! E !s1! B !e1!.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! C !a1! E !e1! B !s1!.d88"
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1! C !a1! E !s1! B !e1!X.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! C !a1! E !e1! B !s1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1! C !a1! E !e1! B !s1!.d88"
+echo ----------------------------------------------------------------------
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1! C !a1! E !e1! B !s1!X.d88"
  echo ----------------------------------------------------------------------
 
 endlocal
@@ -291,21 +292,21 @@ setlocal
  set "d1=(double)"
  set "s1=(single)"
  set "e1=(e e (f f) (g g) h h)"
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1!  !d1! !s1! !e1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1!  !d1! !s1! !e1!.d88"
  echo ----------------------------------------------------------------------
-  call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1!  !d1! !s1! !e1!X.d88"
+  call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1!  !d1! !s1! !e1!X.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1!  !d1! !e1! !s1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1!  !d1! !e1! !s1!.d88"
  echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1!  !d1! !e1! !s1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1!  !d1! !e1! !s1!X.d88"
 echo ----------------------------------------------------------------------
-call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1!  !a1! !s1! !e1!.d88"
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1!  !a1! !s1! !e1!.d88"
 echo ----------------------------------------------------------------------
-call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1!  !a1! !s1! !e1!X.d88"
+call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1!  !a1! !s1! !e1!X.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1!  !a1! !e1! !s1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1!  !a1! !e1! !s1!.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1!  !a1! !e1! !s1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1!  !a1! !e1! !s1!X.d88"
  echo ----------------------------------------------------------------------
 
 endlocal
@@ -320,13 +321,13 @@ setlocal
  set "e1=(e e (f f) (g g) h h)"
 
 
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! !s1! !e1! !a1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1! !s1! !e1! !a1!.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !d1! !s1! !e1! !a1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !d1! !s1! !e1! !a1!X.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1! C !e1! E !d1! B !s1!.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1! C !e1! E !d1! B !s1!.d88"
 echo ----------------------------------------------------------------------
- call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "Y Z !a1! C !e1! E !d1! B !s1!X.d88"
+ call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "Y Z !a1! C !e1! E !d1! B !s1!X.d88"
  echo ----------------------------------------------------------------------
 
 endlocal

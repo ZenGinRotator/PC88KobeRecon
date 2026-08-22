@@ -645,9 +645,11 @@ exit /b
     rem  echo - "!opt2L!"
     rem pause
 
-    call :at_init_bridge "1" "!opt1L!" "!opt1R!" "!bridge!"
+    echo ------------------------------------------------------------------------------------------------------------------------------------OPT 1 "!opt1L! !opt1R!" OPT 2 "!opt2L! !opt2R!"
+    REM echo BRIDGE "!bridge!"
+    call :at_init_bridge "1" "!opt1L!" "!opt1R!" "!bridge!" "!opt2L!" "!opt2R!"
     del "%encptd%"
-    call :at_init_bridge "1" "!opt2L!" "!opt2R!" "!bridge!"
+    REM call :at_init_bridge "1" "!opt2L!" "!opt2R!" "!bridge!" "!opt1L!" "!opt1R!"
 
 
     endlocal
@@ -660,10 +662,14 @@ exit /b
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
+    set "opt_left_char=%~5"
+    set "opt_right_char=%~6"
+
     rem set "optn_left_char=%~5"
     rem set "optn_right_char=%~6"
-    rem echo AT INIT BRIDGE "!left_char!" "!right_char!"
-
+     rem echo AT INIT BRIDGE "!name!"
+     rem pause
+    rem echo FOUR "!name!" should be bridge
     set next_encapped=
     for /f "tokens=1 delims=|" %%i in (%encptd%) do (
         set "next_encapped=%%i"
@@ -672,22 +678,26 @@ exit /b
 
     REM delimit next from any secondary left_chars
     call :delim_with_char "1" "!left_char!" "!next_encapped!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "next_encapped=%%i"
-    )
+     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+          set "next_encapped=%%i"
+     )
     rem echo "next encapped -> " "!next_encapped!"
      
-    if "!next_encapped!" equ "DONE" (
-        exit /b
+     if "!next_encapped!" equ "DONE" (
+         rem echo done
+         exit /b
     )
 
-
     
-    call :delimit_bridge "!token!" "!left_char!" "!right_char!" "!name!"
+    rem pause
+
+
+    rem NEED BOTH OPTION 1 AND 2
+    call :delimit_bridge "!token!" "!left_char!" "!right_char!" "!name!" "!opt_left_char!" "!opt_right_char!"
     rem ECHO BEFORE INCREMENT TOKEN "!token!"
     set /a token+=1
     rem ECHO AFTER INCREMENT TOKEN "!token!"
-    call :at_init_bridge "!token!" "!left_char!" "!right_char!" "!name!"
+    call :at_init_bridge "!token!" "!left_char!" "!right_char!" "!name!" "!opt_left_char!" "!opt_right_char!"
     
     endlocal
 exit /b
@@ -703,9 +713,13 @@ exit /b
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
+    set "opt_left_char=%~5"
+    set "opt_right_char=%~6"
     
 
-    rem ECHO DELIM BRIDGE --- "!bridge! !left_char! !right_char!"
+    REM ECHO DELIM BRIDGE --- "!bridge!"
+    rem !left_char! !right_char! !opt_left_char! !opt_right_char!"
+    rem pause
 
 
 
@@ -818,12 +832,45 @@ rem echo IN "!in!" OUT "!out!"
     )
 
     
+
+
+
     rem call :write_bridge "!this!"
+
+    rem if "!this!" equ " " (
+    rem     set "f=DONE|"
+    rem     echo !f! > "%encptd%"
+    rem    exit /b
+    rem )
+
+
+
     rem echo THIS "!this!"
+
+rem if "!this!" equ " " ( 
+
+    set test=
+     call :delim_with_char "1" "!opt_right_char!" "!this!"
+     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+         set "test=%%i"
+     )
+ rem )
+    rem echo TEST ON THIS  "!test!" with opt right char "!opt_right_char!" "tok = 1"
+    if "!test!" equ "!this!" (
+         rem echo WROTE THIS "!this!"
+        call :write_bridge "!this!"
+        
+    ) 
+    rem pause
+    if exist ef.txt (
     del "ef.txt"
-    call :at_this "1" "!left_char!" "!right_char!" "!this!"
-    call :at_this "1" "{" "}" "!this!"
-    echo THIS IS "!this!"
+    )
+    if "!this!" neq "!test!" (
+        REM APPLY OPTIONS ONTO "THIS"
+    rem call :at_this "1" "!left_char!" "!right_char!" "!this!" "!opt_left_char!" "!opt_right_char!"
+     call :at_this "1" "!opt_left_char!" "!opt_right_char!" "!this!" "!left_char!" "!right_char!"
+     )
+    rem echo THIS IS "!this!"
     
    
     rem A means to create an event that terminates the recursive function 
@@ -832,18 +879,21 @@ rem echo IN "!in!" OUT "!out!"
     endlocal
 exit /b
 
-
+REM USE THE OPTIONS ONTO THIS
 :at_this
     setlocal
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
+    set "opt_left_char=%~5"
+    set "opt_right_char=%~6"
     
     if "!name!" equ " " (
         exit /b
     )
-    echo AT THIS NAME "!name!" "!token!" "!left_char!" "!right_char!"
+    rem echo AT THIS NAME LEFT "!left_char!" RIGHT "!right_char!"
+      rem pause
     
     set next_encapped=
     if exist ef.txt (
@@ -851,7 +901,7 @@ exit /b
         set "next_encapped=%%i"
     )
     )
-   ECHO ----- "NXT ENC" "!next_encapped!"
+   rem ECHO ----- "NXT ENC" "!next_encapped!"
 
     REM delimit next from any secondary left_chars
     REM call :delim_with_char "1" "!left_char!" "!next_encapped!"
@@ -888,18 +938,63 @@ exit /b
      rem if "!next_encapped!" equ "X" (
      rem     exit /b
      rem )
-     echo ** WRITING ** "!next_encapped!"
- call :write_bridge "!next_encapped!"
-
-     if "!next_encapped!" equ "DONE" (
-         exit /b
+     rem echo ** WRITING ** "!next_encapped!"
+    rem echo DO AN ALTERNATIVE THIS RECURSIVE SEARCH ON NEXT_ENCAPPED
+    rem ECHO THEN WRITE THE OUTCOME TO BRIDGES --- NEED TO CHECK FOR AN EXISTING FILE IN A SAMPLE DIR
+    
+    REM DELIMIT WITH OPTIONS
+    rem do the test here for existence of right option
+    
+    set test=
+     call :delim_with_char "1" "!right_char!" "!next_encapped!"
+     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+         set "test=%%i"
      )
+     rem echo VS TEST "!test!" vs "!next_encapped!" NEXT ENCP  RIGHT CHAR "!left_char!"
+     
+     set use=
+     if "!test!" equ "!next_encapped!" (
+        set "use=!next_encapped!"
+    
+     )
+
+     rem echo WRITING USE 1 "!use!"
+    call :write_bridge "!use!"
+     call :delim_with_char "2" "!right_char!" "!next_encapped!"
+     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test=%%i"
+     )
+
+     rem echo NEW VS TEST "!test!" WITH next encp "!next_encapped!"
+
+    if "!test!" neq "!next_encapped!" (
+        set "use=!test!"
+    )
+
+    rem echo WRITING USE  2 "!use!"
+    call :write_bridge "!use!"
+
+    if exist fg.txt (
+    del "fg.txt"
+    )
+    rem echo DEL "!left_char! !right_char! !opt_left_char! !opt_right_char!"
+    rem pause
+    rem Use if to skip empties
+
+    rem if "!next_encapped!" neq "" (
+    REM call :at_prelim "1" "!left_char!" "!right_char!" "!next_encapped!"
+    rem call :at_prelim "1" "!opt_left_char!" "!opt_right_char!" "!next_encapped!"
+    rem )
+
+     rem if "!next_encapped!" equ "DONE" (
+     rem     exit /b
+     rem )
     
 
 
     call :delimit_this "!token!" "!left_char!" "!right_char!" "!name!"
     set /a token+=1
-    call :at_this "!token!" "!left_char!" "!right_char!" "!name!"
+    call :at_this "!token!" "!left_char!" "!right_char!" "!name!" "!opt_left_char!" "!opt_right_char!"
     endlocal
 exit /b
 
@@ -915,8 +1010,8 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "temp_head=%%i"
     )
-    echo ==================================TEMP HEAD "!temp_head!" "!token!" "!left_char!"
-    echo -------------- THIS "!name!"
+    REM echo ==================================TEMP HEAD "!temp_head!" "!token!" "!left_char!"
+    REM echo -------------- THIS "!name!"
 
     if "!temp_head!" equ "!name!" (
         echo !name! > "ef.txt"
@@ -930,6 +1025,71 @@ exit /b
 exit /b
 
 
+REM THE OPTIONS ARE LEFT & RIGHT CHARS
+:at_prelim
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "prelim=%~4"
+    echo AT PRELIM "!prelim!" LEFT CHAR IS  "!left_char!" TOKEN = "!token!"
+    rem pause
+    set next=
+    for /f "tokens=1 delims=|" %%i in (fg.txt) do (
+        set "next=%%i"
+    )
+ echo NEXT "!next!"
+ REM TEST FOR THE EXISTENCE OF RIGHT OPTION = "}"
+ REM IF IT EXISTS DONT' SAVE NEXT
+    rem pause
+
+    if "!next!" equ "ECHO is off." (
+         exit /b
+    )
+rem call :write_bridge "!next!"
+    if "!next!" equ "DONE" (
+        exit /b
+    )
+    call :delim_prelim "!token!" "!left_char!" "!right_char!" "!prelim!"
+    set /a token+=1
+    call :at_prelim "!token!" "!left_char!" "!right_char!" "!prelim!"
+    endlocal
+exit /b
+
+:delim_prelim
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "prelim=%~4"
+    
+
+    call :delim_with_char "!token!" "!left_char!" "!prelim!"
+    set t_head=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "t_head=%%i"
+    )
+    echo T_HEAD "!t_head!" LEFT CHAR = "!left_char!" PRELIM "!prelim!" TOKN "!token!"
+    REM DO A TEST FOR RIGHT OPTION ON T_HEAD
+    call :delim_with_char "1" "!right_char!" "!t_head!"
+   
+
+  
+    rem if "!t_head!" neq "!prelim!" (
+    rem     echo diff "!t_head!" vs "!prelim!"
+    rem )
+    REM if "!t_head!" equ "!prelim!" (
+    REM     echo !prelim! > "fg.txt"
+    REM     exit /b
+    REM )
+
+    rem if "!t_head!" equ "blank" (
+    rem     echo "blank" > "fg.txt"
+    rem )
+
+    echo !t_head! > "fg.txt"
+    endlocal
+exit /b
 
 
 
@@ -951,7 +1111,7 @@ exit /b
     set "right_char=%~3"
     set "name=%~4"
 
-    echo name "!name!" -------------------------------------------------- 
+    echo name "!name!"  -------------------------------------------------- "!left_char!" "!right_char!"
 
     
 
@@ -1031,7 +1191,7 @@ exit /b
     echo !brdg!
     del "%brgtxt%"
 
-pause
+
     endlocal
 exit /b
 
@@ -1184,16 +1344,19 @@ rem echo one tail pause "!one_tail!"
         set "last_nested=%%i"
     )
    
+
+    rem Calling bridges here within encapsulated groups returns any encapsulated bridge
+    REM     that appears after the last encapsulated grou words, but we want the 
+    rem     the appended encapsulated bridge to be in included as
     rem Words that exist in between encapsulated groups of words
     rem eg. "This file name (has) BRIDGES (in between) THESE (groups) so save them."
     set bridge=
     call :delim_with_char "3" "!right_char!" "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
-        
     )
 
-    call :write_bridge "!bridge!"
+     rem call :write_bridge "!bridge!"
   
     rem echo ******************** last_nested "!last_nested!"
     if "!last_nested!" neq " " (
@@ -1257,6 +1420,8 @@ exit /b
 :write_bridge
     setlocal
     set "bridge=%~1"
+
+    rem echo  WRITING "!bridge!"
     set old=
     set /a item=0
     if exist %brgtxt% (
