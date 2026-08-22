@@ -1,6 +1,22 @@
 @ echo off
 @ setlocal EnableDelayedExpansion
 set "equ_border=****************************************************************************************************************************************************************************"
+rem need nested [] () and {}
+rem need indiv [] () and {} - single and multi-word?
+
+set "nest_pare_one=(this is (a nested) (par set) to test one)"
+set "nest_pare_two=(this is (a nested) (par set) to test two)"
+set "nest_curl_one={this is {a nested} {curl set} to test one}"
+set "nest_curl_two={this is {a nested} {curl set} to test tw0}"
+set "nest_sqr_one=[this is [a nested] [sqr set] to test one]"
+set "nest_sqr_two=[this is [a nested] [sqr set] to test two]"
+set "indiv_pare_one=(indiv pare one)"
+set "indiv_paren_two=(indiv pare two)"
+set "indiv_curl_one={indiv curl one}"
+set "indiv_curl_two={indiv curl two}"
+set "indiv_sqr_one=[indiv sqr one]"
+set "indiv_sqr_two=[indiv sqr two]"
+
 set brk=^
 
 
@@ -335,6 +351,15 @@ echo "%equ_border%"
 
 endlocal
 exit /b 
+
+:border_and_file
+    setlocal
+    set "file=%~1"
+    echo "%equ_border%"
+    call "funcs_rom_keywords.bat" : trav_parenth_curl_sqr "!file!"
+    endlocal
+exit /b    
+
 
 :v_bar
     setlocal

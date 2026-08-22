@@ -610,6 +610,7 @@ exit /b
         )
 
 
+
     endlocal
 exit /b
 
@@ -1116,7 +1117,7 @@ exit /b
     set "right_char=%~3"
     set "name=%~4"
 
-    
+    echo NAME "!name!"
 
     
 
@@ -1149,54 +1150,16 @@ exit /b
     
     echo !a! > "%encptd%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
-
-    if exist %grptxt% (
-        set /a qty=0
-        set grp=
-        for /f "tokens=*" %%i in (%grptxt%) do (
-            if !qty! equ 0 (
-                set "grp=!grp!%%i"
-            ) else (
-            set "grp=!grp!!brk!%%i"
-            )
-            set /a qty+=1
-        )
-        echo --- GRUPS ----
-        ECHO !grp!
-        del "%grptxt%"
-        del "%delimtxt%"
-    )
-
+    call :print_group
     echo "!brk!"
-
-    rem tokens for non-encapsulated words
-    REM echo LOOK FOR TOKENS
-    set tokens_=
-    for /f "tokens=*" %%i in (%toktxt%) do (
-        set "tokens_=!tokens_!!brk!%%i"
-    )
-   
-    rem echo "!tokens_!"
-    del "%toktxt%"
-    del "%encptd%"
-    set brdg=
-    if exist "%brgtxt%" (
-        set /a qty=0
-    for /f "tokens=*" %%i in (%brgtxt%) do (
-        if !qty! equ 0 (
-            set "brdg=!brdg!%%i"
-        ) else (
-        set "brdg=!brdg!!brk!%%i"
-        )
-        set /a qty+=1
-    )
-    )
+    rem call :print_bridge
     
-    echo -- BRIDGES --
-    echo !brdg!
-    del "%brgtxt%"
+    
+    
 
-    echo END TRAVERSE "!brk!"
+    echo END TRAVERSE 
+    echo -----------------------------
+    echo "!brk!"
     endlocal
 exit /b
 
@@ -1228,22 +1191,8 @@ exit /b
         exit /b
     )
 
-
-    rem added
-    rem if "!next_encapped!" equ "A " (
-    rem    exit /b
-    rem )
-    rem additional
-    rem if "!next_encapped!" equ "" (
-         rem exit /b
-    rem )
-
-
-
-  
-
     rem Write tokens for encapsulators
-    call :write_tokens "!token!"
+    rem call :write_tokens "!token!"
 
 
   
@@ -1273,18 +1222,6 @@ exit /b
         set "one_tail=%%i"
     )
 
-rem echo one tail pause "!one_tail!"
-
-    rem call :delim_with_char "1" "!right_char!" "!one_tail!"
-    rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-    rem     set "one_tail=%%i"
-    rem )
-    rem set "one_tail=!one_tail!!right_char!"
-    rem echo new one tail "!one_tail!"
-    rem pause
-    
-    rem echo ONE TAIL "!one_tail!" NAME "!name!" "!left_char!"
-    rem pause
     set "one_tail=!right_char!!one_tail!"
     
 
@@ -1292,29 +1229,26 @@ rem echo one tail pause "!one_tail!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "one=%%i"
     )
-
+rem echo ONE "!one!"
+rem echo NON NESTED TEST "!non_nested_test!"
+rem echo ONE TAIL "!one_tail!"
     if "!one!" equ " " (
+        rem call :print_ones
+        call :write_group
         set "one=!one!|" 
         echo !one! > "%encptd%"
+
+        rem echo LAST TOKEN? "!token!"
+        pause
         exit /b
     )
 
 
-    rem echo      ONE "!one!"
-    rem echo one tail "!one_tail!"
-
-   
-    rem echo onnnnnnnnnnnnnnnnnnne "!one!"
-    rem pause
+  
     echo !one! > "%encptd%"
 
-    rem echo ONE TAIL  "!one_tail!" 
-    rem echo ONE "!one!"
     set "non_nested_test=!right_char!!one!!right_char!"
-    rem echo NON NESTED TEST "!non_nested_test!"
-    rem echo RIGHT CHAR "!right_char!" 
-    
-
+  
 
 
     
@@ -1449,6 +1383,7 @@ exit /b
 
     setlocal
     set "new=%~1"
+    rem echo WRITING a NEW ONE "!new!"
     set old=
     if exist %onstxt% (
         for /f "tokens=*" %%i in (%onstxt%) do (
@@ -1456,7 +1391,7 @@ exit /b
         )
     )
     set "old=!old!!new!"
-
+    rem echo ** OLD BEFORE ">" "!old!"
     echo !old! > "%onstxt%"
     endlocal
 exit /b
@@ -1466,11 +1401,15 @@ exit /b
     
     set old_o=
     set /a item=0
-    
-    for /f "tokens=*" %%i in (%onstxt%) do (
-        set "old_o=%%i"
+    if exist %onstxt% (
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            set "old_o=%%i"
+        )
     )
-    del "%onstxt%"
+    if exist %onstxt% (
+        del "%onstxt%"
+    )
+    
 
     set old=
     if exist %grptxt% (
@@ -1508,6 +1447,79 @@ exit /b
     endlocal
 exit /b
 
+:print_group
+    setlocal
+    if exist %grptxt% (
+        set /a qty=0
+        set grp=
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            if !qty! equ 0 (
+                set "grp=!grp!%%i"
+            ) else (
+                set "grp=!grp!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+        echo --- GRUPS ----
+        ECHO !grp!
+    )
+    endlocal
+exit /b
+
+
+:print_bridge
+    setlocal
+
+    set brdg=
+    if exist "%brgtxt%" (
+        set /a qty=0
+        for /f "tokens=*" %%i in (%brgtxt%) do (
+            if !qty! equ 0 (
+                set "brdg=!brdg!%%i"
+            ) else (
+                set "brdg=!brdg!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+    )
+    
+    echo -- BRIDGES --
+    echo !brdg!
+    
+    endlocal
+exit /b
+
+:print_ones
+    setlocal
+    set ons=
+    if exist "%onstxt%" (
+        set /a qty=0
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            if !qty! equ 0 (
+                set "ons=!ons!%%i" 
+            ) else (
+                set "ons=!ons!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+    )
+
+    echo -- ONES --
+    echo !ons!
+    endlocal
+exit /b
+
+
+rem Might not need this function, nor collecting tokens
+:print_tokens
+    setlocal
+    set tokens_=
+    for /f "tokens=*" %%i in (%toktxt%) do (
+        set "tokens_=!tokens_!!brk!%%i"
+    )
+
+    endlocal
+exit /b
 
 
 
