@@ -4,18 +4,39 @@ set "equ_border=****************************************************************
 rem need nested [] () and {}
 rem need indiv [] () and {} - single and multi-word?
 
-set "nest_pare_one=(this is (a nested) (par set) to test one)"
-set "nest_pare_two=(this is (a nested) (par set) to test two)"
-set "nest_curl_one={this is {a nested} {curl set} to test one}"
-set "nest_curl_two={this is {a nested} {curl set} to test tw0}"
-set "nest_sqr_one=[this is [a nested] [sqr set] to test one]"
-set "nest_sqr_two=[this is [a nested] [sqr set] to test two]"
+set none_blank=
+set "none_full=file name without labels"
+
+set "nest_pare_one=(this is (a nested) (par set) one)"
+set "nest_pare_two=(this is (a nested) (par set) two)"
+set "nest_pare_three=(this is (a nested) (par set) three)"
+
+set "nest_curl_one={this is {a nested} {curl set} one}"
+set "nest_curl_two={this is {a nested} {curl set} two}"
+set "nest_curl_three={this is {a nested} {curl set} three}"
+
+set "nest_sqr_one=[this is [a nested] [sqr set] one]"
+set "nest_sqr_two=[this is [a nested] [sqr set] two]"
+set "nest_sqr_three=[this is [a nested] [sqr set] three]"
+
 set "indiv_pare_one=(indiv pare one)"
-set "indiv_paren_two=(indiv pare two)"
+set "indiv_pare_two=(indiv pare two)"
+set "indiv_pare_three=(indiv pare three)"
+
 set "indiv_curl_one={indiv curl one}"
 set "indiv_curl_two={indiv curl two}"
+set "indiv_curl_three={indiv curl three}"
+
+
 set "indiv_sqr_one=[indiv sqr one]"
 set "indiv_sqr_two=[indiv sqr two]"
+set "indiv_sqr_three=[indiv sqr three]"
+
+
+set "brid_one=bridge 1"
+set "brid_two=bridge 2"
+set "brid_three=bridge 3"
+set "brid_four=bridge 4"
 
 set brk=^
 
@@ -131,9 +152,10 @@ call :v_bar "!isp_bar!"
 call :v_bar "!isp_none!"
 pause
 
-call :all_bridges
-call :no_bridges
-call :neighb
+rem call :all_bridges
+rem call :no_bridges
+rem call :neighb
+call :samples
 ECHO ---- DONE ----
   pause
 goto :eof
@@ -268,6 +290,141 @@ exit /b
     echo R "!r!"
 
 exit /b
+
+:samples
+    setlocal
+    rem call :none ""
+    rem call :none ".d88"
+    call :same ""
+    call :same ".d88"
+    REM call :alternating ""
+    REM call :alternating ".d88"
+    endlocal
+exit /b
+
+:none
+    setlocal
+    set "ext=%~1"
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "%none_blank%!ext!"
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "%none_full%!ext!"
+    endlocal
+exit /b
+
+REM CAUSES AN ERROR
+REM FILE "X (indiv pare one)(indiv pare two)"
+REM PRIMARY "("
+REM OPT 1 "[ ]"
+REM OPT 2 "{ }"
+REM --- GRUPS ----
+REM indiv pare one indiv pare two (these need to be on separate lines in txt file)
+:same
+    setlocal
+    set "ext=%~1"
+    call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
+
+    call :same_perms "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
+
+    call :same_perms "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "!ext!"
+
+    call :same_perms "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "!ext!"
+
+    call :same_perms "%nest_sqr_one%" "%nest_sqr_two%" "%nest_sqr_three%" "!ext!"
+
+    call :same_perms "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "!ext!"
+    endlocal
+exit /b
+
+:same_perms
+    setlocal
+    set "one=%~1"
+    set "two=%~2"
+    set "three=%~3"
+    set "ext=%~4"
+
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!ext!"
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!two!!ext!"
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!two!!three!!ext!"
+
+    endlocal
+exit /b
+
+:alternating
+    setlocal
+    set "ext=%~1"
+
+    rem LEADING NON-NESTED PARE, FOLLOW NESTED PARE
+    call :lead_and_follow "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "%nest_pare_one%" "%nest_pare_two%" "!ext!"
+
+    rem LEADING NON-NESTED PARE, FOLLOW NESTED CURL
+    call :lead_and_follow "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "%nest_curl_one%" "%nest_curl_two%" "!ext!"
+
+    REM LEADING NON-NESTED PARE, FOLLOW NESTED SQR
+    call :lead_and_follow "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "%nest_sqr_one%" "%nest_sqr_two%" "!ext!"
+
+    rem LEADING NON-NESTED CURL, FOLLOW NESTED PARE
+    call :lead_and_follow "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "%nest_pare_one%" "%nest_pare_two%" "!ext!"
+    
+    REM LEADING NON-NESTED CURL, FOLLOW NESTED CURL
+    call :lead_and_follow "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "%nest_curl_one%" "%nest_curl_two%" "!ext!"
+    
+    REM LEADING NON-NESTED CURL, FOLLOW NESTED SQR
+    call :lead_and_follow "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "%nest_sqr_one%" "%nest_sqr_two%" "!ext!"
+    
+    rem LEADING NON-NESTED SQR, FOLLOW NESTED PARE
+    call :lead_and_follow "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "%nest_pare_one%" "%nest_pare_two%" "!ext!"
+
+    REM LEADING NON-NESTED SQR, FOLLOW NESTED CURL
+    call :lead_and_follow "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "%nest_curl_one%" "%nest_curl_two%" "!ext!"
+
+    REM LEADING NON-NESTED SQR, FOLLOW NESTED SQR
+    call :lead_and_follow "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "%nest_sqr_one%" "%nest_sqr_two%" "!ext!"
+
+    rem LEADING NESTED PARE, FOLLOW NON-NESTED PARE
+    call :lead_and_follow "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "%indiv_pare_one%" "%indiv_pare_two%" "!ext!"
+
+    rem LEADING NESTED PARE, FOLLOW NON-NESTED CURL
+    call :lead_and_follow "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "%indiv_curl_one%" "%indiv_curl_two%" "!ext!"
+
+    rem LEADING NESTED PARE, FOLLOW NON-NESTED SQR
+    call :lead_and_follow "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "%indiv_sqr_one%" "%indiv_sqr_two%" "!ext!"
+
+    REM LEADING NESTED CURL,  FOLLOW NON-NESTED PARE
+    call :lead_and_follow "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "%indiv_pare_one%" "%indiv_pare_two%" "!ext!"
+
+    REM LEADING NESTED CURL, FOLLOW NON-NESTED CURL
+    call :lead_and_follow "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "%indiv_curl_one%" "%indiv_curl_two%" "!ext!"
+
+    REM LEADING NESTED CURL, FOLLOW NON-NESTED SQR
+    call :lead_and_follow "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "%indiv_sqr_one%" "%indiv_sqr_two%" "!ext!"
+
+    REM LEADING NESTED SQR,  FOLLOW NON-NESTED PARE
+    call :lead_and_follow "%nest_sqr_one%" "%nest_sqr_two%" "%nest_sqr_three%" "%indiv_pare_one%" "%indiv_pare_two%" "!ext!"
+
+    REM LEADING NESTED SQR, FOLLOW NON-NESTED CURL
+    call :lead_and_follow "%nest_sqr_one%" "%nest_sqr_two%" "%nest_sqr_three%" "%indiv_curl_one%" "%indiv_curl_two%" "!ext!"
+
+    REM LEADING NESTED SQR, FOLLOW NON-NESTED SQR
+    call :lead_and_follow "%nest_sqr_one%" "%nest_sqr_two%" "%nest_sqr_three%" "%indiv_sqr_one%" "%indiv_sqr_two%" "!ext!"
+    endlocal
+exit /b
+
+:lead_and_follow
+    setlocal
+    set "lead_one=%~1"
+    set "lead_two=%~2"
+    set "lead_three=%~3"
+    set "middle_one=%~4"
+    set "middle_two=%~5"
+    set "ext=%~6"
+
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X!lead_one!!middle_one!!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X!lead_one!!middle_one!!lead_two!!middle_two!!lead_three!!ext!"
+
+
+    endlocal
+exit /b
+
+
 
 :all_bridges
 setlocal

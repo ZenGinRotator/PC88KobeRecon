@@ -87,7 +87,7 @@ rem determine whether file is .d88, .cmt, or .t88
     )
 
     call :name_ "!name!" "!prim_dirs!" "!sec_dirs!"
-    rem pause
+
     
     
 exit /b
@@ -189,7 +189,7 @@ rem determine whether file and directory name has (), {}, [], or does not have e
     )
 
 
-    rem pause
+
     if "!ptail!" neq "!blnk!" (
         call :delim_it "!name!" "(" ")" "!prim_dirs!" "!sec_dirs!"
     )
@@ -203,7 +203,7 @@ rem determine whether file and directory name has (), {}, [], or does not have e
     )
 
     
-    rem pause
+
 exit /b
 
 
@@ -252,7 +252,7 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
         set "cmbo_grp=%%i"
     )
     rem echo DEST DIR "!dest_dir!"
-    rem pause
+
     
 
     set "dest_dir=!prnth!\!rkeywd!"
@@ -270,7 +270,7 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     )
 
     rem call :echo_dirs "!prim_dirs!" "!sec_dirs!"
-    rem pause
+
     rem exit /b
 
     set is_nested=
@@ -358,7 +358,7 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
     echo two "!two!"
     echo three "!three!"
     echo nested three "!nested_three!"
-    pause
+
     exit /b
 
     rem Guaranteed to have at least 1 group of labels
@@ -644,7 +644,7 @@ exit /b
     rem echo - "!primary_left!"
     rem echo - "!opt1L!"
     rem  echo - "!opt2L!"
-    rem pause
+
 
     echo PRIMARY "!primary_left!"
     echo OPT 1 "!opt1L! !opt1R!"
@@ -671,7 +671,7 @@ exit /b
     rem set "optn_left_char=%~5"
     rem set "optn_right_char=%~6"
      rem echo AT INIT BRIDGE "!name!"
-     rem pause
+
     rem echo FOUR "!name!" should be bridge
     set next_encapped=
     for /f "tokens=1 delims=|" %%i in (%encptd%) do (
@@ -691,8 +691,6 @@ exit /b
          exit /b
     )
 
-    
-    rem pause
 
 
     rem NEED BOTH OPTION 1 AND 2
@@ -722,7 +720,6 @@ exit /b
 
     REM ECHO DELIM BRIDGE --- "!bridge!"
     rem !left_char! !right_char! !opt_left_char! !opt_right_char!"
-    rem pause
 
 
 
@@ -738,7 +735,6 @@ exit /b
         set "temp_head=%%i"
     )
     rem echo TEMP HEAD BEFORE "!temp_head!"
-    rem pause
     
     set "temp_head_before=!temp_head!"
     set "temp_head=!temp_head!!left_char!"
@@ -749,7 +745,6 @@ exit /b
         set "flag=%%i"
     )
     rem echo flag "!flag!"
-    rem pause
 
     set head=
     call :delim_with_char "1" "!left_char!" "!temp_head!"
@@ -829,7 +824,6 @@ rem echo IN "!in!" OUT "!out!"
     rem     eg. write this to encptd.txt file
     rem echo THIS "!this!"
     rem call :write_bridge "!this!"
-    rem pause
 
     rem call :at_init_bridge "1" "!left_char!" "!right_char!" "!this!"
     if "!temp_head_before!" equ " " (
@@ -839,20 +833,6 @@ rem echo IN "!in!" OUT "!out!"
     
 
 
-
-    rem call :write_bridge "!this!"
-
-    rem if "!this!" equ " " (
-    rem     set "f=DONE|"
-    rem     echo !f! > "%encptd%"
-    rem    exit /b
-    rem )
-
-
-
-    rem echo THIS "!this!"
-
-rem if "!this!" equ " " ( 
 
     set test=
      call :delim_with_char "1" "!opt_right_char!" "!this!"
@@ -866,7 +846,7 @@ rem if "!this!" equ " " (
         call :write_bridge "!this!"
         
     ) 
-    rem pause
+
     if exist ef.txt (
     del "ef.txt"
     )
@@ -897,8 +877,7 @@ REM USE THE OPTIONS ONTO THIS
     if "!name!" equ " " (
         exit /b
     )
-    rem echo AT THIS NAME LEFT "!left_char!" RIGHT "!right_char!"
-      rem pause
+   
     
     set next_encapped=
     if exist ef.txt (
@@ -982,19 +961,7 @@ REM USE THE OPTIONS ONTO THIS
     if exist fg.txt (
     del "fg.txt"
     )
-    rem echo DEL "!left_char! !right_char! !opt_left_char! !opt_right_char!"
-    rem pause
-    rem Use if to skip empties
-
-    rem if "!next_encapped!" neq "" (
-    REM call :at_prelim "1" "!left_char!" "!right_char!" "!next_encapped!"
-    rem call :at_prelim "1" "!opt_left_char!" "!opt_right_char!" "!next_encapped!"
-    rem )
-
-     rem if "!next_encapped!" equ "DONE" (
-     rem     exit /b
-     rem )
-    
+  
 
 
     call :delimit_this "!token!" "!left_char!" "!right_char!" "!name!"
@@ -1038,7 +1005,7 @@ REM THE OPTIONS ARE LEFT & RIGHT CHARS
     set "right_char=%~3"
     set "prelim=%~4"
     echo AT PRELIM "!prelim!" LEFT CHAR IS  "!left_char!" TOKEN = "!token!"
-    rem pause
+
     set next=
     for /f "tokens=1 delims=|" %%i in (fg.txt) do (
         set "next=%%i"
@@ -1046,7 +1013,7 @@ REM THE OPTIONS ARE LEFT & RIGHT CHARS
  echo NEXT "!next!"
  REM TEST FOR THE EXISTENCE OF RIGHT OPTION = "}"
  REM IF IT EXISTS DONT' SAVE NEXT
-    rem pause
+
 
     if "!next!" equ "ECHO is off." (
          exit /b
@@ -1150,7 +1117,7 @@ exit /b
     
     echo !a! > "%encptd%"
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
-    call :print_group
+    call :print_group "!name!" "!left_char!"
     echo "!brk!"
     rem call :print_bridge
     
@@ -1159,6 +1126,7 @@ exit /b
 
     echo END TRAVERSE 
     echo -----------------------------
+    PAUSE
     echo "!brk!"
     endlocal
 exit /b
@@ -1239,7 +1207,6 @@ rem echo ONE TAIL "!one_tail!"
         echo !one! > "%encptd%"
 
         rem echo LAST TOKEN? "!token!"
-        pause
         exit /b
     )
 
@@ -1449,6 +1416,31 @@ exit /b
 
 :print_group
     setlocal
+    set "name=%~1"
+    set "primary_char=%~2"
+
+
+    rem to get a pass
+    rem option 1: group = ECHO is empty. & test = name (no delimiting character)
+    rem option 2: group has labels (not = to ECHO is emtpy) & test not = name
+
+    rem test must = name -> +1
+
+    set /a n=0
+    set "r=FAIL"
+
+    call :delim_with_char "1" "!primary_char!" "!name!"
+    set test=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test=%%i"
+    )
+
+    if "!test!" equ "!name!" (
+        set /a n-=1
+    ) else (
+        set /a n+=1
+    )
+
     if exist %grptxt% (
         set /a qty=0
         set grp=
@@ -1460,9 +1452,24 @@ exit /b
             )
             set /a qty+=1
         )
+        
         echo --- GRUPS ----
         ECHO !grp!
+        if "!grp!" equ "ECHO is off." (
+            set /a n-=1
+        ) else (
+            set /a n+=1
+        )
     )
+
+    if !n! equ -2 (
+        set "r=PASS"
+    )
+
+    if !n! equ 2 (
+        set "r=PASS"
+    )    
+    ECHO ********************************************************************* "!r!"
     endlocal
 exit /b
 
@@ -1785,7 +1792,7 @@ exit /b
     if not exist "!root!\!l_only!\!group!" (
         echo "!root!\!l_anfl!\!group!" has "!name!"
     )
-    rem pause
+
     rem echo SAVE THE INDIV "!indiv_this!" LIST ONLY AT  "!root_dir!\!indv_grp!\!lst_o!"
     exit /b    
     rem call "funcs_no_make.bat" :file_into_dir "!dest_dir!" "!group!"
@@ -1992,7 +1999,7 @@ exit /b
     )
     del "!dest_dir!\!f!"
     rem echo ct "!ct!"
-    rem pause
+
     rem exit /b
   
     if !ct! equ 0 (
@@ -2020,7 +2027,7 @@ exit /b
     )
     del "!dest_dir!\!f!"
     rem echo ct "!ct!"
-    rem pause
+
     rem exit /b
   
     if !ct! equ 0 (
