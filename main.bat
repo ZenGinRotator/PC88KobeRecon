@@ -295,7 +295,7 @@ exit /b
     setlocal
     rem call :none ""
     rem call :none ".d88"
-    call :same ""
+    rem call :same ""
     call :same ".d88"
     REM call :alternating ""
     REM call :alternating ".d88"
@@ -320,10 +320,12 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
+    echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
-
+    echo "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
     call :same_perms "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
 
+    goto :eof
     call :same_perms "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "!ext!"
 
     call :same_perms "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "!ext!"
@@ -340,6 +342,9 @@ exit /b
     set "two=%~2"
     set "three=%~3"
     set "ext=%~4"
+
+    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X !one!!two!!three!!ext!" "A"
+    goto :eof
 
     call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!ext!"
     call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!two!!ext!"
@@ -523,6 +528,7 @@ exit /b
     set "phrase=%~1"
     set token1=
     set tokn2=
+    set token3=
     
     for /f "tokens=1 delims=|" %%i in ("!phrase!") do (
         set "token1=%%i"
@@ -531,10 +537,14 @@ exit /b
         set "token2=%%i"
     )
 
+    for /f "tokens=3 delims=|" %%i in ("!phrase!") do (
+        set "token3=%%i"
+    )
+
     echo ORIGIN "!phrase!"
     echo TOKEN = 1 "!token1!"
     echo TOKEN = 2 "!token2!"
-
+    echo TOKEN = 3 "!token3!"
 
     endlocal
 exit /b

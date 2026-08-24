@@ -1531,8 +1531,43 @@ exit /b
 
 
 
+:start
+    setlocal
+
+    if exist next.txt (
+        del "next.txt"
+    )
+    endlocal
+exit /b
+
+:recurse_on_group
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    set "next=%~5"
+
+    
+   
+    if "!next!" equ " " (
+        exit /b
+    )
 
 
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    echo ITEM "!item!"
+
+    set /a token+=1
+
+    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!" "!item!"
+    endlocal
+exit /b
 
 
 
