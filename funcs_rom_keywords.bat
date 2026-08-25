@@ -1542,18 +1542,13 @@ exit /b
 
 :recurse_on_group
     setlocal
+    if exist %delimtxt% ( del %delimtxt% )
+    if exist qty.txt ( del qty.txt )
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
-    set "next=%~5"
-
     
-   
-    if "!next!" equ " " (
-        exit /b
-    )
-
 
     set item=
     call :delim_with_char "!token!" "!right_char!" "!name!"
@@ -1561,15 +1556,142 @@ exit /b
         set "item=%%i"
     )
 
-    echo ITEM "!item!"
+    if "!item!" equ " " ( exit /b )
 
+    
+    rem echo REG ITEM "!item!"
+    set "pad_item=PAD !item!"
+    if exist "is_nested.txt" (
+        rem call :print_status "!label!" "!item!"
+       
+        
+        call :delim_with_char "1" "!left_char!" "!item!"
+        set test=
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "test=%%i"
+        )
+       
+        if "!item!" equ "!test!" (
+            call :print_status "!test!" "!item!"
+            del "is_nested.txt"
+        )
+    )
+    
+    
+    call :recurse_nested_status "PAD !item!" "!left_char!" "2" "0"
+    
+    rem echo FOUND ITEM "!item!" "!token!"    
     set /a token+=1
 
-    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!" "!item!"
+   
+    
+    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!" 
     endlocal
 exit /b
 
 
+:recurse_nested_status
+    setlocal
+    set "item=%~1"
+    set "left_char=%~2"
+    set "token=%~3"
+    set "lqty=%~4"
+    
+   
+    
+ rem echo ---- NESTED STATUS has item --- "!item!" "!left_char!" "!token!"
+    
+    rem set /a qty-=1
+
+    set "orig_item=!item!"
+    set "pad_item=PAD !item!"
+
+
+    set label=
+    call :delim_with_char "!token!" "!left_char!" "!orig_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "label=%%i"
+    )
+
+
+    rem echo "FOUND item " "!item!" 
+    rem echo  "label" "!label!"
+    rem echo  Token "!token!"
+     rem if "!label!" neq " " (
+     rem call :print_status "!label!" "!item!"
+     rem )
+ 
+    if "!label!" equ " " ( 
+        set /a lqty=!token!-2
+        exit /b
+    )   
+    call :print_status "!label!" "!item!"
+
+    set /a token+=1
+    call :recurse_nested_status "!item!" "!left_char!" "!token!" "!lqty!"
+    endlocal
+exit /b
+
+
+
+:print_status
+    setlocal
+    set "label=%~1"
+    set "item=%~2"
+
+    call :delim_with_char "3" "!left_char!" "!item!"
+    set f=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "f=%%i"
+    )
+
+    set "status=NON-NESTED"
+    if "!f!" neq " " (
+        set "status=NESTED"
+        echo "" > "is_nested.txt"
+    )
+
+    if exist "is_nested.txt" (
+        set "status=NESTED"
+    )
+
+
+
+    echo "!label!" *** sttatus = "!status!"
+    
+    set saved=
+    for /f "tokens=*" %%i in (save.txt) do (
+        set "saved=!saved!!brk!%%i"
+    )
+    set "saved=!saved!!brk!!label!"
+    echo !saved! > "save.txt"
+    del "save.txt"
+    endlocal
+exit /b
+
+
+
+
+:nested_status
+    setlocal
+    set "item=%~1"
+    set "left_char=%~2"
+
+    set test=
+    for /f "tokens=2 delims=%~2" %%i in ("!item!") do (
+        set "test=%%i"
+    )
+
+    echo ITEM "!item!" TEST "!test!"
+    set "status=NON-NESTED"
+
+    endlocal
+exit /b
+
+:n_status
+    setlocal
+    endlocal
+exit /b
 
 
 

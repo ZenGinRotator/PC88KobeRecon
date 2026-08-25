@@ -145,10 +145,12 @@ set vvv=
  rem pause
  rem goto :eof
 
- set "isp_bar=is|phrase"
+set "isp_front_bar=|isphrase"
+ set "isp_mid_bar=is|phrase"
 set "isp_none=isphrase"
 echo VERIFY DELIMITING USING 
-call :v_bar "!isp_bar!"
+call :v_bar "!isp_front_bar!"
+call :v_bar "!isp_mid_bar!"
 call :v_bar "!isp_none!"
 pause
 
@@ -320,8 +322,24 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
+    set "n=X (non-nested) (two non) file"
+    echo NAME =========================================================="!n!"
+    echo 0 > lqty.txt
+    echo 0 > rqty.txt   
+    rem del "is_nested.txt"
+    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "!n!"
+    rem goto :eof
+
+    rem del "is_nested.txt"
+    echo 0 > lqty.txt
+    echo 0 > rqty.txt    
+    echo NAME ========================================================== "X (is (nested) group) file"
+    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X (is (nested) (slim) group) (is (nested) (slim) group) file"
+
+    goto :eof
     echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
+    goto :eof
     echo "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
     call :same_perms "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
 
@@ -343,7 +361,7 @@ exit /b
     set "three=%~3"
     set "ext=%~4"
 
-    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X !one!!two!!three!!ext!" "A"
+    call "funcs_rom_keywords.bat" :recurse_on_group  "2" "(" ")" "X !one!!two!!three!!ext!" "A"
     goto :eof
 
     call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!ext!"
