@@ -324,17 +324,23 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     set "ext=%~1"
     set "n=X (non-nested) (two non) file"
     echo NAME =========================================================="!n!"
-    echo 0 > lqty.txt
-    echo 0 > rqty.txt   
+ 
     rem del "is_nested.txt"
+    
+    if exist labels.txt ( del labels.txt)
+    if exist nested.txt ( del nested.txt )
+    
     call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "!n!"
     rem goto :eof
-
+    pause
     rem del "is_nested.txt"
-    echo 0 > lqty.txt
-    echo 0 > rqty.txt    
-    echo NAME ========================================================== "X (is (nested) group) file"
-    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X (is (nested) (slim) group) (is (nested) (slim) group) file"
+    if exist labels.txt ( del labels.txt)
+    if exist nested.txt ( del nested.txt )
+
+    set "nst1=(is (nested) (slim) group)"
+    set "nst2=(a (b) d)"
+    echo NAME ========================================================== "X !nst1! !nst2!  file"
+    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X !nst1! !nst2!  file"
 
     goto :eof
     echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
