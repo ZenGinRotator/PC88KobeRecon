@@ -322,25 +322,27 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
-    set "n=X (non-nested) (two non) file"
-    echo NAME =========================================================="!n!"
- 
-    rem del "is_nested.txt"
-    
-    if exist labels.txt ( del labels.txt)
-    if exist nested.txt ( del nested.txt )
-    
-    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "!n!"
+    set "n1=X (non-nested) (two non) file"
+    echo NAME =========================================================="!n1!"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "!n1!"
+
+    set "n2=X (non-nested) A (two non) file"
+     echo NAME =========================================================="!n2!"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "!n2!"
+
     rem goto :eof
     pause
     rem del "is_nested.txt"
-    if exist labels.txt ( del labels.txt)
-    if exist nested.txt ( del nested.txt )
+   
 
     set "nst1=(is (nested) (slim) group)"
     set "nst2=(a (b) d)"
     echo NAME ========================================================== "X !nst1! !nst2!  file"
-    call "funcs_rom_keywords.bat" :recurse_on_group  "1" "(" ")" "X !nst1! !nst2!  file"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! !nst2!  file"
+
+
+    echo NAME ========================================================== "X !nst1! A !nst2!  file"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! A !nst2!  file"
 
     goto :eof
     echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
