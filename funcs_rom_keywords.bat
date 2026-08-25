@@ -1346,6 +1346,24 @@ exit /b
 exit /b
 
 
+:write_nested
+    setlocal
+    set "nested=%~1"
+    set old=
+    if exist nested.txt (
+        for /f "tokens=*" %%i in (nested.txt) do (
+            set "old=!old! %%i"
+        )
+    )
+    set "old=!old! !nested!"
+    echo !old! > "nested.txt"
+    endlocal
+exit /b
+
+
+
+
+
 :write_ones
 
     setlocal
@@ -1653,19 +1671,20 @@ exit /b
 
     if exist "is_nested.txt" (
         set "status=NESTED"
+        call :write_nested "!label!"
     )
 
 
 
     echo "!label!" *** sttatus = "!status!"
     
-    set saved=
-    for /f "tokens=*" %%i in (save.txt) do (
-        set "saved=!saved!!brk!%%i"
-    )
-    set "saved=!saved!!brk!!label!"
+    rem set saved=
+    rem for /f "tokens=*" %%i in (save.txt) do (
+    rem     set "saved=!saved!!brk!%%i"
+    rem )
+    rem set "saved=!saved!!brk!!label!"
     echo !saved! > "save.txt"
-    del "save.txt"
+    if exist "save.txt" ( del "save.txt" )
     endlocal
 exit /b
 
