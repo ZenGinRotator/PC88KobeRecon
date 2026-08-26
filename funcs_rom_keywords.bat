@@ -1119,7 +1119,7 @@ exit /b
     call :at_group "!token!" "!left_char!" "!right_char!" "!name!"
     call :print_group "!name!" "!left_char!"
     echo "!brk!"
-    rem call :print_bridge
+    
     
     
     
@@ -1495,7 +1495,7 @@ exit /b
     
     echo -- BRIDGES --
     echo !brdg!
-    
+    echo "!brk!"
     endlocal
 exit /b
 
@@ -1574,8 +1574,18 @@ exit /b
     set "right_char=%~3"
     set "name=%~4"
     call :del_txts
-    rem call :recurse_on_bridge "!token!" "!left_char!" "!right_char!" "!name!"
+    
     call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!"
+
+    rem show contents for:
+    rem     bridges.txt
+    call :print_bridge
+    rem     labels.txt
+   
+    call :print_labels
+    rem     nested.txt
+    call :print_nested
+    
     endlocal
 exit /b
 
@@ -1584,6 +1594,7 @@ exit /b
     if exist labels.txt ( del labels.txt)
     if exist nested.txt ( del nested.txt )
     if exist %delimtxt% ( del %delimtxt% )
+    if exist %brgtxt% ( del %brgtxt% )
     
     endlocal
 exit /b
@@ -1603,7 +1614,9 @@ exit /b
         set "item=%%i"
     )
 
-    if "!item!" equ " " ( exit /b )
+    if "!item!" equ " " (
+        exit /b
+    )
 
     rem echo ITEM "!item!"
     call :delim_with_char "1" "!left_char!" "!item!"
@@ -1614,7 +1627,7 @@ exit /b
 
     if not exist "is_nested.txt" (
         if "!bridge!" neq " " (
-            echo ------------ BRIDGE "!bridge!"
+            call :write_bridge "!bridge!"
         )
     )
     
@@ -1628,7 +1641,14 @@ exit /b
             set "test=%%i"
         )
 
+
+        rem Attempt to delimit the (last) nested label with a
+        rem     delimiting character that does not exist within
+        rem     the final item from the nested group
+        rem     --- returns the same item having no delimiting 
+        rem         characters
         if "!item!" equ "!test!" (
+            rem echo call :write_all.... "!test!"
             call :write_all_nested_to_group "!test!"
             del "is_nested.txt"
         )
@@ -1665,7 +1685,8 @@ exit /b
  
     if "!label!" equ " " ( 
         exit /b
-    )   
+    )
+    rem echo --- call :print_status "!label!" "!item!"
     call :print_status "!label!" "!item!"
 
     set /a token+=1
@@ -1697,10 +1718,12 @@ exit /b
         set "status=NESTED"
     )
 
+    rem echo STATUS "!status!"
+
     if "!status!" equ "NESTED" (
         call :write_nested "!label!"
     ) else (
-        call :write_all_nested_to_group "!label!"
+        call :write_label "!label!"
     )  
   
     endlocal
@@ -1724,71 +1747,111 @@ exit /b
     endlocal
 exit /b
 
+:write_label
+    setlocal
+    set "label=%~1"
+    
+    if not exist labels.txt (
+        echo !label! > "labels.txt"
+        exit /b
+    )
+
+    set old=
+    set /a qty=0
+    for /f "tokens=*" %%i in (labels.txt) do (
+        if !qty! equ 0 (
+            set "old=%%i"    
+        ) else (
+            set "old=!old!!brk!%%i"
+        )
+        set /a qty+=1
+    )
+
+    set "old=!old!!brk!!label!"
+    rem echo ++ "!old!"
+
+    echo !old! > "labels.txt"
+
+    endlocal
+exit /b
+
 :write_all_nested_to_group
     setlocal
     set "nested=%~1"
     set old=
     if exist nested.txt (
+       
         for /f "tokens=*" %%i in (nested.txt) do (
-            set "old=!old!%%i"
+            set "old=!old!%%i"    
         )
-    )
+        del nested.txt
+    ) 
     set "old=!old!!nested!"
-    echo "!brk!"
-    rem echo OLD NESTED "!old!"
+    rem echo OLDY "!old!"
+    rem echo "write label" "!nested!"
+    rem echo "!brk!"
+     rem echo OLD NESTED "!old!"
     set labels=
     if exist labels.txt (
+        
         for /f "tokens=*" %%i in (labels.txt) do (
             set "labels=!labels!!brk!%%i"
+            
+
         )
     )
     set "labels=!labels!!brk!!old!"
+     rem echo "made labels" "!labels!"
     echo !labels! > "labels.txt"
     
-    echo Labels "!labels!"
-    if exist nested.txt (
-        del nested.txt
-    )
 
     endlocal
 exit /b
 
-rem starting value for token=1
-:recurse_on_bridge
+:print_nested
     setlocal
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-
-    call :delim_with_char "!token!" "!left_char!" "!name!"
-    set item=
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
+    set old=
+    
+    if exist labels.txt (
+        set /a qty=0
+        for /f "tokens=*" %%i in (nested.txt) do (
+            if !qty! equ 0 (
+                set "old=%%i"
+            ) else (
+                set "old=!old!!brk!%%i"
+            )
+            
+        )
     )
+    echo --- NESTED ---
+    echo !old!
+    echo "!brk!"
 
-    if "!item!" equ " " ( exit /b )
-
-    echo "!item!" "!token!"
-
-
-    set /a token+=1
-    call :recurse_on_bridge "!token!" "!left_char!" "!right_char!" "!name!"
     endlocal
 exit /b
 
-:do_bridge
+:print_labels
     setlocal
-    set "left_char=%~1"
-    set "item=%~2"
-
-    call :delim_with_char "1" "!left_char!" "!item!"
-    for  /f "tokens=1 delims=|" %%i in ("!item!") do (
-
+    set old=
+    
+    if exist labels.txt (
+        set /a qty=0
+        for /f "tokens=*" %%i in (labels.txt) do (
+            if !qty! equ 0 (
+                set "old=%%i"
+            ) else (
+                set "old=!old!!brk!%%i"
+            )
+            set /a qty+=1
+        )
     )
-
+    echo --- LABELS ---
+    echo !old!
+    echo "!brk!"
     endlocal
 exit /b
+
+
 
 
 

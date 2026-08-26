@@ -344,6 +344,14 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     echo NAME ========================================================== "X !nst1! A !nst2!  file"
     call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! A !nst2!  file"
 
+    echo NAME ========================================================== "X !nst1! !n2! file"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! !n2! file"
+
+    echo NAME ========================================================== "X !n2! !nst1! file"
+    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !n2! !nst1! file"
+
+
+
     goto :eof
     echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
