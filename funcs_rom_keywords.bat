@@ -1647,11 +1647,8 @@ exit /b
     ECHO "!brk!"
     rem echo ITEM "!item!"
     rem echo BRIDGE "!bridge!"
+   rem echo TOKEN "!token!"
 
-
-    
-    
-    SET "in=NESTED"
 
 
     set "pad_item=PAD!item!"
@@ -1662,6 +1659,26 @@ exit /b
         set "pad_bridge=%%i"
     )
 
+    set /a pqty=0
+    if "!pad_bridge!" neq "PAD" (
+        set /a pqty+=1
+    )
+
+    if "!pad_bridge!" neq "PAD " (
+        set /a pqty+=1
+    )
+
+    if "!item!" neq "!bridge!" (
+        set /a pqty+=1
+    )
+
+    if !token! gtr 1 (
+        set /a pqty+=1
+    )
+
+    if !pqty! equ 4 (
+    echo BRIDGE "!bridge!"
+    )
     REM echo PAD ITEM "!pad_item!"
 
 
@@ -1676,14 +1693,6 @@ exit /b
         echo "" > "is_nested.txt"
     )
 
-    
-
-    
-    
-
-
-
-   
 
 
     set /a token+=1
@@ -1762,6 +1771,62 @@ echo SML_ITEM "!sml_item!" TO "!dest!"
 
     endlocal
 exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
