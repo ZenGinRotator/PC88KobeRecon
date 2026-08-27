@@ -7,36 +7,36 @@ rem need indiv [] () and {} - single and multi-word?
 set none_blank=
 set "none_full=file name without labels"
 
-set "nest_pare_one=(this is (a nested) (par set) one)"
-set "nest_pare_two=(this is (a nested) (par set) two)"
-set "nest_pare_three=(this is (a nested) (par set) three)"
+set "nest_pare_one=(N1 (P11) (P12) PG1)"
+set "nest_pare_two=(N2 (P21) (P22) PG2)"
+set "nest_pare_three=(N3 (P31) (P32) PG3)"
 
-set "nest_curl_one={this is {a nested} {curl set} one}"
-set "nest_curl_two={this is {a nested} {curl set} two}"
-set "nest_curl_three={this is {a nested} {curl set} three}"
+set "nest_curl_one={N1 {C1} {C2} CG1}"
+set "nest_curl_two={N2 {C1} {C2} CG2}"
+set "nest_curl_three={N3 {C1} {C2} CG3}"
 
-set "nest_sqr_one=[this is [a nested] [sqr set] one]"
-set "nest_sqr_two=[this is [a nested] [sqr set] two]"
-set "nest_sqr_three=[this is [a nested] [sqr set] three]"
+set "nest_sqr_one=[N1 [S1] [S2] SG1]"
+set "nest_sqr_two=[N2 [S1] [S2] SG1]"
+set "nest_sqr_three=[N3 [S1] [S2] SG1]"
 
-set "indiv_pare_one=(indiv pare one)"
-set "indiv_pare_two=(indiv pare two)"
-set "indiv_pare_three=(indiv pare three)"
+set "indiv_pare_one=(P1)"
+set "indiv_pare_two=(P2)"
+set "indiv_pare_three=(P3)"
 
-set "indiv_curl_one={indiv curl one}"
-set "indiv_curl_two={indiv curl two}"
-set "indiv_curl_three={indiv curl three}"
-
-
-set "indiv_sqr_one=[indiv sqr one]"
-set "indiv_sqr_two=[indiv sqr two]"
-set "indiv_sqr_three=[indiv sqr three]"
+set "indiv_curl_one={C1}"
+set "indiv_curl_two={C2}"
+set "indiv_curl_three={C3}"
 
 
-set "brid_one=bridge 1"
-set "brid_two=bridge 2"
-set "brid_three=bridge 3"
-set "brid_four=bridge 4"
+set "indiv_sqr_one=[S1]"
+set "indiv_sqr_two=[S2]"
+set "indiv_sqr_three=[S3]"
+
+
+set "brid_one=B1"
+set "brid_two=B2"
+set "brid_three=B3"
+set "brid_four=B4"
 
 set brk=^
 
@@ -146,13 +146,14 @@ set vvv=
  rem goto :eof
 
 set "isp_front_bar=|isphrase"
+set "isp_front_bar_extra=|isphrase|"
  set "isp_mid_bar=is|phrase"
 set "isp_none=isphrase"
 echo VERIFY DELIMITING USING 
 call :v_bar "!isp_front_bar!"
+call :v_bar "!isp_front_bar_extra!"
 call :v_bar "!isp_mid_bar!"
 call :v_bar "!isp_none!"
-pause
 
 rem call :all_bridges
 rem call :no_bridges
@@ -295,20 +296,20 @@ exit /b
 
 :samples
     setlocal
-    rem call :none ""
-    rem call :none ".d88"
-    rem call :same ""
-    call :same ".d88"
-    REM call :alternating ""
-    REM call :alternating ".d88"
+    REM call :none ""
+    REM call :none ".d88"
+     rem call :same ""
+     call :same ".d88"
+     rem call :alternating ""
+     rem call :alternating ".d88"
     endlocal
 exit /b
 
 :none
     setlocal
     set "ext=%~1"
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "%none_blank%!ext!"
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "%none_full%!ext!"
+    call "funcs_rom_keywords.bat" :start "%none_blank%!ext!"
+    call "funcs_rom_keywords.bat" :start "%none_full%!ext!"
     endlocal
 exit /b
 
@@ -322,44 +323,11 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
-    set "n1=X (non-nested) (two non) file"
-    echo NAME =========================================================="!n1!"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "!n1!"
 
-    set "n2=X (non-nested) A (two non) file"
-     echo NAME =========================================================="!n2!"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "!n2!"
-
-    rem goto :eof
-    pause
-    rem del "is_nested.txt"
-   
-
-    set "nst1=(is (nested) (slim) group)"
-    set "nst2=(a (b) d)"
-    echo NAME ========================================================== "X !nst1! !nst2!  file"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! !nst2!  file"
-
-
-    echo NAME ========================================================== "X !nst1! A !nst2!  file"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! A !nst2!  file"
-
-    echo NAME ========================================================== "X !nst1! !n2! file"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !nst1! !n2! file"
-
-    echo NAME ========================================================== "X !n2! !nst1! file"
-    call "funcs_rom_keywords.bat" :start_kywds  "1" "(" ")" "X !n2! !nst1! file"
-
-
-
-    goto :eof
-    echo "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%"
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
-    goto :eof
-    echo "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
+    exit /b
     call :same_perms "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
 
-    goto :eof
     call :same_perms "%nest_curl_one%" "%nest_curl_two%" "%nest_curl_three%" "!ext!"
 
     call :same_perms "%indiv_curl_one%" "%indiv_curl_two%" "%indiv_curl_three%" "!ext!"
@@ -377,13 +345,17 @@ exit /b
     set "three=%~3"
     set "ext=%~4"
 
-    call "funcs_rom_keywords.bat" :recurse_on_group  "2" "(" ")" "X !one!!two!!three!!ext!" "A"
-    goto :eof
 
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!ext!"
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!two!!ext!"
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X !one!!two!!three!!ext!"
+    rem call "funcs_rom_keywords.bat" :start "X !one!!ext!"
+    rem call "funcs_rom_keywords.bat" :start "X !one!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!!two!!three!!indiv_pare_one!!indiv_pare_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! !two! !three! !indiv_pare_one! !indiv_pare_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! B1 !two! B2 !three! B3 !indiv_pare_one! B4 !indiv_pare_two!!ext!"
 
+    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one!!indiv_pare_two!!one!!two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one! !indiv_pare_two! !one! !two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one! B1 !indiv_pare_two! B2 !one! B3 !two! B4 !three!!ext!"
+    
     endlocal
 exit /b
 
@@ -456,8 +428,8 @@ exit /b
     set "middle_two=%~5"
     set "ext=%~6"
 
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X!lead_one!!middle_one!!lead_two!!ext!"
-    call "funcs_rom_keywords.bat" :trav_parenth_curl_sqr "X!lead_one!!middle_one!!lead_two!!middle_two!!lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one!!middle_one!!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one!!middle_one!!lead_two!!middle_two!!lead_three!!ext!"
 
 
     endlocal
@@ -580,5 +552,42 @@ exit /b
     echo TOKEN = 2 "!token2!"
     echo TOKEN = 3 "!token3!"
 
+    endlocal
+exit /b
+
+:basic_samples
+    setlocal
+
+    set "bb=ROM {C1} B 1 {C2} B 2 (P1) {N {C1} {C2} CG} (N (P1) PG) B3  b 4 "
+    call "funcs_rom_keywords.bat" :start "!bb!"
+    goto :eof
+
+        set "n1=X (non-nested) (two non) file"
+    echo NAME =========================================================="!n1!"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "!n1!"
+
+    set "n2=X (non-nested) A (two non) file"
+     echo NAME =========================================================="!n2!"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "!n2!"
+
+    rem goto :eof
+    pause
+    rem del "is_nested.txt"
+   
+
+    set "nst1=(is (nested) (slim) group)"
+    set "nst2=(a (b) d)"
+    echo NAME ========================================================== "X !nst1! !nst2!  file"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "X !nst1! !nst2!  file"
+
+
+    echo NAME ========================================================== "X !nst1! A !nst2!  file"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "X !nst1! A !nst2!  file"
+
+    echo NAME ========================================================== "X !nst1! !n2! file"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "X !nst1! !n2! file"
+
+    echo NAME ========================================================== "X !n2! !nst1! file"
+    call "funcs_rom_keywords.bat" :start_kywds "(" ")" "X !n2! !nst1! file"
     endlocal
 exit /b

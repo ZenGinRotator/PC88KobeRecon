@@ -1342,6 +1342,7 @@ exit /b
     set "old=!old!!brk!!bridge!"
   
     echo !old! > "%brgtxt%"
+    rem echo OLD bridges "!old!"
     endlocal
 exit /b
 
@@ -1563,31 +1564,20 @@ exit /b
 
 
 
-
-
-
-
-:start_kywds
+:start
     setlocal
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-    call :del_txts
-    
-    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!"
-
-    rem show contents for:
-    rem     bridges.txt
-    call :print_bridge
-    rem     labels.txt
-   
-    call :print_labels
-    rem     nested.txt
-    call :print_nested
-    
+    set "name=%~1"
+    call :start_kywds "(" ")" "!name!" "{" "}" "[" "]"
     endlocal
 exit /b
+
+
+
+
+
+
+
+
 
 :del_txts
     setlocal
@@ -1595,18 +1585,46 @@ exit /b
     if exist nested.txt ( del nested.txt )
     if exist %delimtxt% ( del %delimtxt% )
     if exist %brgtxt% ( del %brgtxt% )
+    if exist "is_nested.txt" ( del "is_nested.txt" )
     
     endlocal
 exit /b
 
-:recurse_on_group
+:start_kywds
     setlocal
-   
+    rem set "token=%~1"
+    set "left_char=%~1"
+    set "right_char=%~2"
+    set "name=%~3"
+    set "optn_one_left=%~4"
+    set "optn_one_right=%~5"
+    set "optn_two_left=%~6"
+    set "optn_two_right=%~7"
+
+    echo ----- "!name!" -----
+    rem echo LEFT PRIMARY CHAR "!left_char!"
+    call :del_txts
+    
+    call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    rem call :print_bridge
+    rem call :print_labels
+    rem call :print_nested
+    pause
+    endlocal
+exit /b
+
+
+:recurse_on_group2
+    setlocal
     set "token=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
     set "name=%~4"
-    
+    set "optn_one_left=%~5"
+    set "optn_one_right=%~6"
+    set "optn_two_left=%~7"
+    set "optn_two_right=%~8"
 
     set item=
     call :delim_with_char "!token!" "!right_char!" "!name!"
@@ -1618,20 +1636,242 @@ exit /b
         exit /b
     )
 
+    
+    
+    
+    set bridge=
+    call :delim_with_char "1" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
+    )
+    ECHO "!brk!"
     rem echo ITEM "!item!"
+    rem echo BRIDGE "!bridge!"
+
+
+    
+    
+    SET "in=NESTED"
+
+
+    set "pad_item=PAD!item!"
+    
+    set pad_bridge=
+    call :delim_with_char "1" "!left_char!" "!pad_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "pad_bridge=%%i"
+    )
+
+    REM echo PAD ITEM "!pad_item!"
+
+
+    set nested_test=
+    call :delim_with_char "3" "!left_char!" "!pad_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "nested_test=%%i"
+    )
+
+    rem echo NESTED TEST "!nested_test!"
+    if "!nested_test!" neq " " (
+        echo "" > "is_nested.txt"
+    )
+
+    
+
+    
+    
+
+
+
+   
+
+
+    set /a token+=1
+ 
+    call :recurse_on_item "2" "!left_char!" "!right_char!" "!pad_item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!item!|!bridge!"
+    call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    endlocal
+exit /b
+
+:recurse_on_item
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "pad_item=%~4"
+    set "optn_one_left=%~5"
+    set "optn_one_right=%~6"
+    set "optn_two_left=%~7"
+    set "optn_two_right=%~8"
+    set "origs=%~9"
+    rem set "orig_item=%~9"
+    rem set "orig_bridge=%~10"
+
+    set orig_item=
+    set orig_bridge=
+    for /f "tokens=1 delims=|" %%i in ("!origs!") do (
+        set "orig_item=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!origs!") do (
+        set "orig_bridge=%%i"
+    )
+
+
+    rem echo ** ORIGS --- ITEM: "!orig_item!" BRIDGE: "!orig_bridge!"
+
+    set sml_item=
+    call :delim_with_char "!token!" "!left_char!" "!pad_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "sml_item=%%i"
+    )
+
+    if "!orig_item!" equ "!orig_bridge!" (
+        set "sml_item=!orig_item!"
+    )
+
+    if "!sml_item!" equ " " (
+        exit /b
+    )
+
+    
+    SET dest=
+    if exist "is_nested.txt" (
+        if "!orig_item!" equ "!orig_bridge!" (
+            rem set "sml_item=!orig_item!
+            del "is_nested.txt"
+        )
+        set "dest=NESTED"
+        
+    ) else (
+        SET "dest=LABELS"
+    )
+echo SML_ITEM "!sml_item!" TO "!dest!"
+
+    REM This is a temporary if condition
+    if "!orig_item!" equ "!orig_bridge!" ( exit /b )
+
+
+
+
+    set /a token+=1
+
+    call :recurse_on_item "!token!" "!left_char!" "!right_char!" "!pad_item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!orig_item!|!orig_bridge!"
+
+    
+
+    endlocal
+exit /b
+
+
+
+:recurse_on_group
+    setlocal
+   
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    set "optn_one_left=%~5"
+    set "optn_one_right=%~6"
+    set "optn_two_left=%~7"
+    set "optn_two_right=%~8"
+
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" equ " " (
+        exit /b
+    )
+
+    echo INIT ITEM "!item!"
+    set "pad_item=PAD !item!"
+    echo PAD ITEM "!pad_item!"
+    
+    
+    rem check pad item for nested status
+    set test_nested=
+    call :delim_with_char "3" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test_nested=%%i"
+    )
+    echo "test nested" "!test_nested!"
+    if "!test_nested!" neq " " (
+        ECHO "" > "is_nested.txt"
+    )
+
+    set "status=NON-NESTED"
+    if exist "is_nested.txt" (
+        echo "!item!"  IS NESTED
+        set "status=NESTED"
+    )
+
+    echo was "status"
+
+    if "!item!" equ "!test_nested!" (
+        echo NEED TO CHANGE "!item!" TO NON-NESTED
+        set "status=NON-NON"
+    )
+
+    ECHO post status "!status!"
+    pause
+
+
     call :delim_with_char "1" "!left_char!" "!item!"
     set bridge=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
 
+
+    rem Work in Progress --- need bug fixes
+    echo INIT BRIDGE "!bridge!"
+    rem echo "OPTN LEFT CHAR " "!optn_one_left!"
     if not exist "is_nested.txt" (
         if "!bridge!" neq " " (
-            call :write_bridge "!bridge!"
+
+            rem Work In Progress
+            set t1=
+            call :delim_with_char "2" "!optn_one_left!" "!bridge!"
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                set "t1=%%i"
+            )
+
+            if "!t1!" neq " " (
+                call :recurse_on_bridge "1" "!optn_one_left!" "!optn_one_right!" "!bridge!"
+            )
+            
+            
+            call :delim_with_char "2" "!optn_two_left!" "!bridge!"
+            set t2=
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                set "t2=%%i"
+            )
+            rem echo t2 "!t2!"
+            if "!t2!" neq " " (
+                call :recurse_on_bridge "1" "!optn_two_left!" "!optn_two_right!" "!bridge!"
+            )
+
+            set /a blank_qty=0
+            if "!t1!" equ " " (
+                set /a blank_qty+=1 
+            )
+
+            if "!t2!" equ " " (
+                set /a blank_qty+=1
+            )
+ECHO QTY !blank_qty!
+            rem if !blank_qty! equ 2 (
+                 call :write_bridge "!bridge!"
+                echo "!brk!"
+            rem )
         )
     )
-    
-    rem echo REG ITEM "!item!"
+
+ 
     set "pad_item=PAD !item!"
     if exist "is_nested.txt" (
 
@@ -1650,7 +1890,6 @@ exit /b
         if "!item!" equ "!test!" (
             rem echo call :write_all.... "!test!"
             call :write_all_nested_to_group "!test!"
-            del "is_nested.txt"
         )
     )
     
@@ -1659,7 +1898,7 @@ exit /b
     
     set /a token+=1
         
-    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!" 
+    call :recurse_on_group "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     endlocal
 exit /b
 
@@ -1694,7 +1933,88 @@ exit /b
     endlocal
 exit /b
 
+:recurse_on_bridge
+    setlocal
+    set "token=%~1"
 
+    rem use this as delim
+    set "optn_left_char=%~2" 
+    set "optn_right_char=%~3"
+    set "bridge=%~4"
+    rem echo :REC -- BRIDGE token "!token!"
+    set item=
+    call :delim_with_char "!token!" "!optn_right_char!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+    rem ECHO item is "!item!" TOKEN "!token!" 
+    rem echo "!optn_left_char!" "!optn_right_char!"
+    if "!item!" equ " " (
+        exit /b
+    )
+
+    set small_bridge=
+    call :delim_with_char "1" "!optn_left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "small_bridge=%%i"
+    )
+rem echo "option left " "!optn_left_char!"
+     echo small Item "!item!"
+
+ echo SMALL BRIDGE "!small_bridge!"
+    
+
+    
+   
+    
+    if not exist "is_nested.txt" (
+         if "!small_bridge!" neq " " (
+             
+             rem echo SAVE SMALL BRIDGE "!small_bridge!"
+             rem Do a check on bridge to see if it contains 
+             rem    option_left_char
+             call :delim_with_char "2" "!optn_left_char!" "!item!"
+             set test=
+             for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                set "test=%%i"
+             )
+
+            rem echo TEST on OPTN LEFT "!test!"
+
+            rem if "!test!" neq " " (
+                call :write_bridge "!small_bridge!"
+            rem )
+             
+         )
+    )
+
+    set "pad_item=PAD !item!"
+    rem echo PAD ITEM "!pad_item!"
+
+    if exist "is_nested.txt" (
+        call :delim_with_char "1" "!optn_left_char!" "!item!"
+        set t=
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "t=%%i"
+        )
+        if "!item!" equ "!t!" (
+            call :write_all_nested_to_group "!t!"
+        )
+    )
+    
+
+    call :recurse_nested_status "!pad_item!" "!optn_left_char!" "2"
+    set /a token+=1
+
+    call :recurse_on_bridge "!token!" "!optn_left_char!"  "!optn_right_char!" "!bridge!"
+    endlocal
+exit /b
+
+:check_char_in_bridge
+    setlocal
+    set "bridge="
+    endlocal
+exit /b
 
 :print_status
     setlocal
@@ -1785,6 +2105,7 @@ exit /b
             set "old=!old!%%i"    
         )
         del nested.txt
+        del "is_nested.txt"
     ) 
     set "old=!old!!nested!"
     rem echo OLDY "!old!"
