@@ -1677,7 +1677,7 @@ exit /b
     )
 
     if !pqty! equ 4 (
-    echo BRIDGE "!bridge!"
+        echo BRIDGE "!bridge!"
     )
     REM echo PAD ITEM "!pad_item!"
 
@@ -1755,7 +1755,7 @@ exit /b
     ) else (
         SET "dest=LABELS"
     )
-echo SML_ITEM "!sml_item!" TO "!dest!"
+echo "!sml_item!" "!dest!"
 
     REM This is a temporary if condition
     if "!orig_item!" equ "!orig_bridge!" ( exit /b )

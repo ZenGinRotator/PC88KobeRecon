@@ -346,16 +346,31 @@ exit /b
     set "ext=%~4"
 
 
-    rem call "funcs_rom_keywords.bat" :start "X !one!!ext!"
-    rem call "funcs_rom_keywords.bat" :start "X !one!!two!!ext!"
-    call "funcs_rom_keywords.bat" :start "X !one!!two!!three!!indiv_pare_one!!indiv_pare_two!!ext!"
-    call "funcs_rom_keywords.bat" :start "X !one! !two! !three! !indiv_pare_one! !indiv_pare_two!!ext!"
-    call "funcs_rom_keywords.bat" :start "X !one! B1 !two! B2 !three! B3 !indiv_pare_one! B4 !indiv_pare_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!B1!two!B2!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! B1 !two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! B1 !two! B2 !ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!!two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! !two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one!B1!two!B2!three!B3!ext!"
+    call "funcs_rom_keywords.bat" :start "X !one! B1 !two! B2 !three! B3!ext!"
 
-    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one!!indiv_pare_two!!one!!two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one! !indiv_pare_two! !one! !two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "X !indiv_pare_one! B1 !indiv_pare_two! B2 !one! B3 !two! B4 !three!!ext!"
-    
+
+    call "funcs_rom_keywords.bat" :start "X!one!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one! !two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one!B1!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one!B1!two!B2!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one! B1 !two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one! B1 !two! B2 !ext!"
+    call "funcs_rom_keywords.bat" :start "X!one!!two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one! !two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one!B1!two!B2!three!B3!ext!"
+    call "funcs_rom_keywords.bat" :start "X!one! B1 !two! B2 !three! B3!ext!"
+
     endlocal
 exit /b
 
@@ -389,6 +404,9 @@ exit /b
 
     REM LEADING NON-NESTED SQR, FOLLOW NESTED SQR
     call :lead_and_follow "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "%nest_sqr_one%" "%nest_sqr_two%" "!ext!"
+
+
+
 
     rem LEADING NESTED PARE, FOLLOW NON-NESTED PARE
     call :lead_and_follow "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "%indiv_pare_one%" "%indiv_pare_two%" "!ext!"
@@ -428,8 +446,37 @@ exit /b
     set "middle_two=%~5"
     set "ext=%~6"
 
+    call "funcs_rom_keywords.bat" :start "X !lead_one!!middle_one!!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one!B1!middle_one!B2!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one!B1!middle_one!B2!lead_two!B3!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! !middle_one! !lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! !middle_one! !lead_two! !ext!"
+    
+    call "funcs_rom_keywords.bat" :start "X !lead_one! B1 !middle_one! B2 !lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! B1 !middle_one! B2 !lead_two! !ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! B1 !middle_one! B2 !lead_two! B3 !ext!"
+    
+    call "funcs_rom_keywords.bat" :start "X !lead_one!!middle_one!!lead_two!!middle_two!!lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one!B1!middle_one!B2!lead_two!B3!middle_two!B4!lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! !middle_one! !lead_two! !middle_two! !lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! !middle_one! !lead_two! !middle_two! !lead_three! !ext!"
+    call "funcs_rom_keywords.bat" :start "X !lead_one! B1 !middle_one! B2 !lead_two! B3 !middle_two! B4 !lead_three!!ext!"
+
     call "funcs_rom_keywords.bat" :start "X!lead_one!!middle_one!!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one!B1!middle_one!B2!lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one!B1!middle_one!B2!lead_two!B3!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! !middle_one! !lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! !middle_one! !lead_two! !ext!"
+    
+    call "funcs_rom_keywords.bat" :start "X!lead_one! B1 !middle_one! B2 !lead_two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! B1 !middle_one! B2 !lead_two! !ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! B1 !middle_one! B2 !lead_two! B3 !ext!"
+    
     call "funcs_rom_keywords.bat" :start "X!lead_one!!middle_one!!lead_two!!middle_two!!lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one!B1!middle_one!B2!lead_two!B3!middle_two!B4!lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! !middle_one! !lead_two! !middle_two! !lead_three!!ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! !middle_one! !lead_two! !middle_two! !lead_three! !ext!"
+    call "funcs_rom_keywords.bat" :start "X!lead_one! B1 !middle_one! B2 !lead_two! B3 !middle_two! B4 !lead_three!!ext!"
 
 
     endlocal
