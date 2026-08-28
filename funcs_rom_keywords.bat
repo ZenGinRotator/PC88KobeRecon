@@ -1636,6 +1636,13 @@ exit /b
         exit /b
     )
 
+    rem File name does not contain any instances of the primary
+    rem     delimiting character (eg ")"),
+    rem     so we can terminate this recursive search.
+    if "!item!" equ "!name!" (
+        exit /b
+    )
+
     
     
     
@@ -1659,6 +1666,14 @@ exit /b
         set "pad_bridge=%%i"
     )
 
+    rem Preliminary code block to limit appearance of 
+    rem     of rom name in bridge?
+    rem But possibly need to relocate this block
+    rem     because we need to do recursive search on
+    rem     on bridges for the existence of optional
+    rem     delimiting characters {} and [].
+
+    rem This block is causing some errors.
     set /a pqty=0
     if "!pad_bridge!" neq "PAD" (
         set /a pqty+=1
@@ -1676,9 +1691,11 @@ exit /b
         set /a pqty+=1
     )
 
-    if !pqty! equ 4 (
-        echo BRIDGE "!bridge!"
-    )
+    rem if !pqty! equ 4 (
+        echo BRIDGE "!bridge!" PAD BRIDGE "!pad_bridge!"
+   rem      echo recurse on bridge for option CHARS
+    call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    rem )
     REM echo PAD ITEM "!pad_item!"
 
 
@@ -1775,6 +1792,108 @@ exit /b
 
 
 
+:start_recurse_bridge
+    setlocal
+    set "left_char=%~1"
+    set "right_char=%~2"
+    set "bridge=%~3"
+    set "optn_one_left=%~4"
+    set "optn_one_right=%~5"
+    set "optn_two_left=%~6"
+    set "optn_two_right=%~7"
+    rem echo optn one "!optn_one_left!" "!optn_one_right!"
+
+    call :recurse_on_bridge2 "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    rem call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!"
+    endlocal
+exit /b
+
+:recurse_on_bridge2
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "bridge=%~4"
+    set "optn_one_left=%~5"
+    set "optn_one_right=%~6"
+    set "optn_two_left=%~7"
+    set "optn_two_right=%~8"
+
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" equ " " (
+        exit /b
+    )
+
+    if "!item!" equ "!bridge!" (
+        exit /b
+    )
+    
+    set smlr_bridge=
+    call :delim_with_char "1" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "smlr_bridge=%%i"
+    )
+
+    set "pad_item=PAD!item!"
+
+    set pad_bridge=
+    call :delim_with_char "1" "!left_char!" "!pad_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "pad_bridge=%%i"
+    )
+
+    rem Attempt to exclude rom name from bridge that 
+    rem     possibly contains option delimiting characters
+    set /a pqty=0
+    if "!pad_bridge!" neq "PAD" (
+        set /a pqty+=1
+    )
+
+    if "!pad_bridge!" neq "PAD " (
+        set /a pqty+=1
+    )
+
+    if "!item!" neq "!smlr_bridge!" (
+        set /a pqty+=1
+    )
+
+    if !token! gtr 1 (
+        set /a pqty+=1
+    )
+    echo "token" "!token!"
+    echo "padbridg" "!pad_bridge!"
+    echo "item" "!item!"
+    echo "smlr bridge " "!smlr_bridge!"
+    echo pqty "!pqty!"
+    rem if !pqty! equ 4 (
+        echo SMLR_BRIDGE "!smlr_bridge!" within initial bridge
+    rem )
+
+    
+    set nested_test=
+    call :delim_with_char "3" "!left_char!" "!pad_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "nested_test=%%i"
+    )
+
+    rem echo NESTED TEST "!nested_test!"
+    if "!nested_test!" neq " " (
+        echo "" > "is_nested.txt"
+    )
+
+    set /a token+=1
+    echo RECURSE ON ITEM
+    call :recurse_on_item "2" "!left_char!" "!right_char!" "!pad_item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!item!|!smlr_bridge!"
+
+    
+    call :recurse_on_bridge2 "!token!" "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    endlocal
+exit /b
 
 
 
@@ -1997,6 +2116,15 @@ exit /b
     call :recurse_nested_status "!item!" "!left_char!" "!token!" "!lqty!"
     endlocal
 exit /b
+
+
+
+
+
+
+
+
+
 
 :recurse_on_bridge
     setlocal
