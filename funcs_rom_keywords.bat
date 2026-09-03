@@ -1692,7 +1692,7 @@ exit /b
     )
 
     rem if !pqty! equ 4 (
-        echo BRIDGE "!bridge!" PAD BRIDGE "!pad_bridge!"
+        rem echo BRIDGE "!bridge!" PAD BRIDGE "!pad_bridge!"
    rem      echo recurse on bridge for option CHARS
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     rem )
@@ -1772,7 +1772,7 @@ exit /b
     ) else (
         SET "dest=LABELS"
     )
-echo "!sml_item!" "!dest!"
+ echo "DEST" "!dest!" ORIG ITEM "!orig_item!",  ORIG BRIDGE "!orig_bridge!"
 
     REM This is a temporary if condition
     if "!orig_item!" equ "!orig_bridge!" ( exit /b )
@@ -1865,13 +1865,13 @@ exit /b
     if !token! gtr 1 (
         set /a pqty+=1
     )
-    echo "token" "!token!"
-    echo "padbridg" "!pad_bridge!"
-    echo "item" "!item!"
-    echo "smlr bridge " "!smlr_bridge!"
-    echo pqty "!pqty!"
-    rem if !pqty! equ 4 (
-        echo SMLR_BRIDGE "!smlr_bridge!" within initial bridge
+    rem echo "token" "!token!"
+    rem echo "padbridg" "!pad_bridge!"
+    rem echo "item" "!item!"
+    rem echo "smlr bridge " "!smlr_bridge!"
+    rem echo pqty "!pqty!"
+    rem if !pqty! equ 3 (
+    rem     echo SMLR_BRIDGE "!smlr_bridge!" within initial bridge
     rem )
 
     
@@ -1887,7 +1887,7 @@ exit /b
     )
 
     set /a token+=1
-    echo RECURSE ON ITEM
+    rem echo RECURSE ON ITEM
     call :recurse_on_item "2" "!left_char!" "!right_char!" "!pad_item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!item!|!smlr_bridge!"
 
     
