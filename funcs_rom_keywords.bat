@@ -1692,7 +1692,7 @@ exit /b
     )
 
     rem if !pqty! equ 4 (
-        rem echo BRIDGE "!bridge!" PAD BRIDGE "!pad_bridge!"
+    echo large BRIDGE "!bridge!"
    rem      echo recurse on bridge for option CHARS
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     rem )
@@ -1743,28 +1743,33 @@ exit /b
         set "orig_bridge=%%i"
     )
 
+    rem echo ORIG BRIDGE "!orig_bridge!"
 
-    rem echo ** ORIGS --- ITEM: "!orig_item!" BRIDGE: "!orig_bridge!"
-
-    set sml_item=
+    set a=
     call :delim_with_char "!token!" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "sml_item=%%i"
+        set "a=%%i"
     )
 
-    if "!orig_item!" equ "!orig_bridge!" (
-        set "sml_item=!orig_item!"
+rem echo TOKEN "!token!" "!left_char!" "!pad_item!"
+    rem A can be equ to " " when token > 2
+    if "!a!" equ " " (
+        if !token! equ 2 (
+            set "a=!orig_item!"
+        ) else ( 
+            exit /b
+        )
     )
-
-    if "!sml_item!" equ " " (
-        exit /b
-    )
+    
 
     
+
+    set find=
     SET dest=
     if exist "is_nested.txt" (
         if "!orig_item!" equ "!orig_bridge!" (
             rem set "sml_item=!orig_item!
+            set "find=!orig_item!"
             del "is_nested.txt"
         )
         set "dest=NESTED"
@@ -1772,12 +1777,9 @@ exit /b
     ) else (
         SET "dest=LABELS"
     )
- echo "DEST" "!dest!" ORIG ITEM "!orig_item!",  ORIG BRIDGE "!orig_bridge!"
-
-    REM This is a temporary if condition
-    if "!orig_item!" equ "!orig_bridge!" ( exit /b )
-
-
+ 
+ 
+    echo "!a!" -- "!dest!"
 
 
     set /a token+=1
@@ -1865,14 +1867,14 @@ exit /b
     if !token! gtr 1 (
         set /a pqty+=1
     )
-    rem echo "token" "!token!"
-    rem echo "padbridg" "!pad_bridge!"
-    rem echo "item" "!item!"
-    rem echo "smlr bridge " "!smlr_bridge!"
-    rem echo pqty "!pqty!"
-    rem if !pqty! equ 3 (
-    rem     echo SMLR_BRIDGE "!smlr_bridge!" within initial bridge
+
+    rem echo ITEM "!item!" "!smlr_bridge!" "!token!"
+    rem if !token!  (
+        echo SMALL BRIDGE "!smlr_bridge!"
     rem )
+
+    
+   
 
     
     set nested_test=

@@ -346,7 +346,7 @@ exit /b
     set "ext=%~4"
 
 
-    call "funcs_rom_keywords.bat" :start "X { hi } {nested {bye} here} !one!B1!ext!"
+    call "funcs_rom_keywords.bat" :start "X { hi } {nested {bye} {farewell} here} !one!B1!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
