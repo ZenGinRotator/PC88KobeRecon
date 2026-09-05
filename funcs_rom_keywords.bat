@@ -1651,12 +1651,8 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
-    rem ECHO "!brk!"
-    rem echo ITEM "!item!"
-    rem echo BRIDGE "!bridge!"
-   rem echo TOKEN "!token!"
-
-
+   
+   
 
     set "pad_item=PAD!item!"
     
@@ -1666,42 +1662,18 @@ exit /b
         set "pad_bridge=%%i"
     )
 
-    set /a padqty=0
-    if "!pad_bridge!" equ "PAD " (
-        set /a padqty+=1
-    )
-
-    IF "!pad_bridge!" equ "PAD" (
-        set /a padqty+=1
-    )
-
-    if !padqty! gtr 0 (
-        set bridge=
-    )
-
     
-
+     call :keep_or_clear_bridge "!pad_bridge!" "!bridge!"
+     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+         set "bridge=%%i"
+     )
    
-   rem      echo recurse on bridge for option CHARS
+   
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    rem )
-    REM echo PAD ITEM "!pad_item!"
-
-
-
+   
     
-    set "isn=FASLE"
-    if exist "is_nested.txt" (
-        set "isn=TRUE"
-    )
-    rem echo L "!bridge!" "!isn!"
-    if !token! gtr 1 (
-        if "!isn!" neq "TRUE" (
-            if "!bridge!" neq "" (
-     echo large BRIDGE "!bridge!" "!isn!"
-            )
-        )
-    )
+
+    call :send_bridge_filter "PRIMARY" "!token!" "!bridge!"
 
     
     set nested_test=
@@ -1781,7 +1753,12 @@ exit /b
     )
  
  
-    rem echo "!a!" -- "!dest!"
+     echo "!a!" -- "!dest!"
+
+
+
+
+
     set "isn=FALSE"
     if exist "is_nested.txt" (
         set "isn=TRUE"
@@ -1804,6 +1781,66 @@ exit /b
 exit /b
 
 
+rem Function to determine whether "padded" is a bridge
+rem     within the file name  or a label
+rem "padded" is a bridge
+rem     "PAD + BRIDGE IN FILE NAME ()/{}/[]..."
+rem     return bridge that is not appended with "PAD" or "PAD "
+rem "padded" is a label -> 
+rem     "PAD (label)/{label}/[label] IN FILE NAME..." (We found a label to ignore!)
+rem     return " " (a blank that will be used to filter output for the bridge)
+:keep_or_clear_bridge
+    setlocal
+    set "pad_bridge=%~1"
+    set "orig_bridge=%~2"
+
+    set /a pad_only_qty=0
+
+    if "!pad_bridge!" equ "PAD" (
+        set /a pad_only_qty+=1
+    )
+
+    IF "!pad_bridge!" equ "PAD " (
+        set /a pad_only_qty+=1
+    )
+
+    if !pad_only_qty! gtr 0 (
+        set orig_bridge=
+    )
+
+set "orig_bridge=!orig_bridge!|"
+    echo !orig_bridge! > "%delimtxt%"
+
+    endlocal
+exit /b
+
+:send_bridge_filter
+    setlocal
+    
+    rem before "PRIMARY"/"SECONDARY" character
+    set "src=%~1"
+    
+
+    set "token=%~2"
+    set "bridge=%~3"
+
+    
+    set "isn=FALSE"
+    if exist "is_nested.txt" (
+        set "isn=TRUE"
+    )
+
+    if !token! gtr 1 (
+        if "!isn!" neq "TRUE" (
+            if "!bridge!" neq " " (
+                echo "!src!" "!bridge!" "!isn!"
+            )
+        )
+    )
+
+
+    endlocal
+exit /b
 
 
 :start_recurse_bridge
@@ -1855,44 +1892,22 @@ exit /b
 
     set "pad_item=PAD!item!"
 
-rem echo PAD ITEM "!pad_item!"
     set pad_bridge=
     call :delim_with_char "1" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "pad_bridge=%%i"
     )
 
-rem echo PAD BRIDGE IS ------ "!pad_bridge!"
-rem echo pad item ==== "!pad_item!"
-    set /a padqty=0
-    if "!pad_bridge!" equ "PAD" (
-        set /a padqty+=1
-    )
 
-    IF "!pad_bridge!" equ "PAD " (
-        set /a padqty+=1
+    call :keep_or_clear_bridge "!pad_bridge!" "!smlr_bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "smlr_bridge=%%i"
     )
 
 
 
-    if !padqty! gtr 0 (
-        set smlr_bridge=
-    )
 
-
-    set "isn=FALSE"
-    if exist "is_nested.txt" (
-        set "isn=TRUE"
-    )
-
-    if !token! gtr 1 (
-        if "!isn!" NEQ "TRUE" (
-             
-          if "!smlr_bridge!" neq "" (
-       echo SMALL BRIDGE "!smlr_bridge!" "!isn!"
-          )
-        )
-    )
+    call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!"
 
 
 
@@ -1904,9 +1919,7 @@ rem echo pad item ==== "!pad_item!"
         set "nested_test=%%i"
     )
 
-     rem echo NESTED TEST "!nested_test!"
-     rem echo PAD BRIDGE  "!pad_bridge!"
-
+    
 
     if "!nested_test!" neq " " (
         echo "" > "is_nested.txt"
