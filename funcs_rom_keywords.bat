@@ -1651,7 +1651,7 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
-    ECHO "!brk!"
+    rem ECHO "!brk!"
     rem echo ITEM "!item!"
     rem echo BRIDGE "!bridge!"
    rem echo TOKEN "!token!"
@@ -1666,46 +1666,51 @@ exit /b
         set "pad_bridge=%%i"
     )
 
-    rem Preliminary code block to limit appearance of 
-    rem     of rom name in bridge?
-    rem But possibly need to relocate this block
-    rem     because we need to do recursive search on
-    rem     on bridges for the existence of optional
-    rem     delimiting characters {} and [].
-
-    rem This block is causing some errors.
-    set /a pqty=0
-    if "!pad_bridge!" neq "PAD" (
-        set /a pqty+=1
+    set /a padqty=0
+    if "!pad_bridge!" equ "PAD " (
+        set /a padqty+=1
     )
 
-    if "!pad_bridge!" neq "PAD " (
-        set /a pqty+=1
+    IF "!pad_bridge!" equ "PAD" (
+        set /a padqty+=1
     )
 
-    if "!item!" neq "!bridge!" (
-        set /a pqty+=1
+    if !padqty! gtr 0 (
+        set bridge=
     )
 
-    if !token! gtr 1 (
-        set /a pqty+=1
-    )
+    
 
-    rem if !pqty! equ 4 (
-    echo large BRIDGE "!bridge!"
+   
    rem      echo recurse on bridge for option CHARS
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     rem )
     REM echo PAD ITEM "!pad_item!"
 
 
+
+    
+    set "isn=FASLE"
+    if exist "is_nested.txt" (
+        set "isn=TRUE"
+    )
+    rem echo L "!bridge!" "!isn!"
+    if !token! gtr 1 (
+        if "!isn!" neq "TRUE" (
+            if "!bridge!" neq "" (
+     echo large BRIDGE "!bridge!" "!isn!"
+            )
+        )
+    )
+
+    
     set nested_test=
     call :delim_with_char "3" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "nested_test=%%i"
     )
 
-    rem echo NESTED TEST "!nested_test!"
+    rem echo NESTED TEST "!nested_test!" AFTER pad item "!pad_item!"
     if "!nested_test!" neq " " (
         echo "" > "is_nested.txt"
     )
@@ -1743,7 +1748,6 @@ exit /b
         set "orig_bridge=%%i"
     )
 
-    rem echo ORIG BRIDGE "!orig_bridge!"
 
     set a=
     call :delim_with_char "!token!" "!left_char!" "!pad_item!"
@@ -1751,7 +1755,6 @@ exit /b
         set "a=%%i"
     )
 
-rem echo TOKEN "!token!" "!left_char!" "!pad_item!"
     rem A can be equ to " " when token > 2
     if "!a!" equ " " (
         if !token! equ 2 (
@@ -1763,13 +1766,12 @@ rem echo TOKEN "!token!" "!left_char!" "!pad_item!"
     
 
     
-
-    set find=
+    rem echo OI vs OB "!orig_item!" "!orig_bridge!"
     SET dest=
     if exist "is_nested.txt" (
+
+        rem At the last nested label
         if "!orig_item!" equ "!orig_bridge!" (
-            rem set "sml_item=!orig_item!
-            set "find=!orig_item!"
             del "is_nested.txt"
         )
         set "dest=NESTED"
@@ -1779,7 +1781,17 @@ rem echo TOKEN "!token!" "!left_char!" "!pad_item!"
     )
  
  
-    echo "!a!" -- "!dest!"
+    rem echo "!a!" -- "!dest!"
+    set "isn=FALSE"
+    if exist "is_nested.txt" (
+        set "isn=TRUE"
+    )
+
+    if "!orig_bridge!" neq "!a!" (
+        if "!orig_bridge!" neq " " (
+        REM ECHO SHOW orig bridge "!orig_bridge!" "!isn!"
+        )
+    )
 
 
     set /a token+=1
@@ -1843,50 +1855,66 @@ exit /b
 
     set "pad_item=PAD!item!"
 
+rem echo PAD ITEM "!pad_item!"
     set pad_bridge=
     call :delim_with_char "1" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "pad_bridge=%%i"
     )
 
-    rem Attempt to exclude rom name from bridge that 
-    rem     possibly contains option delimiting characters
-    set /a pqty=0
-    if "!pad_bridge!" neq "PAD" (
-        set /a pqty+=1
+rem echo PAD BRIDGE IS ------ "!pad_bridge!"
+rem echo pad item ==== "!pad_item!"
+    set /a padqty=0
+    if "!pad_bridge!" equ "PAD" (
+        set /a padqty+=1
     )
 
-    if "!pad_bridge!" neq "PAD " (
-        set /a pqty+=1
+    IF "!pad_bridge!" equ "PAD " (
+        set /a padqty+=1
     )
 
-    if "!item!" neq "!smlr_bridge!" (
-        set /a pqty+=1
+
+
+    if !padqty! gtr 0 (
+        set smlr_bridge=
+    )
+
+
+    set "isn=FALSE"
+    if exist "is_nested.txt" (
+        set "isn=TRUE"
     )
 
     if !token! gtr 1 (
-        set /a pqty+=1
+        if "!isn!" NEQ "TRUE" (
+             
+          if "!smlr_bridge!" neq "" (
+       echo SMALL BRIDGE "!smlr_bridge!" "!isn!"
+          )
+        )
     )
 
-    rem echo ITEM "!item!" "!smlr_bridge!" "!token!"
-    rem if !token!  (
-        echo SMALL BRIDGE "!smlr_bridge!"
-    rem )
 
-    
-   
 
-    
+
+
     set nested_test=
     call :delim_with_char "3" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "nested_test=%%i"
     )
 
-    rem echo NESTED TEST "!nested_test!"
+     rem echo NESTED TEST "!nested_test!"
+     rem echo PAD BRIDGE  "!pad_bridge!"
+
+
     if "!nested_test!" neq " " (
         echo "" > "is_nested.txt"
     )
+
+    
+   
+
 
     set /a token+=1
     rem echo RECURSE ON ITEM
