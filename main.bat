@@ -7,30 +7,30 @@ rem need indiv [] () and {} - single and multi-word?
 set none_blank=
 set "none_full=file name without labels"
 
-set "nest_pare_one=(N1 + (P11 +) (P12 +) PG1 +)"
-set "nest_pare_two=(N2 + (P21 +) (P22 +) PG2 +)"
-set "nest_pare_three=(N3 + (P31 +) (P32 +) PG3 +)"
+set "nest_pare_one=(PN1 + (P1.1 +) (P1.2 +) PG1 +)"
+set "nest_pare_two=(PN2 + (P2.1 +) (P2.2 +) PG2 +)"
+set "nest_pare_three=(PN3 + (P3.1 +) (P3.2 +) PG3 +)"
 
-set "nest_curl_one={N1 + {C1 +} {C2 +} CG1 +}"
-set "nest_curl_two={N2 + {C1 +} {C2 +} CG2 +}"
-set "nest_curl_three={N3 + {C1 +} {C2 +} CG3 +}"
+set "nest_curl_one={CN1 + {C1.1 +} {C1.2 +} CG1 +}"
+set "nest_curl_two={CN2 + {C2.1 +} {C2.2 +} CG2 +}"
+set "nest_curl_three={CN3 + {C3.1 +} {C3.2 +} CG3 +}"
 
-set "nest_sqr_one=[N1 + [S1 +] [S2 +] SG1 +]"
-set "nest_sqr_two=[N2 + [S1 +] [S2 +] SG1 +]"
-set "nest_sqr_three=[N3 + [S1 +] [S2 +] SG1 +]"
+set "nest_sqr_one=[SN1 + [S1.1 +] [S1.2 +] SG1 +]"
+set "nest_sqr_two=[SN2 + [S2.1 +] [S2.2 +] SG2 +]"
+set "nest_sqr_three=[SN3 + [S3.1 +] [S3.2 +] SG3 +]"
 
-set "indiv_pare_one=(P1 +)"
-set "indiv_pare_two=(P2 +)"
-set "indiv_pare_three=(P3 +)"
+set "indiv_pare_one=(PI1 +)"
+set "indiv_pare_two=(PI2 +)"
+set "indiv_pare_three=(PI3 +)"
 
-set "indiv_curl_one={C1 +}"
-set "indiv_curl_two={C2 +}"
-set "indiv_curl_three={C3 +}"
+set "indiv_curl_one={CI1 +}"
+set "indiv_curl_two={CI2 +}"
+set "indiv_curl_three={CI3 +}"
 
 
-set "indiv_sqr_one=[S1 +]"
-set "indiv_sqr_two=[S2 +]"
-set "indiv_sqr_three=[S3 +]"
+set "indiv_sqr_one=[SI1 +]"
+set "indiv_sqr_two=[SI2 +]"
+set "indiv_sqr_three=[SI3 +]"
 
 
 set "brid_one=B1"
@@ -345,8 +345,32 @@ exit /b
     set "three=%~3"
     set "ext=%~4"
 
+    rem List of permutations
+    rem A bridge before extension type (eg. bridge.d88)
+    rem a bridge and " " before extension type (eg. bridge .d88)
+    rem no bridge before extension type (eg. ].d88)
+    rem a " " before extension type (eg. ] .d88)
 
-    call "funcs_rom_keywords.bat" :start "X { hi }B1 A1{nested {bye} {farewell} here}B2 c2!one!B4 C4!two! {bye bye} D1 E1 {encaps {welcome} there} M1 N1 !ext!"
+    rem Additional permutations:
+    rem no space, without bridge
+    rem with space, without bridge
+    rem no space, with bridge
+    rem with space, with bridge
+
+    rem A primary, indiv encapsulator only
+    rem A primary, nested capsulator only
+    rem A primary, indiv, indiv
+    rem A primary, indiv, indiv, indiv
+    rem A primary, nested
+    rem A primary, nested, nested
+    rem A primary, nested, nested, nested
+    rem A primary, indiv & nested encapsulator only
+    rem A primary, nested & indiv encapsulator only
+    rem A primary, nested, indiv, nested encapsulator only
+    rem A primary, indiv, nested, indiv encapsulator only
+    rem A primary
+    rem 
+    call "funcs_rom_keywords.bat" :start "X { hi } B1 A1 {nested {bye} {farewell} here}B2 c2!one!B4 C4!two! {bye bye} D1 E1 {encaps {welcome} there}!ext!"
     call "funcs_rom_keywords.bat" :start "X { hi }{nested {bye} {farewell} here}!one!!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"
