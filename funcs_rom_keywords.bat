@@ -1667,10 +1667,22 @@ exit /b
      for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
          set "bridge=%%i"
      )
-   
-   
+
+    rem if "!bridge!" neq " " (
+    rem echo A BRIDGE "!bridge!"
+    rem )
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
    
+   
+    rem test for .d88, .t88, or .cmt extension
+    rem if one of these extensions is found, then cancel
+    rem the algorithm with exit /b
+
+      call :continue_or_stop "!bridge!"
+     if exist "stop.txt" (
+         del "stop.txt"
+         exit /b
+     )
     
 
     call :send_bridge_filter "PRIMARY" "!token!" "!bridge!"
@@ -1808,8 +1820,37 @@ rem     return " " (a blank that will be used to filter output for the bridge)
         set orig_bridge=
     )
 
-set "orig_bridge=!orig_bridge!|"
+    set "orig_bridge=!orig_bridge!|"
     echo !orig_bridge! > "%delimtxt%"
+
+    endlocal
+exit /b
+
+:continue_or_stop
+    setlocal
+    set "bridge=%~1"
+    
+    call :delim_with_char "2" "." "!bridge!"
+    set ext=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "ext=%%i"
+    )
+rem echo CONTINUE OR STOP BRIDGE "!bridge!" EXT "!ext!"
+    set /a qty=0
+    if "!ext!" equ "d88" (
+        set /a qty+=1
+    )
+    if "!ext!" equ "t88" (
+        set /a qty+=1
+    )
+    if "!ext!" equ "cmt" (
+        set /a qty+=1
+    )
+
+
+    if !qty! gtr 0 (
+        echo "" > "stop.txt"
+    )
 
     endlocal
 exit /b
@@ -1833,7 +1874,7 @@ exit /b
     if !token! gtr 1 (
         if "!isn!" neq "TRUE" (
             if "!bridge!" neq " " (
-                echo "!src!" "!bridge!" "!isn!"
+                echo BRIDGE: "!bridge!" "!src!" "!isn!"
             )
         )
     )
@@ -1855,7 +1896,7 @@ exit /b
     rem echo optn one "!optn_one_left!" "!optn_one_right!"
 
     call :recurse_on_bridge2 "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    rem call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!"
+    call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     endlocal
 exit /b
 
@@ -1889,6 +1930,16 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "smlr_bridge=%%i"
     )
+
+    rem test for .d88, .t88, or .cmt extension
+    rem if one of these extensions is found, then cancel
+    rem the algorithm with exit /b
+    rem call :continue_or_stop "!smlr_bridge!"
+    rem if exist "stop.txt" (
+    rem    del "stop.txt"
+    rem    exit /b
+    rem )
+   
 
     set "pad_item=PAD!item!"
 

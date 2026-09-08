@@ -7,30 +7,30 @@ rem need indiv [] () and {} - single and multi-word?
 set none_blank=
 set "none_full=file name without labels"
 
-set "nest_pare_one=(N1 (P11) (P12) PG1)"
-set "nest_pare_two=(N2 (P21) (P22) PG2)"
-set "nest_pare_three=(N3 (P31) (P32) PG3)"
+set "nest_pare_one=(N1 + (P11 +) (P12 +) PG1 +)"
+set "nest_pare_two=(N2 + (P21 +) (P22 +) PG2 +)"
+set "nest_pare_three=(N3 + (P31 +) (P32 +) PG3 +)"
 
-set "nest_curl_one={N1 {C1} {C2} CG1}"
-set "nest_curl_two={N2 {C1} {C2} CG2}"
-set "nest_curl_three={N3 {C1} {C2} CG3}"
+set "nest_curl_one={N1 + {C1 +} {C2 +} CG1 +}"
+set "nest_curl_two={N2 + {C1 +} {C2 +} CG2 +}"
+set "nest_curl_three={N3 + {C1 +} {C2 +} CG3 +}"
 
-set "nest_sqr_one=[N1 [S1] [S2] SG1]"
-set "nest_sqr_two=[N2 [S1] [S2] SG1]"
-set "nest_sqr_three=[N3 [S1] [S2] SG1]"
+set "nest_sqr_one=[N1 + [S1 +] [S2 +] SG1 +]"
+set "nest_sqr_two=[N2 + [S1 +] [S2 +] SG1 +]"
+set "nest_sqr_three=[N3 + [S1 +] [S2 +] SG1 +]"
 
-set "indiv_pare_one=(P1)"
-set "indiv_pare_two=(P2)"
-set "indiv_pare_three=(P3)"
+set "indiv_pare_one=(P1 +)"
+set "indiv_pare_two=(P2 +)"
+set "indiv_pare_three=(P3 +)"
 
-set "indiv_curl_one={C1}"
-set "indiv_curl_two={C2}"
-set "indiv_curl_three={C3}"
+set "indiv_curl_one={C1 +}"
+set "indiv_curl_two={C2 +}"
+set "indiv_curl_three={C3 +}"
 
 
-set "indiv_sqr_one=[S1]"
-set "indiv_sqr_two=[S2]"
-set "indiv_sqr_three=[S3]"
+set "indiv_sqr_one=[S1 +]"
+set "indiv_sqr_two=[S2 +]"
+set "indiv_sqr_three=[S3 +]"
 
 
 set "brid_one=B1"
@@ -346,7 +346,7 @@ exit /b
     set "ext=%~4"
 
 
-    call "funcs_rom_keywords.bat" :start "X { hi }B1 A1{nested {bye} {farewell} here}B2 c2!one!B4 C4!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "X { hi }B1 A1{nested {bye} {farewell} here}B2 c2!one!B4 C4!two! {bye bye} D1 E1 {encaps {welcome} there} M1 N1 !ext!"
     call "funcs_rom_keywords.bat" :start "X { hi }{nested {bye} {farewell} here}!one!!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"
