@@ -1586,6 +1586,7 @@ exit /b
     if exist %delimtxt% ( del %delimtxt% )
     if exist %brgtxt% ( del %brgtxt% )
     if exist "is_nested.txt" ( del "is_nested.txt" )
+    if exist "bridge.txt" ( del "bridge.txt" )
     
     endlocal
 exit /b
@@ -1643,7 +1644,8 @@ exit /b
         exit /b
     )
 
-    
+
+
     
     
     set bridge=
@@ -1780,7 +1782,9 @@ exit /b
     rem echo ---
     rem echo TOKEN "!token!"
     rem echo A "!a!"
-    rem echo ORIG iTEM "!orig_item!"
+     rem echo ORIG iTEM "!orig_item!"
+
+     
     rem A can be equ to " " when token > 2
     if "!a!" equ " " (
         if !token! equ 2 (
@@ -1806,6 +1810,52 @@ exit /b
     ) else (
         SET "dest=LABELS"
     )
+
+    
+    set ext=
+    call :delim_with_char "2" "." "!orig_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "ext=%%i"
+    )
+
+    set extless=
+    call :delim_with_char "1" "." "!orig_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "extless=%%i"
+    )
+
+    set /a ext_qty=0
+
+    if "!ext!" equ "d88" (
+        set /a ext_qty+=1
+    )
+    if "!ext!" equ "d88" (
+        set /a ext_qty+=1
+    )
+    if "!ext!" equ "d88" (
+        set /a ext_qty+=1
+    )
+
+     if !ext_qty! gtr 0 (
+           set "a=!extless!"
+       )
+
+            set /a extless_qty=0
+
+    if "!extless!" equ "d88" (
+        set /a extless_qty+=1
+    )
+    if "!extless!" equ "t88" (
+        set /a extless_qty+=1
+    )
+    if "!extless!" equ "cmt" (
+        set /a extless_qty+=1
+    )
+
+    if !extless_qty! gtr 0 (
+        set "a= "
+    )
+
  
     set read=
     if exist "bridge.txt" (
@@ -1814,10 +1864,13 @@ exit /b
         )
         del "bridge.txt"
     )
+     rem echo READ "!read!"
     
    
     if "!read!" neq "!a!" (
+        if "!a!" neq " " (
      echo "!a!" -- "!dest!"
+     )
     )
     
 
@@ -1841,7 +1894,7 @@ exit /b
     set "primaries=!left_char!|!right_char!"
     set "optn_ones=!optn_one_left!|!optn_one_right!"
     set "optn_twos=!optn_two_left!|!optn_two_right!"
-    call :recurse_on_item "!token!" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!orig_item!|!orig_bridge!" "!bridge!" "!future_token!"
+    call :recurse_on_item "!token!" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!orig_item!|!orig_bridge!"
 
     
 
@@ -1941,19 +1994,6 @@ exit /b
         )
     )
 
-    rem set "isb=FALSE"
-    rem if exist "bridge.txt" (
-    rem     set "isb=TRUE"
-    rem )
-    rem if !token! gtr 1 (
-    rem     if "!isb!" equ "TRUE" (
-    rem         if "!bridge!" neq " " (
-    rem         echo BRIDGE: "!bridge!" "!src!" "!isb!"
-    rem         )
-    rem     )
-    rem )
-
-
     endlocal
 exit /b
 
@@ -2024,31 +2064,82 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "pad_bridge=%%i"
     )
-rem ECHO SECONDARY
-rem echo ITEM "!item!"
-rem echo PAD ITEM "!pad_item!"
-rem echo PAD BRIDGE "!pad_bridge!"
-rem pause
+
     call :keep_or_clear_bridge "!pad_bridge!" "!smlr_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "smlr_bridge=%%i"
     )
 
-    set sec=
-    call :delim_with_char "2" "!left_char!" "!pad_item!"
+    set ext=
+    call :delim_with_char "2" "." "!smlr_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "sec=%%i"
+        set "ext=%%i"
     )
 
-    rem echo SEC "!sec!"
-    rem pause
+    set extless=
+    call :delim_with_char "1" "." "!smlr_bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "extless=%%i"
+    )
 
+    rem Assume that bridge exceeds file extension within file name
+    set /a ext_qty=0
+
+    if "!ext!" equ "d88" (
+        set /a ext_qty+=1
+    )
+    if "!ext!" equ "t88" (
+        set /a ext_qty+=1
+    )
+    if "!ext!" equ "cmt" (
+        set /a ext_qty+=1
+    )
+
+    if !ext_qty! gtr 0 (
+           set "smlr_bridge=!extless!"
+          rem if "!ext!" equ " " (
+          rem   set "smlr_bridge=!ext!"
+          rem )
+    )
+
+        set /a extless_qty=0
+
+    if "!extless!" equ "d88" (
+        set /a extless_qty+=1
+    )
+    if "!extless!" equ "t88" (
+        set /a extless_qty+=1
+    )
+    if "!extless!" equ "cmt" (
+        set /a extless_qty+=1
+    )
+
+    if !extless_qty! gtr 0 (
+        set "smlr_bridge= "
+    )
+
+
+
+REM * might not need -- To account if no bridge preceeds file extension within file name 
+    set /a bridge_is_ext=0
+    if "!smlr_bridge!" equ ".d88" (
+        set /a bridge_is_ext+=1
+    )
+    if "!smlr_bridge!" equ ".t88" (
+        set /a bridge_is_ext+=1
+    )
+    if "!smlr_bridge!" equ ".cmt" (
+        set /a bridge_is_ext+=1
+    )
+
+    
     rem if "!sec!" neq " " (
         rem echo "" > "bridge.txt"
         rem del "bridge.txt"
     rem )
-
+    rem if !bridge_is_ext! equ 0 (
     call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!pad_bridge!"
+    rem )
     rem del "bridge.txt"
     rem )
 
