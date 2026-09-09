@@ -1993,6 +1993,11 @@ exit /b
         set "isn=TRUE"
     )
 
+    if !token! equ 1 (
+        echo ROM: "!bridge!"
+        exit /b
+    )
+
     if !token! gtr 1 (
         if "!isn!" neq "TRUE" (
             if "!bridge!" neq " " (
@@ -2122,17 +2127,8 @@ exit /b
 
 
 
-
-    
-    rem if "!sec!" neq " " (
-        rem echo "" > "bridge.txt"
-        rem del "bridge.txt"
-    rem )
-    rem if !bridge_is_ext! equ 0 (
+    rem echo SECONDARY -- "!smlr_bridge!"
     call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!pad_bridge!"
-    rem )
-    rem del "bridge.txt"
-    rem )
 
 
 
