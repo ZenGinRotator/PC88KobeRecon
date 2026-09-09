@@ -1824,33 +1824,29 @@ exit /b
         set "extless=%%i"
     )
 
-    set /a ext_qty=0
 
-    if "!ext!" equ "d88" (
-        set /a ext_qty+=1
+
+    call :ext_qty "!ext!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a ext_qty=%%i
     )
-    if "!ext!" equ "d88" (
-        set /a ext_qty+=1
-    )
-    if "!ext!" equ "d88" (
-        set /a ext_qty+=1
-    )
+    del ext_qty.txt
+
 
      if !ext_qty! gtr 0 (
            set "a=!extless!"
        )
 
-            set /a extless_qty=0
+    
 
-    if "!extless!" equ "d88" (
-        set /a extless_qty+=1
+    
+
+    call :ext_qty "!extless!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a extless_qty=%%i
     )
-    if "!extless!" equ "t88" (
-        set /a extless_qty+=1
-    )
-    if "!extless!" equ "cmt" (
-        set /a extless_qty+=1
-    )
+    del ext_qty.txt
+
 
     if !extless_qty! gtr 0 (
         set "a= "
@@ -1935,6 +1931,26 @@ rem     return " " (a blank that will be used to filter output for the bridge)
     endlocal
 exit /b
 
+:ext_qty
+    setlocal
+    set "phrase=%~1"
+
+    set /a qty=0
+
+    if "!phrase!" equ "cmt" (
+        set /a qty+=1
+    )
+    if "!phrase!" equ "t88" (
+        set /a qty+=1
+    )
+    if "!phrase!" equ "d88" (
+        set /a qty+=1
+    )
+
+    echo !qty! > "ext_qty.txt"
+    endlocal
+exit /b
+
 :continue_or_stop
     setlocal
     set "bridge=%~1"
@@ -1945,17 +1961,13 @@ exit /b
         set "ext=%%i"
     )
 rem echo CONTINUE OR STOP BRIDGE "!bridge!" EXT "!ext!"
-    set /a qty=0
-    if "!ext!" equ "d88" (
-        set /a qty+=1
-    )
-    if "!ext!" equ "t88" (
-        set /a qty+=1
-    )
-    if "!ext!" equ "cmt" (
-        set /a qty+=1
-    )
+    
 
+    call :ext_qty "!ext!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a qty=%%i
+    )
+    del ext_qty.txt
 
     if !qty! gtr 0 (
         echo "" > "stop.txt"
@@ -2083,36 +2095,26 @@ exit /b
     )
 
     rem Assume that bridge exceeds file extension within file name
-    set /a ext_qty=0
+   
+    call :ext_qty "!ext!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a ext_qty=%%i
+    )
+    del ext_qty.txt
 
-    if "!ext!" equ "d88" (
-        set /a ext_qty+=1
-    )
-    if "!ext!" equ "t88" (
-        set /a ext_qty+=1
-    )
-    if "!ext!" equ "cmt" (
-        set /a ext_qty+=1
-    )
 
     if !ext_qty! gtr 0 (
            set "smlr_bridge=!extless!"
-          rem if "!ext!" equ " " (
-          rem   set "smlr_bridge=!ext!"
-          rem )
     )
 
-        set /a extless_qty=0
 
-    if "!extless!" equ "d88" (
-        set /a extless_qty+=1
+    
+    call :ext_qty "!extless!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a extless_qty=%%i
     )
-    if "!extless!" equ "t88" (
-        set /a extless_qty+=1
-    )
-    if "!extless!" equ "cmt" (
-        set /a extless_qty+=1
-    )
+    del ext_qty.txt
+
 
     if !extless_qty! gtr 0 (
         set "smlr_bridge= "
@@ -2120,17 +2122,6 @@ exit /b
 
 
 
-REM * might not need -- To account if no bridge preceeds file extension within file name 
-    set /a bridge_is_ext=0
-    if "!smlr_bridge!" equ ".d88" (
-        set /a bridge_is_ext+=1
-    )
-    if "!smlr_bridge!" equ ".t88" (
-        set /a bridge_is_ext+=1
-    )
-    if "!smlr_bridge!" equ ".cmt" (
-        set /a bridge_is_ext+=1
-    )
 
     
     rem if "!sec!" neq " " (

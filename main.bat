@@ -370,7 +370,7 @@ exit /b
     rem A primary, indiv, nested, indiv encapsulator only
     rem A primary
     rem 
-    call "funcs_rom_keywords.bat" :start "X { hi } B1 A1 {nested {bye} {farewell} here} {there}B2 c2 {far now}BOB!one!B4 C4!two! M4 (M) {bye bye} D1 E1 {encaps {welcome} there}some !ext!"
+    call "funcs_rom_keywords.bat" :start "X { hi } B1 A1 {nested {bye} {farewell} here} {there}B2 c2 {far now}BOB!one!B4 C4!two! M4 (M) {bye bye} D1 E1 {encaps {welcome} there} some!ext!"
     call "funcs_rom_keywords.bat" :start "X { hi }{nested {bye} {farewell} here}!one!!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"
