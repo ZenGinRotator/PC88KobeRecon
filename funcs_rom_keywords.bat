@@ -1713,6 +1713,7 @@ rem pause
     set "primaries=!left_char!|!right_char!"
     set "optn_ones=!optn_one_left!|!optn_one_right!"
     set "optn_twos=!optn_two_left!|!optn_two_right!"
+
  
     call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!bridge!"
     call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
@@ -1728,6 +1729,8 @@ exit /b
     set "optn_ones=%~4"
     set "optn_twos=%~5"
     set "origs=%~6"
+    rem set "bridge=%~7"
+    rem set "future_token=%~8"
 
 
     set left_char=
@@ -1774,7 +1777,10 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "a=%%i"
     )
-
+    rem echo ---
+    rem echo TOKEN "!token!"
+    rem echo A "!a!"
+    rem echo ORIG iTEM "!orig_item!"
     rem A can be equ to " " when token > 2
     if "!a!" equ " " (
         if !token! equ 2 (
@@ -1801,17 +1807,19 @@ exit /b
         SET "dest=LABELS"
     )
  
-    rem set /a future_token=!token!+1
-    rem set future_item=
-    rem call :delim_with_char "!future_token!" "!left_char!" ""
-
-
-
-    rem if exist "bridge.txt" (
+    set read=
+    if exist "bridge.txt" (
+        for /f "tokens=1 delims=|" %%i in (bridge.txt) do (
+            set "read=%%i"
+        )
+        del "bridge.txt"
+    )
+    
+   
+    if "!read!" neq "!a!" (
      echo "!a!" -- "!dest!"
-    rem  del "bridge.txt"
-    rem )
-
+    )
+    
 
 
 
@@ -1833,7 +1841,7 @@ exit /b
     set "primaries=!left_char!|!right_char!"
     set "optn_ones=!optn_one_left!|!optn_one_right!"
     set "optn_twos=!optn_two_left!|!optn_two_right!"
-    call :recurse_on_item "!token!" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!orig_item!|!orig_bridge!"
+    call :recurse_on_item "!token!" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!orig_item!|!orig_bridge!" "!bridge!" "!future_token!"
 
     
 
@@ -1925,7 +1933,8 @@ exit /b
             if "!bridge!" neq " " (
 
                 echo BRIDGE: "!bridge!" "!src!" "!isn!"
-                rem echo "" > "bridge.txt"
+                set "bridge=!bridge!|"
+                echo !bridge! > "bridge.txt"
                 rem del "bridge.txt"
                 exit /b
             )
