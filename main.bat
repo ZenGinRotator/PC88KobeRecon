@@ -350,7 +350,12 @@ exit /b
     call "funcs_rom_keywords.bat" :start "!s!!d!"
     call "funcs_rom_keywords.bat" :start "!p!!d!"
     call "funcs_rom_keywords.bat" :start "!c!!d!"
-    
+
+    call "funcs_rom_keywords.bat" :start "!s! !d!"
+    call "funcs_rom_keywords.bat" :start "!p! !d!"
+    call "funcs_rom_keywords.bat" :start "!c! !d!"
+
+
     call "funcs_rom_keywords.bat" :start "!s!!p!!d!"
     call "funcs_rom_keywords.bat" :start "!s!!c!!d!"
     call "funcs_rom_keywords.bat" :start "!p!!s!!d!"
@@ -385,6 +390,45 @@ exit /b
     call "funcs_rom_keywords.bat" :start "!c!!s!!p!some!d!"
     call "funcs_rom_keywords.bat" :start "!c!!p!!s!some!d!"
     
+
+    call "funcs_rom_keywords.bat" :start "some !d!"
+    call "funcs_rom_keywords.bat" :start "!s!some !d!"
+    call "funcs_rom_keywords.bat" :start "!p!some !d!"
+    call "funcs_rom_keywords.bat" :start "!c!some !d!"
+    
+    call "funcs_rom_keywords.bat" :start "!s!!p!some !d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!some !d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!some !d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!some !d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!some !d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!some !d!"
+
+    call "funcs_rom_keywords.bat" :start "!s!!p!!c!some !d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!!p!some !d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!!s!some !d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!!c!some !d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!!p!some !d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!!s!some !d!"
+
+    call "funcs_rom_keywords.bat" :start "some!d!"
+    call "funcs_rom_keywords.bat" :start "!s! some!d!"
+    call "funcs_rom_keywords.bat" :start "!p! some!d!"
+    call "funcs_rom_keywords.bat" :start "!c! some!d!"
+    
+    call "funcs_rom_keywords.bat" :start "!s!!p! some!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c! some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s! some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c! some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p! some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s! some!d!"
+
+    call "funcs_rom_keywords.bat" :start "!s!!p!!c! some!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!!p! some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!!s! some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!!c! some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!!p! some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!!s! some!d!"
+
 
     endlocal
 exit /b

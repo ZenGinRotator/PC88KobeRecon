@@ -1640,7 +1640,7 @@ exit /b
         set "primary_item=%%i"
     )
     
-    call :parse_item_with_ext "!primary_item!" "!right_char!" "!optn_one_right!" "!optn_two_right!"
+    call :parse_item_with_ext "!primary_item!" "!right_char!" "!optn_one_right!" "!optn_two_right!" "!name!"
 
     if exist has_paren.txt (
         exit /b
@@ -1655,7 +1655,7 @@ exit /b
         set "secondary_item=%%i"
     )
 
-    call :parse_item_with_ext "!secondary_item!" "!optn_one_right!" "!optn_two_right!" "!right_char!"
+    call :parse_item_with_ext "!secondary_item!" "!optn_one_right!" "!optn_two_right!" "!right_char!" "!name!"
     if exist has_curl.txt (
         exit /b
     )
@@ -1667,7 +1667,7 @@ exit /b
         set "tertiary_item=%%i"
     )
     
-    call :parse_item_with_ext "!tertiary_item!" "!optn_two_right!" "!right_char!" "!optn_one_right!"
+    call :parse_item_with_ext "!tertiary_item!" "!optn_two_right!" "!right_char!" "!optn_one_right!" "!name!"
     if exist has_square.txt (
         exit /b
     )
@@ -1704,6 +1704,36 @@ exit /b
         echo "" > !file!
     )
 
+    endlocal
+exit /b
+
+:verify_last_char
+    setlocal
+    
+    set "token=%~1"
+    set "right_char=%~2"
+    set "!name!=%~3"
+    set "old_item=%~4"
+    set "phrase=%~5"
+
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" equ " " (
+        set "result=FAIL"
+        if "!phrase!" equ "!old_item!" (
+            set "result=PASS"
+            echo  --- "!result!"
+        )
+        exit /b 
+    )
+
+    
+    set /a token+=1
+    call :verify_last_char "!token!" "!right_char!" "!name!" "!item!" "!phrase!"
     endlocal
 exit /b
 
@@ -2099,6 +2129,7 @@ exit /b
     set "right_char=%~2"
     set "optn_one_right=%~3"
     set "optn_two_right=%~4"
+    set "name=%~5"
     
 
 
@@ -2124,8 +2155,12 @@ exit /b
     )
 
     if !qty! equ 0 (
-        echo R "!phrase!" "!r!" "!right_char!"
+        
         call :check_for_char "!right_char!"
+        echo R "!phrase!" "!r!" "!right_char!" "!name!"
+
+        rem CALLING A FUNCTIONT TO VERIFY CORRECTNESS OF OUR DISCOVERED RIGHT_CHAR
+        call :verify_last_char "1" "!right_char!" "!name!" "" "!phrase!"
     )
     
     rem echo PHRASE "!phrase!" RR "!r!" "!right_char!"
