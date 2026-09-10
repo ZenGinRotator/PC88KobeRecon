@@ -323,7 +323,8 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
-
+    call :last
+    exit /b
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
     exit /b
     call :same_perms "%indiv_pare_one%" "%indiv_pare_two%" "%indiv_pare_three%" "!ext!"
@@ -335,6 +336,56 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     call :same_perms "%nest_sqr_one%" "%nest_sqr_two%" "%nest_sqr_three%" "!ext!"
 
     call :same_perms "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "!ext!"
+    endlocal
+exit /b
+
+:last
+    setlocal
+    set "s=[s]"
+    set "p=(p)"
+    set "c={c}"
+    set "d=.d88"
+
+    call "funcs_rom_keywords.bat" :start "!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!d!"
+    
+    call "funcs_rom_keywords.bat" :start "!s!!p!!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!!d!"
+
+    call "funcs_rom_keywords.bat" :start "!s!!p!!c!!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!!p!!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!!s!!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!!c!!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!!p!!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!!s!!d!"
+
+    
+    call "funcs_rom_keywords.bat" :start "some!d!"
+    call "funcs_rom_keywords.bat" :start "!s!some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!some!d!"
+    
+    call "funcs_rom_keywords.bat" :start "!s!!p!some!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!some!d!"
+
+    call "funcs_rom_keywords.bat" :start "!s!!p!!c!some!d!"
+    call "funcs_rom_keywords.bat" :start "!s!!c!!p!some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!c!!s!some!d!"
+    call "funcs_rom_keywords.bat" :start "!p!!s!!c!some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!s!!p!some!d!"
+    call "funcs_rom_keywords.bat" :start "!c!!p!!s!some!d!"
+    
+
     endlocal
 exit /b
 
@@ -370,7 +421,8 @@ exit /b
     rem A primary, indiv, nested, indiv encapsulator only
     rem A primary
     rem 
-    call "funcs_rom_keywords.bat" :start "X { hi } B1 A1 {nested {bye} {farewell} here} {there}B2 c2 {far now}BOB!one!B4 C4!two! M4 (M) {bye bye} D1 E1 {encaps {welcome} there} some!ext!"
+    call "funcs_rom_keywords.bat" :start "X [sq]{ hi } B1 A1 {nested {bye} {farewell} here} {there}B2 c2 {far now}BOB!one!B4 C4!two! M4 (M) {bye bye} D1 E1 {encaps {welcome} there} some!ext!"
+    exit /b
     call "funcs_rom_keywords.bat" :start "X { hi }{nested {bye} {farewell} here}!one!!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one!B1!two!!ext!"
     call "funcs_rom_keywords.bat" :start "X !one! !two!!ext!"

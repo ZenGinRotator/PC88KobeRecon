@@ -1587,6 +1587,9 @@ exit /b
     if exist %brgtxt% ( del %brgtxt% )
     if exist "is_nested.txt" ( del "is_nested.txt" )
     if exist "bridge.txt" ( del "bridge.txt" )
+    if exist "has_square.txt" ( del "has_square.txt" )
+    if exist "has_curl.txt" ( del "has_curl.txt" )
+    if exist "has_paren.txt" ( del "has_paren.txt" )
     
     endlocal
 exit /b
@@ -1602,9 +1605,14 @@ exit /b
     set "optn_two_left=%~6"
     set "optn_two_right=%~7"
 
+    echo "!brk!"
     echo ----- "!name!" -----
-    rem echo LEFT PRIMARY CHAR "!left_char!"
     call :del_txts
+    
+    call :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
+    exit /b
+
+
     
     call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
 
@@ -1614,6 +1622,140 @@ exit /b
     pause
     endlocal
 exit /b
+
+:find_last_delim_char
+    setlocal
+    rem set "left_char=%~1"
+    set "right_char=%~1"
+    set "name=%~2"
+    rem set "optn_one_left=%~4"
+    set "optn_one_right=%~3"
+    rem set "optn_two_left=%~6"
+    set "optn_two_right=%~4"
+
+    
+    set primary_item=
+    call :recurse_to_ext "1" "!right_char!" "!name!" ""
+    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
+        set "primary_item=%%i"
+    )
+    
+    call :parse_item_with_ext "!primary_item!" "!right_char!" "!optn_one_right!" "!optn_two_right!"
+
+    if exist has_paren.txt (
+        exit /b
+    )
+    del last_item.txt
+    
+    
+    
+    set secondary_item=
+    call :recurse_to_ext "1" "!optn_one_right!" "!primary_item!" ""
+    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
+        set "secondary_item=%%i"
+    )
+
+    call :parse_item_with_ext "!secondary_item!" "!optn_one_right!" "!optn_two_right!" "!right_char!"
+    if exist has_curl.txt (
+        exit /b
+    )
+    del last_item.txt
+    
+    set tertiary_item=
+    call :recurse_to_ext "1" "!optn_two_right!" "!secondary_item!" ""
+    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
+        set "tertiary_item=%%i"
+    )
+    
+    call :parse_item_with_ext "!tertiary_item!" "!optn_two_right!" "!right_char!" "!optn_one_right!"
+    if exist has_square.txt (
+        exit /b
+    )
+    del last_item.txt
+
+    endlocal
+exit /b
+
+:check_for_char
+    setlocal
+    set "right_char=%~1"
+    set "name=%~2"
+
+    set hst=has_square.txt
+    set hct=has_curl.txt
+    set hpt=has_paren.txt
+
+    set file=!hst!
+
+    if "!right_char!" equ "}" (
+        set file=!hct!
+    )
+    if "!right_char!" equ ")" (
+        set file=!hpt!
+    )
+
+    set item=
+    call :delim_with_char "1" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" neq "!name!" (
+        echo "" > !file!
+    )
+
+    endlocal
+exit /b
+
+:recurse_to_ext
+    setlocal
+    set "token=%~1"
+    set "right_char=%~2"
+    set "name=%~3"
+    set "old_item=%~4"
+   
+   
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+
+    if "!item!" equ " " (
+        set "old_item=!old_item!|"
+        echo !old_item! > "last_item.txt"
+        exit /b
+    )
+
+
+
+    set ext=
+    call :delim_with_char "2" "." "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "ext=%%i"
+    )
+
+    set /a ext_qty=0
+    call :ext_qty "!ext!"
+    for /f "tokens=*" %%i in (ext_qty.txt) do (
+        set /a ext_qty=%%i
+    )
+
+    rem if !ext_qty! gtr 0 (
+    rem     echo fouND item extension "!item!" "!optn_one_right!"
+    rem     set "item=!item!|"
+    rem     echo !item! > "last_item.txt"
+        rem call :find_last_char "1" "!optn_one_right!" "!item!" "!optn_one_right!" "!optn_two_right!"
+    rem    exit /b
+    rem )
+    
+
+    set /a token+=1
+    call :recurse_to_ext "!token!" "!right_char!" "!name!" "!item!"
+    endlocal
+exit /b
+
 
 
 :recurse_on_group2
@@ -1951,6 +2093,45 @@ exit /b
     endlocal
 exit /b
 
+:parse_item_with_ext
+    setlocal
+    set "phrase=%~1"
+    set "right_char=%~2"
+    set "optn_one_right=%~3"
+    set "optn_two_right=%~4"
+    
+
+
+    set opt1=
+    call :delim_with_char "1" "!optn_one_right!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "opt1=%%i"
+    )
+
+
+    set opt2=
+    call :delim_with_char "1" "!optn_two_right!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "opt2=%%i"
+    )
+
+    set /a qty=0
+    if "!opt1!" neq "!phrase!" (
+        set /a qty+=1
+    )
+    if "!opt2!" neq "!phrase!" (
+        set /a qty+=1
+    )
+
+    if !qty! equ 0 (
+        echo R "!phrase!" "!r!" "!right_char!"
+        call :check_for_char "!right_char!"
+    )
+    
+    rem echo PHRASE "!phrase!" RR "!r!" "!right_char!"
+    endlocal
+exit /b
+
 :continue_or_stop
     setlocal
     set "bridge=%~1"
@@ -2028,7 +2209,7 @@ exit /b
     rem echo optn one "!optn_one_left!" "!optn_one_right!"
 
     call :recurse_on_bridge2 "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    rem call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     endlocal
 exit /b
 
