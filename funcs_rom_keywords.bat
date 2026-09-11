@@ -1728,6 +1728,11 @@ exit /b
             set "result=PASS"
             echo  --- "!result!"
         )
+        if "!result!" equ "FAIL" (
+            echo !!!!!! FAIL
+            rem pause
+
+        )
         exit /b 
     )
 
@@ -2157,7 +2162,7 @@ exit /b
     if !qty! equ 0 (
         
         call :check_for_char "!right_char!"
-        echo R "!phrase!" "!r!" "!right_char!" "!name!"
+        rem echo R "!phrase!" "!r!" "!right_char!" "!name!"
 
         rem CALLING A FUNCTIONT TO VERIFY CORRECTNESS OF OUR DISCOVERED RIGHT_CHAR
         call :verify_last_char "1" "!right_char!" "!name!" "" "!phrase!"

@@ -323,7 +323,7 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
-    call :last
+    call :last_char
     exit /b
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
     exit /b
@@ -339,95 +339,222 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     endlocal
 exit /b
 
-:last
+:last_char
     setlocal
     set "s=[s]"
     set "p=(p)"
     set "c={c}"
     set "d=.d88"
+    set "b=BRIDGE"
 
     call "funcs_rom_keywords.bat" :start "!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!d!"
-
-    call "funcs_rom_keywords.bat" :start "!s! !d!"
-    call "funcs_rom_keywords.bat" :start "!p! !d!"
-    call "funcs_rom_keywords.bat" :start "!c! !d!"
-
-
-    call "funcs_rom_keywords.bat" :start "!s!!p!!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!!d!"
-
-    call "funcs_rom_keywords.bat" :start "!s!!p!!c!!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!!p!!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!!s!!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!!c!!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!!p!!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!!s!!d!"
-
-    
-    call "funcs_rom_keywords.bat" :start "some!d!"
-    call "funcs_rom_keywords.bat" :start "!s!some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!some!d!"
-    
-    call "funcs_rom_keywords.bat" :start "!s!!p!some!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!some!d!"
-
-    call "funcs_rom_keywords.bat" :start "!s!!p!!c!some!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!!p!some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!!s!some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!!c!some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!!p!some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!!s!some!d!"
+    call :one_ext_last "!s!" "!b!" "!d!"
+    call :one_ext_last "!p!" "!b!" "!d!"
     
 
-    call "funcs_rom_keywords.bat" :start "some !d!"
-    call "funcs_rom_keywords.bat" :start "!s!some !d!"
-    call "funcs_rom_keywords.bat" :start "!p!some !d!"
-    call "funcs_rom_keywords.bat" :start "!c!some !d!"
+    call :one_ext_last "!c!" "!b!" "!d!"
+
+    call :two_ext_last "!s!" "!p!" "!b!" "!d!"
+    call :two_ext_last "!s!" "!c!" "!b!" "!d!"
     
-    call "funcs_rom_keywords.bat" :start "!s!!p!some !d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!some !d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!some !d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!some !d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!some !d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!some !d!"
-
-    call "funcs_rom_keywords.bat" :start "!s!!p!!c!some !d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!!p!some !d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!!s!some !d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!!c!some !d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!!p!some !d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!!s!some !d!"
-
-    call "funcs_rom_keywords.bat" :start "some!d!"
-    call "funcs_rom_keywords.bat" :start "!s! some!d!"
-    call "funcs_rom_keywords.bat" :start "!p! some!d!"
-    call "funcs_rom_keywords.bat" :start "!c! some!d!"
+    call :two_ext_last "!p!" "!s!" "!b!" "!d!"
     
-    call "funcs_rom_keywords.bat" :start "!s!!p! some!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c! some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s! some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c! some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p! some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s! some!d!"
+    call :two_ext_last "!p!" "!c!" "!b!" "!d!"
+    
+    call :two_ext_last "!c!" "!p!" "!b!" "!d!"
+    
+    call :two_ext_last "!c!" "!s!" "!b!" "!d!"
 
-    call "funcs_rom_keywords.bat" :start "!s!!p!!c! some!d!"
-    call "funcs_rom_keywords.bat" :start "!s!!c!!p! some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!c!!s! some!d!"
-    call "funcs_rom_keywords.bat" :start "!p!!s!!c! some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!s!!p! some!d!"
-    call "funcs_rom_keywords.bat" :start "!c!!p!!s! some!d!"
+    
+    call :three_ext_last "!s!" "!p!" "!c!" "!b!" "!d!"
+    
+    call :three_ext_last "!s!" "!c!" "!p!" "!b!" "!d!"
+
+
+    call :three_ext_last "!p!" "!c!" "!s!" "!b!" "!d!"
+
+
+    call :three_ext_last "!p!" "!s!" "!c!" "!b!" "!d!"
+
+    call :three_ext_last "!c!" "!s!" "!p!" "!b!" "!d!"
+
+    call :three_ext_last "!c!" "!p!" "!s!" "!b!" "!d!"
+    
+
+
+    endlocal
+exit /b
+
+:one_ext_last
+    setlocal
+    set "one=%~1"
+    set "bridge=%~2"
+    set "ext=%~3"
+    
+    call "funcs_rom_keywords.bat" :start "!one!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!ext!" 
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !ext!"
+    endlocal
+exit /b
+
+:two_ext_last
+    setlocal
+    set "one=%~1"
+    set "two=%~2"
+    set "bridge=%~3"
+    set "ext=%~4"
+    call "funcs_rom_keywords.bat" :start "!one!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !two!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!two! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !two! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!two!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!two! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!two!!bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !ext!"
+    
+    
+    
+    
+    endlocal
+exit /b
+
+:three_ext_last
+    setlocal
+    set "one=%~1"
+    set "two=%~2"
+    set "three=%~3"
+    set "bridge=%~4"
+    set "ext=%~5"
+
+    call "funcs_rom_keywords.bat" :start "!one!!two!!three!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !two! !three!!ext!"
+    
+    call "funcs_rom_keywords.bat" :start "!one! !two! !three! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!two! !three! !ext!"
+    
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two! !three! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !three! !ext!"
+
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !three!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !three! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three!!bridge!!ext!"
+    
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+
+    rem --
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+
+    rem --
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three! !bridge!!ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
+
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+
+
 
 
     endlocal
