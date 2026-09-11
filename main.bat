@@ -10,10 +10,14 @@ set "none_full=file name without labels"
 set "nest_pare_one=(PN1 + (P1.1 +) (P1.2 +) PG1 +)"
 set "nest_pare_two=(PN2 + (P2.1 +) (P2.2 +) PG2 +)"
 set "nest_pare_three=(PN3 + (P3.1 +) (P3.2 +) PG3 +)"
+rem (P1.0 + (P1.1 +) (P1.2 +) P1.N +)
+
+
 
 set "nest_curl_one={CN1 + {C1.1 +} {C1.2 +} CG1 +}"
 set "nest_curl_two={CN2 + {C2.1 +} {C2.2 +} CG2 +}"
 set "nest_curl_three={CN3 + {C3.1 +} {C3.2 +} CG3 +}"
+
 
 set "nest_sqr_one=[SN1 + [S1.1 +] [S1.2 +] SG1 +]"
 set "nest_sqr_two=[SN2 + [S2.1 +] [S2.2 +] SG2 +]"
@@ -26,6 +30,9 @@ set "indiv_pare_three=(PI3 +)"
 set "indiv_curl_one={CI1 +}"
 set "indiv_curl_two={CI2 +}"
 set "indiv_curl_three={CI3 +}"
+
+rem (P1 +)
+rem (P2 +)
 
 
 set "indiv_sqr_one=[SI1 +]"
@@ -323,7 +330,25 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
 :same
     setlocal
     set "ext=%~1"
-    call :last_char
+    rem call :last_char
+    rem call :indiv_encaps "(" ")" "1"
+    rem call :nested_encaps "(" ")" "1"
+    rem call :encap_n_gap "I" "(" ")" ""
+    rem call :encap_n_gap "I" "(" ")" " "
+    rem call :encap_n_gap "N" "(" ")" ""
+    rem call :encap_n_gap "N" "(" ")" " "
+    rem del *_fart.txt
+    pause
+
+    rem call these functions from a single function 
+   
+    rem echo "" > 1_fart.txt
+    rem echo "" > 2_fart.txt
+    rem pause
+    rem del *_fart.txt
+    call :spool
+
+    
     exit /b
     call :same_perms "%nest_pare_one%" "%nest_pare_two%" "%nest_pare_three%" "!ext!"
     exit /b
@@ -338,6 +363,143 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     call :same_perms "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "!ext!"
     endlocal
 exit /b
+
+:spool
+    setlocal
+    call :nth_encaps "4" "1" "(" ")" "N" " "
+    call :nth_encaps "4" "1" "(" ")" "N" ""
+    call :nth_encaps "4" "1" "(" ")" "I" " "
+    call :nth_encaps "4" "1" "(" ")" "I" ""
+    endlocal
+exit /b
+
+:nth_encaps
+    setlocal
+    set "nth=%~1"
+    set "token=%~2"
+    set "left_char=%~3"
+    set "right_char=%~4"
+    set "encap_type=%~5"
+    set "gap=%~6"
+
+    if "!token!" equ "!nth!" (
+        exit /b
+    )
+    
+    set enc=
+    rem call :indiv_encaps "!left_char!" "!right_char!" "!token!"
+    call :encap_n_gap "!encap_type!" "!left_char!" "!right_char!" "!gap!" "!token!"
+   
+   
+    set /a token+=1
+    call :nth_encaps "!nth!" "!token!" "!left_char!" "!right_char!" "!encap_type!" "!gap!"
+
+    endlocal
+exit /b
+
+:indiv_encaps
+    setlocal
+    set "left_char=%~1"
+    set "right_char=%~2"
+    set "num=%~3"
+
+    set "type=P"
+    if "!left_char!" equ "[" (
+        set "type=S"
+    )
+    if "!left_char!" equ "{" (
+        set "type=C"
+    )
+
+    set "r=!left_char!!type!!num! +!right_char!"
+    rem echo "!r!"
+    set "r=!r!|"
+    echo !r! > "encap.txt"
+    endlocal
+exit /b
+
+
+rem (P1.0 + (P1.1 +) (P1.2 +) P1.N +)
+:nested_encaps
+    setlocal
+    set "left_char=%~1"
+    set "right_char=%~2"
+    set "num=%~3"
+
+    set "type=P"
+    if "!left_char!" equ "[" (
+        set "type=S"
+    )
+    if "!left_char!" equ "{" (
+        set "type=C"
+    )
+
+    set "r=!left_char!!type!!num!.0 + !left_char!!type!!num!.1 +!right_char! !left_char!!type!!num!.2 +!right_char! !type!!num!.n +!right_char!"
+    rem echo "!r!"
+    set "r=!r!|"
+    echo !r! > "encap.txt"
+    endlocal
+exit /b
+
+
+
+:encap_n_gap
+    setlocal
+    set "encap_type=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    rem set "gap_num=%~4"
+    set "gap=%~4"
+    set "token=%~5"
+    
+    if exist encap.txt ( del encap.txt )
+
+    if "!encap_type!" equ "" (
+        exit /b
+    )
+
+    rem Assume num=1
+    set "gap_type=WITH_GAP"
+    IF "!gap!" equ " " (
+        set "gap_type=WITHOUT_GAP"
+    )
+    set enc=
+    call :indiv_encaps "!left_char!" "!right_char!" "!token!"
+    set "enc_type=INDIV"
+
+
+    if "!encap_type!" equ "N" (
+        call :nested_encaps "!left_char!" "!right_char!" "!token!"
+        set "enc_type=NEST"
+    )
+    
+    for /f "tokens=1 delims=|" %%i in (encap.txt) do (
+        set "enc=%%i"
+    )
+
+
+    echo  "!enc!!gap!"
+    echo "!enc!!gap!" > "!token!!enc_type!_!gap_type!_fart.txt"
+    endlocal
+exit /b
+
+:gap
+    setlocal
+    set "gap_num=%~1"
+    echo GAPnum "!gap_num!"
+
+    if exist "gap.txt" ( del gap.txt )
+
+    set "r="
+    if "!gap_num!" equ "1" (
+        set "r= "
+    )
+
+    set "r=!r!|"
+    echo !r! > gap.txt
+    endlocal
+exit /b
+
 
 :last_char
     setlocal

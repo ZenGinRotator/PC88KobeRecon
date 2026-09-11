@@ -1590,6 +1590,7 @@ exit /b
     if exist "has_square.txt" ( del "has_square.txt" )
     if exist "has_curl.txt" ( del "has_curl.txt" )
     if exist "has_paren.txt" ( del "has_paren.txt" )
+    if exist "last_item.txt" ( del "last_item.txt" )
     
     endlocal
 exit /b
