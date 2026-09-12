@@ -1637,19 +1637,13 @@ exit /b
         set "optn_two_right=%%i"
     )
 
-    echo PRIMARIES "!left_char!" "!right_char!"
-    echo OPTN1 "!optn_one_left!" "!optn_one_right!"
-    echo OPTN2 "!optn_two_left!" "!optn_two_right!"
-    
-
-
     
     call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
 
     rem call :print_bridge
     rem call :print_labels
     rem call :print_nested
-    pause
+    
     endlocal
 exit /b
 
@@ -1760,7 +1754,7 @@ exit /b
         )
         if "!result!" equ "FAIL" (
             echo !!!!!! FAIL
-            rem pause
+
 
         )
         exit /b 
@@ -1877,11 +1871,6 @@ exit /b
          set "bridge=%%i"
      )
 
-rem    echo PRIMARY
-   rem  echo ITEM "!item!"
-rem echo PAD ITEM "!pad_item!"
-rem echo PAD BRIDGE "!pad_bridge!"
-rem pause
 
 
     rem if "!bridge!" neq " " (
@@ -2127,6 +2116,14 @@ rem     return " " (a blank that will be used to filter output for the bridge)
     IF "!pad_bridge!" equ "PAD " (
         set /a pad_only_qty+=1
     )
+
+    REM IF "!pad_bridge!" equ " PAD" (
+    REM     set /a pad_only_qty+=1
+    REM )
+
+    REM IF "!pad_bridge!" equ " PAD " (
+    REM     set /a pad_only_qty+=1
+    REM )
 
     if !pad_only_qty! gtr 0 (
         set orig_bridge=
@@ -2564,7 +2561,7 @@ exit /b
     )
 
     ECHO post status "!status!"
-    pause
+    
 
 
     call :delim_with_char "1" "!left_char!" "!item!"
