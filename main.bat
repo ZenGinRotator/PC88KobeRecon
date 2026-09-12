@@ -7,37 +7,37 @@ rem need indiv [] () and {} - single and multi-word?
 set none_blank=
 set "none_full=file name without labels"
 
-set "nest_pare_one=(PN1 + (P1.1 +) (P1.2 +) PG1 +)"
-set "nest_pare_two=(PN2 + (P2.1 +) (P2.2 +) PG2 +)"
-set "nest_pare_three=(PN3 + (P3.1 +) (P3.2 +) PG3 +)"
+set "nest_pare_one=(P1.0 + (P1.1 +) (P1.2 +) P1.n +)"
+set "nest_pare_two=(P2.0 + (P2.1 +) (P2.2 +) P2.n +)"
+set "nest_pare_three=(P3.0 + (P3.1 +) (P3.2 +) P3.n +)"
 rem (P1.0 + (P1.1 +) (P1.2 +) P1.N +)
 
 
 
-set "nest_curl_one={CN1 + {C1.1 +} {C1.2 +} CG1 +}"
-set "nest_curl_two={CN2 + {C2.1 +} {C2.2 +} CG2 +}"
-set "nest_curl_three={CN3 + {C3.1 +} {C3.2 +} CG3 +}"
+set "nest_curl_one={C1.0 + {C1.1 +} {C1.2 +} C1.n +}"
+set "nest_curl_two={C2.0 + {C2.1 +} {C2.2 +} C2.n +}"
+set "nest_curl_three={C3.0 + {C3.1 +} {C3.2 +} C3.n +}"
 
 
-set "nest_sqr_one=[SN1 + [S1.1 +] [S1.2 +] SG1 +]"
-set "nest_sqr_two=[SN2 + [S2.1 +] [S2.2 +] SG2 +]"
-set "nest_sqr_three=[SN3 + [S3.1 +] [S3.2 +] SG3 +]"
+set "nest_sqr_one=[S1.0 + [S1.1 +] [S1.2 +] S1.n +]"
+set "nest_sqr_two=[S2.0 + [S2.1 +] [S2.2 +] S2.n +]"
+set "nest_sqr_three=[S3.0 + [S3.1 +] [S3.2 +] S3.n +]"
 
-set "indiv_pare_one=(PI1 +)"
-set "indiv_pare_two=(PI2 +)"
-set "indiv_pare_three=(PI3 +)"
+set "indiv_pare_one=(P1 +)"
+set "indiv_pare_two=(P2 +)"
+set "indiv_pare_three=(P3 +)"
 
-set "indiv_curl_one={CI1 +}"
-set "indiv_curl_two={CI2 +}"
-set "indiv_curl_three={CI3 +}"
+set "indiv_curl_one={C1 +}"
+set "indiv_curl_two={C2 +}"
+set "indiv_curl_three={C3 +}"
 
 rem (P1 +)
 rem (P2 +)
 
 
-set "indiv_sqr_one=[SI1 +]"
-set "indiv_sqr_two=[SI2 +]"
-set "indiv_sqr_three=[SI3 +]"
+set "indiv_sqr_one=[S1 +]"
+set "indiv_sqr_two=[S2 +]"
+set "indiv_sqr_three=[S3 +]"
 
 
 set "brid_one=B1"
@@ -167,7 +167,8 @@ rem call :no_bridges
 rem call :neighb
 call :samples
 ECHO ---- DONE ----
-  pause
+
+PAUSE
 goto :eof
 
 set "a=hiby"
@@ -338,7 +339,7 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     rem call :encap_n_gap "N" "(" ")" ""
     rem call :encap_n_gap "N" "(" ")" " "
     rem del *_fart.txt
-    pause
+    rem pause
 
     rem call these functions from a single function 
    
@@ -346,7 +347,16 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     rem echo "" > 2_fart.txt
     rem pause
     rem del *_fart.txt
-    call :spool
+
+    for /f "tokens=1" %%i in (scorn.txt) do (
+        set "st=%%i"
+    )
+    echo "!st!"
+
+    call :run_samples
+    pause
+
+    rem call :spool
 
     
     exit /b
@@ -363,6 +373,97 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     call :same_perms "%indiv_sqr_one%" "%indiv_sqr_two%" "%indiv_sqr_three%" "!ext!"
     endlocal
 exit /b
+
+:run_samples
+    setlocal
+
+    call :same_encaps "!nest_pare_one!" "!nest_pare_two!"
+    call :same_encaps "!indiv_pare_one!" "!indiv_pare_two!"
+    call :diff_encaps "!indiv_pare_one!" "!nest_pare_one!"
+    endlocal
+exit /b
+
+:same_encaps
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "bri1=BRIDGE 1"
+    set "bri2=BRIDGE 2"
+
+    set "e=.d88"
+    
+    ECHO SAME ENCAPS
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM !enc1! !e!"
+    REM call "funcs_rom_keywords.bat" :start "ROM !enc2!!e!"
+    REM call "funcs_rom_keywords.bat" :start "ROM !enc2! !e!"
+
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2!!e!"
+
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1!!enc2!!bri2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1!!enc2! !bri2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1! !enc2!!bri2! !e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1! !enc2! !bri2! !e!"
+
+
+    endlocal
+exit /B
+
+:diff_encaps
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "bri1=BRIDGE 1"
+    rem set "bri2=BRIDGE 2"
+
+    call :diff_no_space "!enc1!" "!enc2!"
+    call :diff_with_space "!enc1!" "!enc2!"
+    call :diff_with_bridge "!enc1!" "!enc2!" "!bri1!"
+    endlocal
+exit /b
+
+:diff_no_space
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "e=.d88"
+
+    ECHO DIFF NO SPACE
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc2!!enc1!!e!"
+    endlocal
+exit /B
+
+:diff_with_space
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "e=.d88"
+    ECHO DIFF WITH SPACE
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc2! !enc1!!e!"
+    
+    endlocal
+exit /b
+
+:diff_with_bridge
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "bri1=%~3"
+    set "bri2=%~4"
+    set "e=.d88"
+
+    ECHO DIFF WITH BRIDGE
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1!!enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1!!enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1! !enc2!!e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1! !enc2!!e!"
+    endlocal
+exit /b
+
+
 
 :spool
     setlocal
@@ -389,6 +490,8 @@ exit /b
     set enc=
     rem call :indiv_encaps "!left_char!" "!right_char!" "!token!"
     call :encap_n_gap "!encap_type!" "!left_char!" "!right_char!" "!gap!" "!token!"
+
+    call :bridge_n_num "!token!" "!gap!"
    
    
     set /a token+=1
@@ -448,15 +551,14 @@ exit /b
     set "encap_type=%~1"
     set "left_char=%~2"
     set "right_char=%~3"
-    rem set "gap_num=%~4"
     set "gap=%~4"
     set "token=%~5"
     
     if exist encap.txt ( del encap.txt )
 
-    if "!encap_type!" equ "" (
-        exit /b
-    )
+    rem if "!encap_type!" equ "" (
+    rem     exit /b
+    rem )
 
     rem Assume num=1
     set "gap_type=WITH_GAP"
@@ -483,20 +585,26 @@ exit /b
     endlocal
 exit /b
 
-:gap
+:bridge_n_gap
     setlocal
-    set "gap_num=%~1"
-    echo GAPnum "!gap_num!"
+    endlocal
+exit /b
 
-    if exist "gap.txt" ( del gap.txt )
+:bridge_n_num
+    setlocal
+    set "token=%~1"
+    set "gap=%~2"
+    rem echo "BRIDGE !token!!gap!"
+    set "bng=BRIDGE !token!!gap!"
 
-    set "r="
-    if "!gap_num!" equ "1" (
-        set "r= "
+    set "gap_type=WITH_GAP"
+    if "!gap!" equ " " (
+        set "gap_type=WITOUT_GAP"
     )
-
-    set "r=!r!|"
-    echo !r! > gap.txt
+    if not exist "bridge_num.txt" (
+        set "bng=!bng!|"
+        echo !bng! > "!token!_bridge_num_!gap_type!.txt"
+    )
     endlocal
 exit /b
 
