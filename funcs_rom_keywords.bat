@@ -1611,7 +1611,36 @@ exit /b
     call :del_txts
     
     call :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
-    exit /b
+    
+
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "left_char=%%i"
+    )
+    
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "right_char=%%i"
+    )
+    
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "optn_one_left=%%i"
+    )
+    
+    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
+        set "optn_one_right=%%i"
+    )
+    
+    for /f "tokens=5 delims=|" %%i in (chars.txt) do (
+        set "optn_two_left=%%i"
+    )
+    
+    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
+        set "optn_two_right=%%i"
+    )
+
+    echo PRIMARIES "!left_char!" "!right_char!"
+    echo OPTN1 "!optn_one_left!" "!optn_one_right!"
+    echo OPTN2 "!optn_two_left!" "!optn_two_right!"
+    
 
 
     
@@ -1677,7 +1706,7 @@ exit /b
     endlocal
 exit /b
 
-:check_for_char
+:char_to_barrier_file
     setlocal
     set "right_char=%~1"
     set "name=%~2"
@@ -2162,8 +2191,11 @@ exit /b
 
     if !qty! equ 0 (
         
-        call :check_for_char "!right_char!"
+        call :char_to_barrier_file "!right_char!"
         rem echo R "!phrase!" "!r!" "!right_char!" "!name!"
+        rem echo Use right_char "!right_char!" to determine option 1 and 2 characters
+        if exist "chars.txt" ( del "chars.txt" )
+        call :primary_and_optn_chars "!right_char!"
 
         rem CALLING A FUNCTIONT TO VERIFY CORRECTNESS OF OUR DISCOVERED RIGHT_CHAR
         call :verify_last_char "1" "!right_char!" "!name!" "" "!phrase!"
@@ -2172,6 +2204,48 @@ exit /b
     rem echo PHRASE "!phrase!" RR "!r!" "!right_char!"
     endlocal
 exit /b
+
+:primary_and_optn_chars
+    setlocal
+    set "right_char=%~1"
+
+    set left_char=
+    if "!right_char!" equ ")" (
+        set "left_char=("
+    )
+
+    set "optn_one_left={"
+    set "optn_one_right=}"
+
+    set "optn_two_left=["
+    set "optn_two_right=]"
+
+    if "!right_char!" equ "}" (
+        set "left_char={"
+        set "optn_one_left=["
+        set "optn_one_right=]"
+        set "optn_two_left=("
+        set "optn_two_right=)"
+    )
+    if "!right_char!" equ "]" (
+        set "left_char=["
+        set "optn_one_left=("
+        set "optn_one_right=)"
+        set "optn_two_left={"
+        set "optn_two_right=}"
+    )
+
+    set "prime=!left_char!|!right_char!"
+    set "optn1=!optn_one_left!|!optn_one_right!"
+    set "optn2=!optn_two_left!|!optn_two_right!"
+
+    set "chars=!prime!|!optn1!|!optn2!|"
+    echo !chars! > "chars.txt"
+
+    endlocal
+exit /b
+
+
 
 :continue_or_stop
     setlocal

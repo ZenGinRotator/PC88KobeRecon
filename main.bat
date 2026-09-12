@@ -377,8 +377,8 @@ exit /b
 :run_samples
     setlocal
 
-    call :same_encaps "!nest_pare_one!" "!nest_pare_two!"
-    call :same_encaps "!indiv_pare_one!" "!indiv_pare_two!"
+    call :same_encaps "!nest_curl_one!" "!nest_curl_two!"
+    call :same_encaps "!indiv_sqr_one!" "!indiv_sqr_two!"
     call :diff_encaps "!indiv_pare_one!" "!nest_pare_one!"
     endlocal
 exit /b
