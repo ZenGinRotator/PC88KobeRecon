@@ -1750,7 +1750,7 @@ exit /b
         set "result=FAIL"
         if "!phrase!" equ "!old_item!" (
             set "result=PASS"
-            echo  --- "!result!"
+            REM echo  --- "!result!"
         )
         if "!result!" equ "FAIL" (
             echo !!!!!! FAIL
@@ -1883,9 +1883,10 @@ exit /b
     rem if one of these extensions is found, then cancel
     rem the algorithm with exit /b
 
-      call :continue_or_stop "!bridge!"
+      call :continue_or_stop "!bridge!" "!token!"
      if exist "stop.txt" (
          del "stop.txt"
+         echo STOPPED with bridge "!bridge!"
          exit /b
      )
     
@@ -2117,13 +2118,13 @@ rem     return " " (a blank that will be used to filter output for the bridge)
         set /a pad_only_qty+=1
     )
 
-    REM IF "!pad_bridge!" equ " PAD" (
-    REM     set /a pad_only_qty+=1
-    REM )
+    IF "!pad_bridge!" equ " PAD" (
+        set /a pad_only_qty+=1
+    )
 
-    REM IF "!pad_bridge!" equ " PAD " (
-    REM     set /a pad_only_qty+=1
-    REM )
+    IF "!pad_bridge!" equ " PAD " (
+        set /a pad_only_qty+=1
+    )
 
     if !pad_only_qty! gtr 0 (
         set orig_bridge=
@@ -2247,14 +2248,17 @@ exit /b
 :continue_or_stop
     setlocal
     set "bridge=%~1"
+    set "token=%~2"
     
-    call :delim_with_char "2" "." "!bridge!"
+    set "pad_bridge=PAD!bridge!"
+
+    rem token argument used to be "2", now "1"
+    call :delim_with_char "1" "." "!bridge!"
     set ext=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "ext=%%i"
     )
-rem echo CONTINUE OR STOP BRIDGE "!bridge!" EXT "!ext!"
-    
+
 
     call :ext_qty "!ext!"
     for /f "tokens=*" %%i in (ext_qty.txt) do (
@@ -2272,14 +2276,13 @@ exit /b
 :send_bridge_filter
     setlocal
     
-    rem before "PRIMARY"/"SECONDARY" character
-    set "src=%~1"
     
-
+    set "src=%~1"
     set "token=%~2"
     set "bridge=%~3"
-    set "pad_bridge=%~4"
 
+
+rem echo SEND BRIDGE FILTER "!bridge!"
     
     set "isn=FALSE"
     if exist "is_nested.txt" (
@@ -2293,8 +2296,24 @@ exit /b
 
     if !token! gtr 1 (
         if "!isn!" neq "TRUE" (
+            call :delim_with_char "1" "." "!bridge!"
+                for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                    set "bridge=%%i"
+                )
             if "!bridge!" neq " " (
 
+
+                call :delim_with_char "1" "." "!bridge!"
+                for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                    set "bridge=%%i"
+                )
+
+                call :delim_with_char "2" "." "!bridge!"
+                for /f "tokens=2 delims=|" %%i in (%delimtxt%) do (
+                    set "ext=%%i"
+                )
+                
+                rem call
                 echo BRIDGE: "!bridge!" "!src!" "!isn!"
                 set "bridge=!bridge!|"
                 echo !bridge! > "bridge.txt"
@@ -2357,14 +2376,7 @@ exit /b
         set "smlr_bridge=%%i"
     )
 
-    rem test for .d88, .t88, or .cmt extension
-    rem if one of these extensions is found, then cancel
-    rem the algorithm with exit /b
-    rem call :continue_or_stop "!smlr_bridge!"
-    rem if exist "stop.txt" (
-    rem    del "stop.txt"
-    rem    exit /b
-    rem )
+   
    
 
     set "pad_item=PAD!item!"
