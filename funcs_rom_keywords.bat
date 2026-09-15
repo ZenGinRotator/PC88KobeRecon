@@ -2299,6 +2299,64 @@ rem echo SEND BRIDGE FILTER "!bridge!"
 
 
     rem Refactor this to improve legibility
+    rem For "token > 1"
+    rem call :oldFilter "!token!" "!isn!" "!bridge!"
+    call :filterB "!bridge!"
+
+
+
+    endlocal
+exit /b
+
+:filterB
+    setlocal
+    rem set "isn=%~1"
+    set "!bridge=%~1"
+
+    set "isn=FALSE"
+    if exist "is_nested.txt" (
+        set "isn=TRUE"
+    )
+
+
+    if "!isn!" EQU "TRUE" (
+        exit /b
+    )
+
+    call :delim_with_char "1" "." "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
+    )
+
+    if "!bridge!" equ " " (
+        exit /b
+    )
+
+    call :delim_with_char "1" "." "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
+    )
+
+    call :delim_with_char "2" "." "!bridge!"
+    for /f "tokens=2 delims=|" %%i in (%delimtxt%) do (
+        set "ext=%%i"
+    )
+                
+    rem call
+    echo BRIDGE: "!bridge!" "!src!" "!isn!"
+    set "bridge=!bridge!|"
+    echo !bridge! > "bridge.txt"
+    rem del "bridge.txt"
+                
+    endlocal
+exit /b
+
+:oldFilter
+    setlocal
+
+    set "token=%~1"
+    set "isn=%~2:"
+    set "bridge=%~3"
     if !token! gtr 1 (
         if "!isn!" neq "TRUE" (
             call :delim_with_char "1" "." "!bridge!"
@@ -2327,9 +2385,10 @@ rem echo SEND BRIDGE FILTER "!bridge!"
             )
         )
     )
-
     endlocal
 exit /b
+
+
 
 
 :start_recurse_bridge
