@@ -2289,11 +2289,16 @@ rem echo SEND BRIDGE FILTER "!bridge!"
         set "isn=TRUE"
     )
 
+    rem Bring option chars 1 & 2 to test !bridge! for the existence of 
+    rem     these characters. If an option character exists, exclude 
+    rem     !bridge! from output
     if !token! equ 1 (
         echo ROM: "!bridge!"
         exit /b
     )
 
+
+    rem Refactor this to improve legibility
     if !token! gtr 1 (
         if "!isn!" neq "TRUE" (
             call :delim_with_char "1" "." "!bridge!"
