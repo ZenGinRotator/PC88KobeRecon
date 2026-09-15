@@ -1827,6 +1827,8 @@ exit /b
     set "optn_one_right=%~6"
     set "optn_two_left=%~7"
     set "optn_two_right=%~8"
+    rem echo === "!optn_one_right!"
+    rem echo --- "!optn_two_right!"
 
     set item=
     call :delim_with_char "!token!" "!right_char!" "!name!"
@@ -1890,8 +1892,9 @@ exit /b
          exit /b
      )
     
-
-    call :send_bridge_filter "PRIMARY" "!token!" "!bridge!"
+    rem echo * R "!optn_one_right!"
+    rem echo ** R "!optn_two_right!"
+    call :send_bridge_filter "PRIMARY" "!token!" "!bridge!" "!optn_one_right!" "!optn_two_right!"
 
     
     set nested_test=
@@ -2280,9 +2283,9 @@ exit /b
     set "src=%~1"
     set "token=%~2"
     set "bridge=%~3"
+    set "optn_one_right=%~4"
+    set "optn_two_right=%~5"
 
-
-rem echo SEND BRIDGE FILTER "!bridge!"
     
     set "isn=FALSE"
     if exist "is_nested.txt" (
@@ -2293,14 +2296,26 @@ rem echo SEND BRIDGE FILTER "!bridge!"
     rem     these characters. If an option character exists, exclude 
     rem     !bridge! from output
     if !token! equ 1 (
+        
+
+        set t1=
+        set t2=
+        call :delim_with_char "1" "!optn_one_right!" "!bridge!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "t1=%%i"
+        )
+        call :delim_with_char "1" "!optn_two_right!" "!bridge!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "t2=%%i"
+        )
+
+        if "!t1!" neq "!bridge!" ( exit /b )
+        if "!t2!" neq "!bridge!" ( exit /b )
+
         echo ROM: "!bridge!"
         exit /b
     )
 
-
-    rem Refactor this to improve legibility
-    rem For "token > 1"
-    rem call :oldFilter "!token!" "!isn!" "!bridge!"
     call :filterB "!bridge!"
 
 
@@ -2497,7 +2512,11 @@ exit /b
 
 
     rem echo SECONDARY -- "!smlr_bridge!"
-    call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!pad_bridge!"
+    rem echo * R "!optn_one_right!"
+     rem echo ** R "!optn_two_right!"
+     rem ECHO *** "!smlr_bridge!"
+
+    call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!optn_one_right!" "!optn_two_right!"
 
 
 
