@@ -376,12 +376,49 @@ exit /b
 
 :run_samples
     setlocal
+    call :one_encaps "!indiv_pare_one!" "!nest_pare_one!"
 
-    rem call :same_encaps "!nest_curl_one!" "!nest_curl_two!"
-    rem call :same_encaps "!indiv_sqr_one!" "!indiv_sqr_two!"
-    rem call :diff_encaps "!indiv_pare_one!" "!nest_pare_one!"
+    call :two_encaps
+
+    REM call :same_encaps "!nest_curl_one!" "!nest_curl_two!"
+    REM call :same_encaps "!indiv_sqr_one!" "!indiv_sqr_two!"
+    call :diff_encaps "!indiv_pare_one!" "!nest_pare_one!"
     call :diff_encaps "!indiv_sqr_one!" "!indiv_pare_one!"
     call :diff_encaps "!nest_sqr_one!" "!nest_curl_one!"
+    endlocal
+exit /b
+
+:one_encaps
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+
+    call :one_with_space "!enc1!"
+    call :one_with_space "!enc2!"
+
+    call :one_without_space "!enc1!"
+    call :one_without_space "!enc2!"
+    endlocal
+exit /b
+
+:one_with_space
+    setlocal
+    set "e=.d88"
+    set "enc=%~1"
+    call "funcs_rom_keywords.bat" :start "ROM!enc! !e!"
+    endlocal
+exit /b
+
+:one_without_space
+    setlocal
+    set "e=.d88"
+    set "enc=%~1"
+    call "funcs_rom_keywords.bat" :start "ROM!enc!!e!"
+    endlocal
+exit /b
+
+:two_encaps
+    setlocal
     endlocal
 exit /b
 
@@ -395,18 +432,14 @@ exit /b
     set "e=.d88"
     
     ECHO SAME ENCAPS
-    call "funcs_rom_keywords.bat" :start "ROM!enc1!!e!"
-    call "funcs_rom_keywords.bat" :start "ROM !enc1! !e!"
-    REM call "funcs_rom_keywords.bat" :start "ROM !enc2!!e!"
-    REM call "funcs_rom_keywords.bat" :start "ROM !enc2! !e!"
 
     call "funcs_rom_keywords.bat" :start "ROM!enc1!!enc2!!e!"
     call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2!!e!"
 
-    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1!!enc2!!bri2!!e!"
-    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1!!enc2! !bri2!!e!"
-    call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1! !enc2!!bri2! !e!"
-    call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1! !enc2! !bri2! !e!"
+    rem call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1!!enc2!!bri2!!e!"
+    rem call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1!!enc2! !bri2!!e!"
+    rem call "funcs_rom_keywords.bat" :start "ROM!enc1!!bri1! !enc2!!bri2! !e!"
+    rem call "funcs_rom_keywords.bat" :start "ROM!enc1! !bri1! !enc2! !bri2! !e!"
 
 
     endlocal
@@ -421,7 +454,7 @@ exit /B
 
     call :diff_no_space "!enc1!" "!enc2!"
     call :diff_with_space "!enc1!" "!enc2!"
-    call :diff_with_bridge "!enc1!" "!enc2!" "!bri1!"
+    REM call :diff_with_bridge "!enc1!" "!enc2!" "!bri1!"
     endlocal
 exit /b
 

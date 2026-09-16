@@ -1591,6 +1591,7 @@ exit /b
     if exist "has_curl.txt" ( del "has_curl.txt" )
     if exist "has_paren.txt" ( del "has_paren.txt" )
     if exist "last_item.txt" ( del "last_item.txt" )
+    if exist "chars.txt" ( del "chars.txt" )
     
     endlocal
 exit /b
@@ -1879,7 +1880,21 @@ exit /b
     rem echo A BRIDGE "!bridge!"
     rem )
     call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-   
+    set /a t=0
+    for /f "tokens=*" %%i in (token.txt) do (
+        set /a "t=%%i"
+    )
+    
+
+    set read_right_char=
+    for /f "tokens=1" %%i in (chars.txt) do (
+        set "read_right_char=%%i"
+    )
+    REM echo "tok=" "!t!"
+    REM echo "read_right_char=" "!read_right_char!"
+    REM echo "name " "!name!"
+    call :tokenize_name "!t!" "!read_right_char!" "!name!" "!left_char!"
+
    
     rem test for .d88, .t88, or .cmt extension
     rem if one of these extensions is found, then cancel
@@ -2063,11 +2078,11 @@ exit /b
      rem echo READ "!read!"
     
    
-    if "!read!" neq "!a!" (
-        if "!a!" neq " " (
-     echo "!a!" -- "!dest!"
+     if "!read!" neq "!a!" (
+         if "!a!" neq " " (
+      echo "!a!" -- "!dest!"
      )
-    )
+     )
     
 
 
@@ -2112,13 +2127,17 @@ rem     return " " (a blank that will be used to filter output for the bridge)
     set "orig_bridge=%~2"
 
     set /a pad_only_qty=0
-
+  rem echo pad_bridge "!pad_bridge!"
     if "!pad_bridge!" equ "PAD" (
         set /a pad_only_qty+=1
+        
     )
 
     IF "!pad_bridge!" equ "PAD " (
         set /a pad_only_qty+=1
+         if not exist is_nested.txt (
+         echo "          " 
+         )
     )
 
     IF "!pad_bridge!" equ " PAD" (
@@ -2131,11 +2150,36 @@ rem     return " " (a blank that will be used to filter output for the bridge)
 
     if !pad_only_qty! gtr 0 (
         set orig_bridge=
+        rem if not exist is_nested.txt (
+        rem echo keep_or_clear pad_bridge "!pad_bridge!")
+        rem This occurs for when recursing across group or bridge found within group
     )
 
     set "orig_bridge=!orig_bridge!|"
     echo !orig_bridge! > "%delimtxt%"
 
+    endlocal
+exit /b
+
+:tokenize_name
+    setlocal
+    set "token=%~1"
+    set "right_char=%~2"
+    set "name=%~3"
+    set "left_char_prime=%~4"
+    set butt=
+    for /f "tokens=%~1 delims=%~2" %%i in ("!name!") do (
+        set "butt=%%i"
+    ) 
+    rem echo "BUTT" "!butt!"
+    set head=
+    for /f "tokens=1 delims=%~4" %%i in ("!butt!") do (
+        set "head=%%i"
+    )
+    rem echo HEAD "!head!"
+    if "!head!" equ " " (
+    echo "                             "
+    )
     endlocal
 exit /b
 
@@ -2309,8 +2353,37 @@ exit /b
             set "t2=%%i"
         )
 
-        if "!t1!" neq "!bridge!" ( exit /b )
-        if "!t2!" neq "!bridge!" ( exit /b )
+        set g1=
+        set g2=
+        rem Have to recurse across bridge because of a possiblly increasing token value
+        rem use spaces as delimiting character
+        call :delim_with_char "2" "!optn_one_right!" "!bridge!"
+        for /f "tokens=2 delims=%~4" %%i in ("!bridge!") do (
+            set "g1=%%i"
+        )
+        call :delim_with_char "2" "!optn_two_right!" "!bridge!"
+        for /f "tokens=2 delims=%~5" %%i in ("!bridge!") do (
+            set "g2=%%i"
+        )
+
+rem echo UNFILTERED BRIDGE "!bridge!"
+rem echo G1 "!g1!"
+rem echo G2 "!g2!"
+        if "!t1!" neq "!bridge!" ( 
+rem             echo " " SEND BRIDGE FILTER
+            rem if "!g1!" equ " " (
+               rem  echo " "
+            rem )
+            exit /b
+        )
+        if "!t2!" neq "!bridge!" (
+            rem if "!g2!" equ " " (
+            rem echo " "
+            rem )
+    rem         echo " " SEND BRIDGE FILTER
+            exit /b
+            
+        )
 
         echo ROM: "!bridge!"
         exit /b
@@ -2321,6 +2394,9 @@ exit /b
 
 
     endlocal
+exit /b
+
+:do_space
 exit /b
 
 :filterB
@@ -2337,13 +2413,18 @@ exit /b
     if "!isn!" EQU "TRUE" (
         exit /b
     )
-
+    rem echo FILTER B'S BRIDGE "!bridge!"
+rem if "!isn!" equ "FALSE" (
+   rem  if "!bridge!" equ " " (
+rem ECHO filter b: bridge "!bridge!"
+rem ))
     call :delim_with_char "1" "." "!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
 
     if "!bridge!" equ " " (
+        rem REQUIRED
         exit /b
     )
 
@@ -2434,20 +2515,30 @@ exit /b
     set "optn_two_left=%~7"
     set "optn_two_right=%~8"
     rem set "name=%~9"
-
+     REM echo REC ON "!bridge!"
     set item=
     call :delim_with_char "!token!" "!right_char!" "!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "item=%%i"
     )
-
+ rem echo ITEM "!item!" 
+ rem IF "!token!" gtr 1 (
+   rem echo "increasing token" "!token!"
+   rem echo "inc right_char " "!right_char!"
+  rem )
     if "!item!" equ " " (
+        REM echo "token" "!token!"
+        rem echo "right_char" "!right_char!"
+        echo !token! > "token.txt"
+        echo !right_char! > "chars.txt"
         exit /b
     )
 
     if "!item!" equ "!bridge!" (
+        rem echo "token" "!token!"
+        rem This is the last item in a nested encapsulator
         exit /b
-    )
+     )
     
     set smlr_bridge=
     call :delim_with_char "1" "!left_char!" "!item!"
