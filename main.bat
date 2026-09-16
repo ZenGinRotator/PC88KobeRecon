@@ -376,10 +376,21 @@ exit /b
 
 :run_samples
     setlocal
-    call :one_encaps "!indiv_pare_one!" "!nest_pare_one!"
+    call :one_encap "!indiv_pare_one!" "!nest_pare_one!" "BRIDGE 1" "S"
+    call :one_encap "!indiv_pare_one!" "!nest_pare_one!" "BRIDGE 1" ""
 
-    call :two_encaps
+    set "ips=!indiv_pare_one!|!indiv_pare_two!|!indiv_pare_three!"
+    set "nps=!nest_pare_one!|!nest_pare_two!|!nest_pare_three!"
 
+    set "ics=!indiv_curl_one!|!indiv_curl_two!|!indiv_curl_three!"
+    set "ncs=!nest_curl_one!|!nest_curl_two!|!nest_curl_three!"
+
+    set "iss=!indiv_sqr_one!|!indiv_sqr_two!|!indiv_sqr_three!"
+    set "nss=!nest_sqr_one!|!nest_sqr_two!|!nest_sqr_three!"
+
+    
+
+    call :two_encaps "!ips!" "!nps!" "!ics!" "!ncs!" "!iss!" "!nss!" "BRIDGE 1"
     REM call :same_encaps "!nest_curl_one!" "!nest_curl_two!"
     REM call :same_encaps "!indiv_sqr_one!" "!indiv_sqr_two!"
     call :diff_encaps "!indiv_pare_one!" "!nest_pare_one!"
@@ -388,37 +399,203 @@ exit /b
     endlocal
 exit /b
 
-:one_encaps
+:one_encap
+    setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "b=%~3"
+
+    call :one_perms "!enc1!" "!b!"
+    call :one_perms "!enc2!" "!b!"
+    endlocal
+exit /b
+
+:one_perms
+    setlocal
+    set "enc=%~1"
+    set "b=%~2"
+    set "flag=%~3"
+
+    if "!flag!" equ "S" (
+        call "funcs_rom_keywords.bat" :start "ROM!enc!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc! !e!"
+    ) else (
+        call "funcs_rom_keywords.bat" :start "ROM!enc!!b!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc!!b! !e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc! !b!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc! !b! !e!"
+    )
+    endlocal
+exit /b
+
+
+:two_encaps
+    setlocal
+    set "ips=%~1"
+    set "nps=%~2"
+    set "ics=%~3"
+    set "ncs=%~4"
+    set "iss=%~5"
+    set "nps=%~6"
+    set "b=%~7"
+    set "e=.d88"
+
+    set ip1=
+    set ip2=
+    set ip3=
+
+    set np1=
+    set np2=
+    set np3=
+    
+    set ic1=
+    set ic2=
+    set ic3=
+    
+    set nc1=
+    set nc2=
+    set nc3=
+    
+    set is1=
+    set is2=
+    set is3=
+    
+    set ns1=
+    set ns2=
+    set ns3=
+
+    for /f "tokens=1 delims=|" %%i in ("!ips!") do (
+        set "ip1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!ips!") do (
+        set "ip2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!ips!") do (
+        set "ip3=%%i"
+    )
+
+    
+    for /f "tokens=1 delims=|" %%i in ("!nps!") do (
+        set "np1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!nps!") do (
+        set "np2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!nps!") do (
+        set "np3=%%i"
+    )
+
+    
+    for /f "tokens=1 delims=|" %%i in ("!ics!") do (
+        set "ic1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!ics!") do (
+        set "ic2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!ics!") do (
+        set "ic3=%%i"
+    )
+    
+    
+    for /f "tokens=1 delims=|" %%i in ("!ncs!") do (
+        set "nc1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!ncs!") do (
+        set "nc2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!ncs!") do (
+        set "nc3=%%i"
+    )
+
+
+    for /f "tokens=1 delims=|" %%i in ("!iss!") do (
+        set "is1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!iss!") do (
+        set "is2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!iss!") do (
+        set "is3=%%i"
+    )
+
+
+    for /f "tokens=1 delims=|" %%i in ("!nps!") do (
+        set "ns1=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!nps!") do (
+        set "ns2=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!nps!") do (
+        set "ns3=%%i"
+    )
+
+    set "b=BRIDGE 1"
+    rem -- same encapsulator (eg () & ())
+    rem 2 indiv
+    rem 2 nest
+    rem indiv & nest
+    rem nest & indiv
+    call :one_instance_each_bridge_yes_no "!is1!" "!is2!"
+
+    call :one_instance_each_bridge_yes_no "!ns1!" "!ns2!"
+
+    call :one_instance_each_bridge_yes_no "!is1!" "!ns1!"
+
+    call :one_instance_each_bridge_yes_no "!ns1!" "!is1!"
+
+    rem -- diff encapsulator (eg. [] & {})
+    rem 2 indiv
+    rem 2 nest
+    rem indiv & nest
+    rem nest & indiv
+    call :one_instance_each_bridge_yes_no "!ip1!" "!ic1!"
+
+    call :one_instance_each_bridge_yes_no "!np1!" "!nc1!"
+
+    call :one_instance_each_bridge_yes_no "!ip1!" "!nc1!"
+
+    call :one_instance_each_bridge_yes_no "!np1!" "!ic1!"
+
+    endlocal
+exit /b
+
+:one_instance_each_bridge_yes_no
     setlocal
     set "enc1=%~1"
     set "enc2=%~2"
 
-    call :one_with_space "!enc1!"
-    call :one_with_space "!enc2!"
+    set "b=BRIDGE 1"
 
-    call :one_without_space "!enc1!"
-    call :one_without_space "!enc2!"
+    call :two_perms "!enc1!" "!enc2!" "B"
+    call :two_perms "!enc1!" "!enc2!" ""
+
     endlocal
 exit /b
 
-:one_with_space
+
+    rem no space
+    rem space only
+    rem space bridge
+    rem bridge space
+    rem space bridge space
+
+:two_perms
     setlocal
+    set "enc1=%~1"
+    set "enc2=%~2"
+    set "b=%~3"
+    set "flag=%~4"
     set "e=.d88"
-    set "enc=%~1"
-    call "funcs_rom_keywords.bat" :start "ROM!enc! !e!"
-    endlocal
-exit /b
 
-:one_without_space
-    setlocal
-    set "e=.d88"
-    set "enc=%~1"
-    call "funcs_rom_keywords.bat" :start "ROM!enc!!e!"
-    endlocal
-exit /b
-
-:two_encaps
-    setlocal
+    if "!flag!" neq "B" (
+        call "funcs_rom_keywords.bat" :start "ROM!enc1!!enc2!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2!!e!"
+    ) else (
+        call "funcs_rom_keywords.bat" :start "ROM!enc1!!b!!enc2!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc1!!b! !enc2!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc1! !b!!enc2!!e!"
+        call "funcs_rom_keywords.bat" :start "ROM!enc1! !b! !enc2!!e!"
+    )
     endlocal
 exit /b
 
