@@ -2536,6 +2536,7 @@ exit /b
 
     if "!item!" equ "!bridge!" (
         rem echo "token" "!token!"
+        rem Is the following true?
         rem This is the last item in a nested encapsulator
         exit /b
      )
