@@ -157,10 +157,10 @@ set "isp_front_bar_extra=|isphrase|"
  set "isp_mid_bar=is|phrase"
 set "isp_none=isphrase"
 echo VERIFY DELIMITING USING 
-call :v_bar "!isp_front_bar!"
-call :v_bar "!isp_front_bar_extra!"
-call :v_bar "!isp_mid_bar!"
-call :v_bar "!isp_none!"
+call :v_bar "!isp_front_bar!" "|"
+call :v_bar "!isp_front_bar_extra!" "|"
+call :v_bar "!isp_mid_bar!" "|"
+call :v_bar "!isp_none!" "|"
 
 rem call :all_bridges
 rem call :no_bridges
@@ -685,21 +685,21 @@ exit /b
     )
 
 
-    for /f "tokens=1 delims=|" %%i in ("!nps!") do (
+    for /f "tokens=1 delims=|" %%i in ("!nss!") do (
         set "ns1=%%i"
     )
-    for /f "tokens=2 delims=|" %%i in ("!nps!") do (
+    for /f "tokens=2 delims=|" %%i in ("!nss!") do (
         set "ns2=%%i"
     )
-    for /f "tokens=3 delims=|" %%i in ("!nps!") do (
+    for /f "tokens=3 delims=|" %%i in ("!nss!") do (
         set "ns3=%%i"
     )
 
     set "b=BRIDGE 1"
     rem call :three_perms "!ns1!" "!ns2!" "!ns3!" 
     rem call :three_perms "!ns1!" "!is1!" "!ns2!"
-    call :three_perms "!ns1!" "!ip1!" "!ns2!" "!ip2!"
-    call :three_perms "!ip1!" "!ns1!" "!ns2!"
+    call :three_perms "!ns1!" "!nc1!" "!ns2!"
+    rem call :three_perms "!ip1!" "!ns1!" "!ns2!"
     endlocal
 exit /b
 
@@ -712,8 +712,8 @@ exit /b
     SET "B2=BRIDGE 2"
     set "e=.d88"
 
-    call "funcs_rom_keywords.bat" :start "ROM!enc1!!enc2!!enc3!!e!"
-    call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2! !enc3! !e!"
+    call "funcs_rom_keywords.bat" :start "ROM!enc1!!indiv_pare_one!!enc2!!enc3!!e!"
+    rem call "funcs_rom_keywords.bat" :start "ROM!enc1! !enc2! !enc3! !e!"
     endlocal
 exit /b
 
@@ -1427,22 +1427,23 @@ exit /b
 :v_bar
     setlocal
     set "phrase=%~1"
+    set "delim_char=%~2"
     set token1=
     set tokn2=
     set token3=
     
-    for /f "tokens=1 delims=|" %%i in ("!phrase!") do (
+    for /f "tokens=1 delims=%~2" %%i in ("!phrase!") do (
         set "token1=%%i"
     )
-    for /f "tokens=2 delims=|" %%i in ("!phrase!") do (
+    for /f "tokens=2 delims=%~2" %%i in ("!phrase!") do (
         set "token2=%%i"
     )
 
-    for /f "tokens=3 delims=|" %%i in ("!phrase!") do (
+    for /f "tokens=3 delims=%~2" %%i in ("!phrase!") do (
         set "token3=%%i"
     )
 
-    echo ORIGIN "!phrase!"
+    echo ORIGIN "!phrase!", DELIM CHAR "!delim_char!"
     echo TOKEN = 1 "!token1!"
     echo TOKEN = 2 "!token2!"
     echo TOKEN = 3 "!token3!"

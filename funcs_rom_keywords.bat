@@ -1586,13 +1586,15 @@ exit /b
     if exist %delimtxt% ( del %delimtxt% )
     if exist %brgtxt% ( del %brgtxt% )
     if exist "is_nested.txt" ( del "is_nested.txt" )
+    if exist "is_primary_nested.txt" ( del "is_primary_nested.txt" )
+    if exist "is_secondary_nested.txt" ( del "is_secondary_nested.txt" )
     if exist "bridge.txt" ( del "bridge.txt" )
     if exist "has_square.txt" ( del "has_square.txt" )
     if exist "has_curl.txt" ( del "has_curl.txt" )
     if exist "has_paren.txt" ( del "has_paren.txt" )
     if exist "last_item.txt" ( del "last_item.txt" )
     if exist "chars.txt" ( del "chars.txt" )
-    
+    if exist "token.txt" ( del "token.txt" )
     endlocal
 exit /b
 
@@ -1802,15 +1804,6 @@ exit /b
         set /a ext_qty=%%i
     )
 
-    rem if !ext_qty! gtr 0 (
-    rem     echo fouND item extension "!item!" "!optn_one_right!"
-    rem     set "item=!item!|"
-    rem     echo !item! > "last_item.txt"
-        rem call :find_last_char "1" "!optn_one_right!" "!item!" "!optn_one_right!" "!optn_two_right!"
-    rem    exit /b
-    rem )
-    
-
     set /a token+=1
     call :recurse_to_ext "!token!" "!right_char!" "!name!" "!item!"
     endlocal
@@ -1837,6 +1830,8 @@ exit /b
         set "item=%%i"
     )
 
+    
+
     if "!item!" equ " " (
         exit /b
     )
@@ -1848,7 +1843,16 @@ exit /b
         exit /b
     )
 
+    rem Stop at extension
+    rem Situations: a. bridge.d88, or .d88
 
+    
+    call :continue_or_stop "!item!"
+     if exist "stop.txt" (
+         del "stop.txt"
+         exit /b
+     )
+    
 
     
     
@@ -1857,71 +1861,66 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
-   
-   
+    rem ECHO PRIMARY ITEM "!item!"
+    rem echo PRIMARY BRIDGE  "!bridge!"
 
-    set "pad_item=PAD!item!"
-    
-    set pad_bridge=
-    call :delim_with_char "1" "!left_char!" "!pad_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "pad_bridge=%%i"
+    if "!item!" equ "!bridge!" (
+        echo T "!item!"
+        rem echo "!item!" is nested
+        rem echo delete "is_primary_nested.txt"
+        set /a token+=1
+        call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+        exit /b
     )
 
-    
-     call :keep_or_clear_bridge "!pad_bridge!" "!bridge!"
-     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-         set "bridge=%%i"
-     )
-
-
-
-    rem if "!bridge!" neq " " (
-    rem echo A BRIDGE "!bridge!"
+    rem if not exist "is_primary_nested.txt" (
+    rem     echo 
     rem )
-    call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    set /a t=0
-    for /f "tokens=*" %%i in (token.txt) do (
-        set /a "t=%%i"
-    )
+
+    set "primes=!left_char!|!right_char!"
+    set "optn1s=!optn_one_left!|!optn_one_right!"
+    set "optn2s=!optn_two_left!|!optn_two_right!"
+
+    set "delim_chars=!primes!|!optn1s!|!optn2s!"
+    
+    
+    call :count_optn "!delim_chars!" "PAD!item!" "!bridge!"
+     rem call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!token!"
+    rem set /a t=0
+    rem for /f "tokens=*" %%i in (token.txt) do (
+    rem     set /a "t=%%i"
+    rem )
     
 
-    set read_right_char=
-    for /f "tokens=1" %%i in (chars.txt) do (
-        set "read_right_char=%%i"
-    )
+    rem set read_right_char=
+    rem for /f "tokens=1" %%i in (chars.txt) do (
+    rem    set "read_right_char=%%i"
+    rem )
     REM echo "tok=" "!t!"
     REM echo "read_right_char=" "!read_right_char!"
     REM echo "name " "!name!"
-    call :tokenize_name "!t!" "!read_right_char!" "!name!" "!left_char!"
+    rem call :tokenize_name "!t!" "!read_right_char!" "!name!" "!left_char!"
 
    
     rem test for .d88, .t88, or .cmt extension
     rem if one of these extensions is found, then cancel
     rem the algorithm with exit /b
 
-      call :continue_or_stop "!bridge!" "!token!"
-     if exist "stop.txt" (
-         del "stop.txt"
-         echo STOPPED with bridge "!bridge!"
-         exit /b
-     )
-    
     rem echo * R "!optn_one_right!"
     rem echo ** R "!optn_two_right!"
-    call :send_bridge_filter "PRIMARY" "!token!" "!bridge!" "!optn_one_right!" "!optn_two_right!"
+    rem call :send_bridge_filter "PRIMARY" "!token!" "!bridge!" "!optn_one_right!" "!optn_two_right!" "!token!"
 
     
-    set nested_test=
-    call :delim_with_char "3" "!left_char!" "!pad_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "nested_test=%%i"
-    )
+    rem set nested_test=
+    rem call :delim_with_char "3" "!left_char!" "!pad_item!"
+    rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    rem     set "nested_test=%%i"
+    rem )
 
     rem echo NESTED TEST "!nested_test!" AFTER pad item "!pad_item!"
-    if "!nested_test!" neq " " (
-        echo "" > "is_nested.txt"
-    )
+    rem if "!nested_test!" neq " " (
+    rem     echo "" > "is_nested.txt"
+    rem )
 
 
 
@@ -1932,7 +1931,7 @@ exit /b
     set "optn_twos=!optn_two_left!|!optn_two_right!"
 
  
-    call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!bridge!"
+    rem call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!bridge!"
     call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
 
     endlocal
@@ -2027,45 +2026,6 @@ exit /b
     )
 
     
-    set ext=
-    call :delim_with_char "2" "." "!orig_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "ext=%%i"
-    )
-
-    set extless=
-    call :delim_with_char "1" "." "!orig_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "extless=%%i"
-    )
-
-
-
-    call :ext_qty "!ext!"
-    for /f "tokens=*" %%i in (ext_qty.txt) do (
-        set /a ext_qty=%%i
-    )
-    del ext_qty.txt
-
-
-     if !ext_qty! gtr 0 (
-           set "a=!extless!"
-       )
-
-    
-
-    
-
-    call :ext_qty "!extless!"
-    for /f "tokens=*" %%i in (ext_qty.txt) do (
-        set /a extless_qty=%%i
-    )
-    del ext_qty.txt
-
-
-    if !extless_qty! gtr 0 (
-        set "a= "
-    )
 
  
     set read=
@@ -2294,13 +2254,13 @@ exit /b
 
 :continue_or_stop
     setlocal
-    set "bridge=%~1"
-    set "token=%~2"
+    set "item=%~1"
     
-    set "pad_bridge=PAD!bridge!"
+    
+    set "pad_item=PAD!item!"
 
     rem token argument used to be "2", now "1"
-    call :delim_with_char "1" "." "!bridge!"
+    call :delim_with_char "2" "." "!pad_item!"
     set ext=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "ext=%%i"
@@ -2329,6 +2289,7 @@ exit /b
     set "bridge=%~3"
     set "optn_one_right=%~4"
     set "optn_two_right=%~5"
+    set "primary_token=%~6"
 
     
     set "isn=FALSE"
@@ -2384,8 +2345,10 @@ rem             echo " " SEND BRIDGE FILTER
             exit /b
             
         )
-
+        rem 
+         if "!primary_token!" EQU "1" (
         echo ROM: "!bridge!"
+         )
         exit /b
     )
 
@@ -2485,6 +2448,96 @@ exit /b
 exit /b
 
 
+:count_optn
+    setlocal
+    set "delim_chars=%~1"
+    set "item=%~2"
+    set "bridge=%~3"
+    set r1=
+    set r2=
+
+    set prime_left=
+    set prime_right=
+    set optn1_left=
+    set optn1_right=
+    set optn2_left=
+    set optn2_right=
+
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "prime_left=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!delim_chars!") do (
+        set "prime_right=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!delim_chars!") do (
+        set "optn1_left=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!delim_chars!") do (
+        set "optn1_right=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!delim_chars!") do (
+        set "optn2_left=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!delim_chars!") do (
+        set "optn2_right=%%i"
+    )
+
+
+    
+
+
+    ECHO ITEM "!item!"
+    echo BRIDGE "!bridge!"
+
+
+    call :recurse_with_left "2" "!prime_left!" "!item!"
+    
+    call :delim_with_char "1" "!optn1_left!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "left1=%%i"
+    )
+    call :delim_with_char "1" "!optn2_left!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "left2=%%i"
+    )
+
+    set /a q=0
+    if "!left1!" neq "!item!" (
+        set /a q+=1
+    )
+    if "!left2!" neq "!item!" (
+        set /a q+=1
+    )
+    echo QTY "!q!"
+
+    endlocal
+exit /b
+
+:recurse_with_left
+    setlocal
+    set "token=%~1"
+    set "left=%~2"
+    set "item=%~3"
+
+    set t=
+    call :delim_with_char "!token!" "!left!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "t=%%i"
+    )
+
+    if "!t!" equ " " (
+        exit /b
+    )
+
+    echo T "!t!"
+
+
+    set /a !token+=1
+    call :recurse_with_left "!token!" "!left!" "!item!"
+    endlocal
+exit /b
+
+
 
 
 :start_recurse_bridge
@@ -2496,11 +2549,12 @@ exit /b
     set "optn_one_right=%~5"
     set "optn_two_left=%~6"
     set "optn_two_right=%~7"
+    set "primary_token=%~8"
     rem set "name=%~8"
     rem echo optn one "!optn_one_left!" "!optn_one_right!"
 
-    call :recurse_on_bridge2 "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    call :recurse_on_bridge2 "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!primary_token!"
+    call :recurse_on_bridge2 "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!primary_token!"
     endlocal
 exit /b
 
@@ -2514,6 +2568,7 @@ exit /b
     set "optn_one_right=%~6"
     set "optn_two_left=%~7"
     set "optn_two_right=%~8"
+    set "primary_token=%~9"
     rem set "name=%~9"
      REM echo REC ON "!bridge!"
     set item=
@@ -2521,98 +2576,55 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "item=%%i"
     )
- rem echo ITEM "!item!" 
- rem IF "!token!" gtr 1 (
-   rem echo "increasing token" "!token!"
-   rem echo "inc right_char " "!right_char!"
-  rem )
+     ECHO SEC ITEM "!item!"
     if "!item!" equ " " (
-        REM echo "token" "!token!"
-        rem echo "right_char" "!right_char!"
-        echo !token! > "token.txt"
-        echo !right_char! > "chars.txt"
-        exit /b
+rem        REM echo "token" "!token!"
+rem        rem echo "right_char" "!right_char!"
+rem        echo !token! > "token.txt"
+rem        echo !right_char! > "chars.txt"
+       exit /b
     )
 
     if "!item!" equ "!bridge!" (
-        rem echo "token" "!token!"
-        rem Is the following true?
-        rem This is the last item in a nested encapsulator
+       
+        rem Delimiting right char does not exist within the bridge
         exit /b
      )
+
+    REM echo ITEM "!item!"
+    rem echo RIGHT CHAR "!right_char!"
+    rem echo BRIDGE "!bridge!"
+    
     
     set smlr_bridge=
     call :delim_with_char "1" "!left_char!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "smlr_bridge=%%i"
     )
-
+    rem echo SECONDARY ITEM "!item!"
+    rem echo SMLR BRIDGE "!smlr_bridge!"
+    rem if "!smlr_bridge!" equ "!item!" (
+        
+    rem     exit /b
+    rem )
    
+
+    rem set "pad_item=PAD!item!"
+
+    rem set pad_bridge=
+    rem call :delim_with_char "1" "!left_char!" "!pad_item!"
+    rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    rem     set "pad_bridge=%%i"
+    rem )
+
+    rem call :keep_or_clear_bridge "!pad_bridge!" "!smlr_bridge!"
+    rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    rem     set "smlr_bridge=%%i"
+    rem )
+
+  
+    rem call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!optn_one_right!" "!optn_two_right!" "!primary_token!"
    
-
-    set "pad_item=PAD!item!"
-
-    set pad_bridge=
-    call :delim_with_char "1" "!left_char!" "!pad_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "pad_bridge=%%i"
-    )
-
-    call :keep_or_clear_bridge "!pad_bridge!" "!smlr_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "smlr_bridge=%%i"
-    )
-
-    set ext=
-    call :delim_with_char "2" "." "!smlr_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "ext=%%i"
-    )
-
-    set extless=
-    call :delim_with_char "1" "." "!smlr_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "extless=%%i"
-    )
-
-    rem Assume that bridge exceeds file extension within file name
-   
-    call :ext_qty "!ext!"
-    for /f "tokens=*" %%i in (ext_qty.txt) do (
-        set /a ext_qty=%%i
-    )
-    del ext_qty.txt
-
-
-    if !ext_qty! gtr 0 (
-           set "smlr_bridge=!extless!"
-    )
-
-
-    
-    call :ext_qty "!extless!"
-    for /f "tokens=*" %%i in (ext_qty.txt) do (
-        set /a extless_qty=%%i
-    )
-    del ext_qty.txt
-
-
-    if !extless_qty! gtr 0 (
-        set "smlr_bridge= "
-    )
-
-
-
-    rem echo SECONDARY -- "!smlr_bridge!"
-    rem echo * R "!optn_one_right!"
-     rem echo ** R "!optn_two_right!"
-     rem ECHO *** "!smlr_bridge!"
-
-    call :send_bridge_filter "SECONDARY" "!token!" "!smlr_bridge!" "!optn_one_right!" "!optn_two_right!"
-
-
-
-
 
     set nested_test=
     call :delim_with_char "3" "!left_char!" "!pad_item!"
@@ -2635,7 +2647,7 @@ exit /b
     set "optn_ones=!optn_one_left!|!optn_one_right!"
     set "optn_twos=!optn_two_left!|!optn_two_right!"
     rem echo RECURSE ON ITEM
-    call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!smlr_bridge!"
+    rem call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!smlr_bridge!"
 
     
     call :recurse_on_bridge2 "!token!" "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
