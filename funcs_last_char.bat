@@ -349,7 +349,7 @@ exit /b
 
     call :the_last "!last_char!"
 
-    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!"
+    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!" ""
 
 
     endlocal
@@ -361,6 +361,7 @@ exit /b
     set "right_c=%~2"
     set "phrase=%~3"
     set "end_mark=%~4"
+    SET "old_item=%~5"
 
     set item=
     call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
@@ -368,6 +369,16 @@ exit /b
         set "item=%%i"
     )
 
+
+    set end=
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!end_mark!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "end=%%i"
+    )
+
+    rem if "!end!" neq "!item!" (
+    rem     echo END "!end!"
+    rem )
     
 
     if "!item!" equ ".d88!end_mark!" (
@@ -380,18 +391,70 @@ exit /b
     )
 
     if "!item!" equ " " (
-        rem If this has been achieved, we failed to find
-        rem     the correct the last character, because
-        rem     the above "correct conditions" were not 
-        rem     achieved (we found a string containing the 
-        rem     the end mark, but that end mark is preceeded
-        rem     with the actual last character in the string).
-        echo FAIL
+        rem We traversed the entire phrase but need to evaluate whether
+        rem     the previous item contains optional delimiting characters
+        call :evalOI "!old_item!" "!right_c!"
         exit /b
     )
 
     set /a token+=1
-    call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!"
+    call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!" "!item!"
+
+    endlocal
+exit /b
+
+:evalOI
+    setlocal
+    set "old_item=%~1"
+    set "right_c=%~2"
+
+    set optn1_r=
+    set optn2_r=
+    call :primary_and_optn_chars "!right_c!"
+    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
+        set "optn1_r=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
+        set "optn2_r=%%i"
+    )
+
+    
+
+    set res1=
+    set res2=
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn1_r!" "!old_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "res1=%%i"
+    )
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn2_r!" "!old_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "res2=%%i"
+    )
+
+    set /a q=0
+
+    if "!res1!" equ "!old_item!" (
+        rem Returns the entire item when the optional delimiting 
+        rem     character does not exist with the item.
+        rem An item as defined as a string containing the end-mark 
+        rem     character.
+        set /a q+=1
+    )
+
+    if "!res2!" equ "!old_item!" (
+        set /a q+=1
+    )
+
+    if !q! equ 2 (
+        echo PASS
+    ) ELSE (
+        ECHO FAIL
+        pause
+    )
+
+    
+
 
     endlocal
 exit /b

@@ -113,10 +113,18 @@ exit /b
     
     call "funcs_last_char.bat" :find_last_char "" "!one!!ext!"
     call "funcs_last_char.bat" :find_last_char "" "!one!"
-    rem call "funcs_last_char.bat" :find_last_char "" "!one! !ext!"
-    rem call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!ext!" 
-    rem call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!ext!"
-    rem call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!ext!" 
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !ext!" 
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !ext!"
+    
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!" 
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!" 
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!"
+    
+
+    
     endlocal
 exit /b
 
