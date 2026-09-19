@@ -55,26 +55,9 @@ goto :eof
 
 
     rem call :all_ones
-    call :all_twos
+    rem call :all_twos
 
-
-    exit /b
-    
-    call :three_ext_last "!s!" "!p!" "!c!" "!b!" "!d!"
-    
-    call :three_ext_last "!s!" "!c!" "!p!" "!b!" "!d!"
-
-
-    call :three_ext_last "!p!" "!c!" "!s!" "!b!" "!d!"
-
-
-    call :three_ext_last "!p!" "!s!" "!c!" "!b!" "!d!"
-
-    call :three_ext_last "!c!" "!s!" "!p!" "!b!" "!d!"
-
-    call :three_ext_last "!c!" "!p!" "!s!" "!b!" "!d!"
-    
-
+    call :all_threes
 
     endlocal
 exit /b
@@ -158,7 +141,7 @@ exit /b
     set "ext=%~4"
     call "funcs_last_char.bat" :find_last_char "" "!one!!two!!ext!"
     call "funcs_last_char.bat" :find_last_char "" "!one!!two!"
-    exit /b
+    
     call "funcs_last_char.bat" :find_last_char "" "!one! !two!!ext!"
     call "funcs_last_char.bat" :find_last_char "" "!one!!two! !ext!"
     call "funcs_last_char.bat" :find_last_char "" "!one! !two! !ext!"
@@ -188,8 +171,72 @@ exit /b
     call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !ext!"
     
     
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge!"
     
     
+    
+    endlocal
+exit /b
+
+:all_threes
+    setlocal
+    
+    call :three_ext_last "!is1!" "!ip1!" "!ic1!" "!b!" "!d!"
+    call :three_ext_last "!is1!" "!ic1!" "!ip1!" "!b!" "!d!"
+    call :three_ext_last "!ic1!" "!is1!" "!ip1!" "!b!" "!d!"
+    call :three_ext_last "!ic1!" "!ip1!" "!is1!" "!b!" "!d!"
+    call :three_ext_last "!ip1!" "!ic1!" "!is1!" "!b!" "!d!"
+    call :three_ext_last "!ip1!" "!is1!" "!ic1!" "!b!" "!d!"
+
+    
+    call :three_ext_last "!ns1!" "!np1!" "!nc1!" "!b!" "!d!"
+    call :three_ext_last "!ns1!" "!nc1!" "!np1!" "!b!" "!d!"
+    call :three_ext_last "!nc1!" "!ns1!" "!np1!" "!b!" "!d!"
+    call :three_ext_last "!nc1!" "!np1!" "!ns1!" "!b!" "!d!"
+    call :three_ext_last "!np1!" "!nc1!" "!ns1!" "!b!" "!d!"
+    call :three_ext_last "!np1!" "!ns1!" "!nc1!" "!b!" "!d!"
+
+    
+    call :three_ext_last "!is1!" "!np1!" "!ic1!" "!b!" "!d!"
+    call :three_ext_last "!is1!" "!nc1!" "!ip1!" "!b!" "!d!"
+    call :three_ext_last "!ic1!" "!ns1!" "!ip1!" "!b!" "!d!"
+    call :three_ext_last "!ic1!" "!np1!" "!is1!" "!b!" "!d!"
+    call :three_ext_last "!ip1!" "!nc1!" "!is1!" "!b!" "!d!"
+    call :three_ext_last "!ip1!" "!ns1!" "!ic1!" "!b!" "!d!"
+
+    
+    call :three_ext_last "!ns1!" "!ip1!" "!nc1!" "!b!" "!d!"
+    call :three_ext_last "!ns1!" "!ic1!" "!np1!" "!b!" "!d!"
+    call :three_ext_last "!nc1!" "!is1!" "!np1!" "!b!" "!d!"
+    call :three_ext_last "!nc1!" "!ip1!" "!ns1!" "!b!" "!d!"
+    call :three_ext_last "!np1!" "!ic1!" "!ns1!" "!b!" "!d!"
+    call :three_ext_last "!np1!" "!is1!" "!nc1!" "!b!" "!d!"
     endlocal
 exit /b
 
@@ -201,112 +248,218 @@ exit /b
     set "bridge=%~4"
     set "ext=%~5"
 
-    call "funcs_rom_keywords.bat" :start "!one!!two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!three!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two! !three!!ext!"
     
-    call "funcs_rom_keywords.bat" :start "!one! !two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two! !three! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one!!two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two! !three! !ext!"
     
-    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two! !three! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one!!bridge! !two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !three! !ext!"
 
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !three!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !three!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !three! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one!!bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three!!bridge!!ext!"
     
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!!ext!"
 
     rem --
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!!ext!"
 
     rem --
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two!!bridge! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge!!two! !bridge!!three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three! !bridge!!ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge! !ext!"
 
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
-    call "funcs_rom_keywords.bat" :start "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge! !ext!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!!ext!"
 
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!three!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two! !three!"
+    
+    call "funcs_last_char.bat" :find_last_char "" "!one! !two! !three!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two! !three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!two! !thre!"
+    
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two! !three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two! !three!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge! !two! !three!"
+
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !three!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !three!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one!!bridge!!two!!three!!bridge!"
+    
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!"
+
+    rem --
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two!!three! !bridge!"
+
+    rem --
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two!!bridge! !three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge!!two! !bridge!!three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
+
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three!!bridge!"
+    call "funcs_last_char.bat" :find_last_char "" "!one! !bridge! !two! !bridge! !three! !bridge!"
 
 
 
