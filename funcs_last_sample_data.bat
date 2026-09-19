@@ -53,37 +53,12 @@ goto :eof
     set "d=.d88"
     set "b=BRIDGE"
 
-    rem call "funcs_rom_keywords.bat" :start "!d!"
-    call :one_ext_last "!ip1!" "!b!" "!d!"
-    call :one_ext_last "!np1!" "!b!" "!d!"
-    call :one_ext_last "!ic1!" "!b!" "!d!"
-    call :one_ext_last "!nc1!" "!b!" "!d!"
-    call :one_ext_last "!is1!" "!b!" "!d!"
-    call :one_ext_last "!ns1!" "!b!" "!d!"
-    rem exit /b
-    rem call :one_ext_last "!p!" "!b!" "!d!"
-    
 
-    rem call :one_ext_last "!c!" "!b!" "!d!"
-    call :two_ext_last "!ip1!" "!ic1!" "!b!" "!d!"
-    call :two_ext_last "!ic1!" "!ip1!" "!b!" "!d!"
-    call :two_ext_last "!ip1!" "!is1!" "!b!" "!d!"
-    call :two_ext_last "!is1!" "!ip1!" "!b!" "!d!"
-    call :two_ext_last "!is1!" "!ic1!" "!b!" "!d!"
-    call :two_ext_last "!ic1!" "!is1!" "!b!" "!d!"
+    rem call :all_ones
+    call :all_twos
+
+
     exit /b
-
-    call :two_ext_last "!s!" "!p!" "!b!" "!d!"
-    call :two_ext_last "!s!" "!c!" "!b!" "!d!"
-    
-    call :two_ext_last "!p!" "!s!" "!b!" "!d!"
-    
-    call :two_ext_last "!p!" "!c!" "!b!" "!d!"
-    
-    call :two_ext_last "!c!" "!p!" "!b!" "!d!"
-    
-    call :two_ext_last "!c!" "!s!" "!b!" "!d!"
-
     
     call :three_ext_last "!s!" "!p!" "!c!" "!b!" "!d!"
     
@@ -100,6 +75,19 @@ goto :eof
     call :three_ext_last "!c!" "!p!" "!s!" "!b!" "!d!"
     
 
+
+    endlocal
+exit /b
+
+
+:all_ones
+    setlocal
+    call :one_ext_last "!ip1!" "!b!" "!d!"
+    call :one_ext_last "!np1!" "!b!" "!d!"
+    call :one_ext_last "!ic1!" "!b!" "!d!"
+    call :one_ext_last "!nc1!" "!b!" "!d!"
+    call :one_ext_last "!is1!" "!b!" "!d!"
+    call :one_ext_last "!ns1!" "!b!" "!d!"
 
     endlocal
 exit /b
@@ -125,6 +113,40 @@ exit /b
     
 
     
+    endlocal
+exit /b
+
+
+:all_twos
+    setlocal
+    call :two_ext_last "!ip1!" "!ic1!" "!b!" "!d!"
+    call :two_ext_last "!ic1!" "!ip1!" "!b!" "!d!"
+    call :two_ext_last "!ip1!" "!is1!" "!b!" "!d!"
+    call :two_ext_last "!is1!" "!ip1!" "!b!" "!d!"
+    call :two_ext_last "!is1!" "!ic1!" "!b!" "!d!"
+    call :two_ext_last "!ic1!" "!is1!" "!b!" "!d!"
+
+    call :two_ext_last "!np1!" "!nc1!" "!b!" "!d!"
+    call :two_ext_last "!nc1!" "!np1!" "!b!" "!d!"
+    call :two_ext_last "!np1!" "!ns1!" "!b!" "!d!"
+    call :two_ext_last "!ns1!" "!np1!" "!b!" "!d!"
+    call :two_ext_last "!ns1!" "!nc1!" "!b!" "!d!"
+    call :two_ext_last "!nc1!" "!ns1!" "!b!" "!d!"
+
+    call :two_ext_last "!np1!" "!ic1!" "!b!" "!d!"
+    call :two_ext_last "!nc1!" "!ip1!" "!b!" "!d!"
+    call :two_ext_last "!np1!" "!is1!" "!b!" "!d!"
+    call :two_ext_last "!ns1!" "!ip1!" "!b!" "!d!"
+    call :two_ext_last "!ns1!" "!ic1!" "!b!" "!d!"
+    call :two_ext_last "!nc1!" "!is1!" "!b!" "!d!"
+
+    call :two_ext_last "!ip1!" "!nc1!" "!b!" "!d!"
+    call :two_ext_last "!ic1!" "!np1!" "!b!" "!d!"
+    call :two_ext_last "!ip1!" "!ns1!" "!b!" "!d!"
+    call :two_ext_last "!is1!" "!np1!" "!b!" "!d!"
+    call :two_ext_last "!is1!" "!nc1!" "!b!" "!d!"
+    call :two_ext_last "!ic1!" "!ns1!" "!b!" "!d!"
+
     endlocal
 exit /b
 
