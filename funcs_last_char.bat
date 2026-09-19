@@ -349,18 +349,49 @@ exit /b
 
     call :the_last "!last_char!"
 
-
+    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!"
 
 
     endlocal
 exit /b
 
-:last_char_filter
+:verify_lc
     setlocal
-    set "left_char=%~1"
-    set "phrase=%~2"
-    set "end_mark=%~3"
-    rem set "old_item="
+    set "token=%~1"
+    set "right_c=%~2"
+    set "phrase=%~3"
+    set "end_mark=%~4"
+
+    set item=
+    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    
+
+    if "!item!" equ ".d88!end_mark!" (
+        echo PASSED
+        exit /b
+    )
+    if "!item!" equ "!end_mark!" (
+        echo PASSED
+        exit /b
+    )
+
+    if "!item!" equ " " (
+        rem If this has been achieved, we failed to find
+        rem     the correct the last character, because
+        rem     the above "correct conditions" were not 
+        rem     achieved (we found a string containing the 
+        rem     the end mark, but that end mark is preceeded
+        rem     with the actual last character in the string).
+        echo FAIL
+        exit /b
+    )
+
+    set /a token+=1
+    call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!"
 
     endlocal
 exit /b
@@ -402,7 +433,7 @@ exit /b
      rem echo read ITEM "!item!" 
      rem echo END MARK "!end_mark!"
     if "!item!" neq "!oi!" (
-        echo NEQ "!right_c!"
+        rem echo NEQ "!right_c!"
         set "item=!item!!end_mark!"
         echo !item! > "old_item.txt"
         exit /b
