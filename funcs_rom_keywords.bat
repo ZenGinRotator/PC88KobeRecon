@@ -1310,7 +1310,8 @@ exit /b
 :delim_with_char
     setlocal
     rem %~1: token
-    rem %~2: delim char (eg. [, (, {, ], ), or })
+    rem %~2: delim char 
+    rem (eg. [, (, {, ], ), or })
     set "phrase=%~3"
      rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
     set d=

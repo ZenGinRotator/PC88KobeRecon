@@ -168,7 +168,9 @@ call :v_bar "!isp_none!" "|"
 rem call :all_bridges
 rem call :no_bridges
 rem call :neighb
-call :samples
+rem call :run_samples
+rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
+call "funcs_last_sample_data.bat" :last_char
 ECHO ---- DONE ----
 
 PAUSE
@@ -310,7 +312,7 @@ exit /b
     REM call :none ""
     REM call :none ".d88"
      rem call :same ""
-     call :same ".d88"
+     rem call :same ".d88"
      rem call :alternating ""
      rem call :alternating ".d88"
     endlocal

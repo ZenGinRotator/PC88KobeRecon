@@ -1,3 +1,8 @@
+set delimtxt=delimited.txt
+set brk=^
+
+
+
 call %*
 
 goto :eof
@@ -252,5 +257,177 @@ exit /b
     set "chars=!prime!|!optn1!|!optn2!|"
     echo !chars! > "chars.txt"
 
+    endlocal
+exit /b
+
+:find_last_char
+    setlocal
+    set "delim_chars=%~1"
+    set "phrase=%~2"
+
+
+    set prime_l=
+    set prime_r=
+    set optn1_l=
+    set optn1_r=
+    set optn2_l=
+    set optn2_r=
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "prime_l=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "prime_r=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "optn1_l=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "optn1_r=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "optn2_l=%%i"
+    )
+    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
+        set "optn2_r=%%i"
+    )
+    echo "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" --------------------------------------------NAME "!phrase!"----
+
+    rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
+    rem     or to indicate the end of a bridge
+    rem In both instances, we need to find the last character in the name/bridge
+    set "end_mark=#"
+    set "phrase=!phrase!!end_mark!"
+    
+    
+    
+    if exist old_item.txt ( del old_item.txt )
+
+
+
+
+    set read_item=
+    set last_char=
+    call :recurse_to_end "1" ")" "!phrase!" "" "!end_mark!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "read_item=%%i"
+    )
+
+    
+    if "!old_item!" neq "!phrase!" (
+        set "last_char=)"
+    )
+
+
+
+
+
+    call :recurse_to_end "1" "}" "!read_item!" "" "!end_mark!"
+    set "old_item=!read_item!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "read_item=%%i"
+    )
+    if "!read_item!" neq "!old_item!" (
+        set "last_char=}"
+    )
+
+
+
+
+    set "old_item=!read_item!"
+    call :recurse_to_end "1" "]" "!old_item!" "" "!end_mark!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "read_item=%%i"
+    )
+
+    if "!read_item!" neq "!old_item!" (
+        set "last_char=]"
+    )
+
+
+
+
+
+    call :the_last "!last_char!"
+
+
+
+
+    endlocal
+exit /b
+
+:last_char_filter
+    setlocal
+    set "left_char=%~1"
+    set "phrase=%~2"
+    set "end_mark=%~3"
+    rem set "old_item="
+
+    endlocal
+exit /b
+
+:the_last
+    setlocal
+    set "last_char=%~1"
+    echo =================================================== LAST CHAR "!last_char!"
+    endlocal
+exit /b
+
+:recurse_to_end
+    setlocal
+    set "token=%~1"
+    set "right_c=%~2"
+    set "phrase=%~3"
+    set "old_item=%~4"
+    set "end_mark=%~5"
+
+    if "!phrase!" equ "" (
+        exit /b
+    )
+
+    set item=
+    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+     
+    rem echo RIGHT_C "!right_c!"
+    rem echo OLD ITEM "!old_item!"
+
+    set "oi=!item!"
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!end_mark!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+     rem echo OI "!oi!"
+     rem echo read ITEM "!item!" 
+     rem echo END MARK "!end_mark!"
+    if "!item!" neq "!oi!" (
+        echo NEQ "!right_c!"
+        set "item=!item!!end_mark!"
+        echo !item! > "old_item.txt"
+        exit /b
+    )
+    
+
+rem    if "!item!" equ " " (
+        
+  rem      echo BLANK "!right_c!"
+     rem   set "old_item=!old_item!|"
+       rem echo !old_item! > "old_item.txt"
+       rem exit /b
+   rem )
+    rem if "!item!" equ "!phrase!" (
+       
+       rem echo PHRASE "!right_c!"
+        rem ECHO ITEM IS "!item!"
+       rem set "old_item=!item!|"
+       rem echo !old_item! > "old_item.txt"
+       rem exit /b
+   rem )
+
+
+
+    set /a token+=1
+    call :recurse_to_end "!token!" "!right_c!" "!phrase!" "!item!" "!end_mark!"
     endlocal
 exit /b
