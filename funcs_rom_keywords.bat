@@ -2208,6 +2208,13 @@ exit /b
 exit /b
 
 
+
+rem Function to count the number of optioned encapsulators
+rem Unsure if we will use this function -- might use to see
+rem     if we need to recurse across all option encapsulators
+rem     within a given bridge, and depending on the number of 
+rem     all optional encapsulators, determine the last optional
+rem     encapsulator in the bridge (or not).
 :count_optn
     setlocal
     set "delim_chars=%~1"
