@@ -170,7 +170,10 @@ rem call :no_bridges
 rem call :neighb
 rem call :run_samples
 rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
-call "funcs_last_sample_data.bat" :last_char
+rem call "funcs_last_sample_data.bat" :last_char
+call "funcs_bridge_sample_data.bat" :hard_code
+call "funcs_bridge_sample_data.bat" :soft_code
+call "funcs_bridge_sample_data.bat" :hard_vs_soft
 ECHO ---- DONE ----
 
 PAUSE

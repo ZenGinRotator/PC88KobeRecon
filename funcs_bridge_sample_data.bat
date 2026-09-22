@@ -1,4 +1,6 @@
+setlocal EnableDelayedExpansion 
 
+set "np1=(P1.0 + (P1.1 +) (P1.2 +) P1.n +)"
 set "np2=(P2.0 + (P2.1 +) (P2.2 +) P2.n +)"
 set "np3=(P3.0 + (P3.1 +) (P3.2 +) P3.n +)"
 rem (P1.0 + (P1.1 +) (P1.2 +) P1.N +)
@@ -36,6 +38,8 @@ set "b2=B2"
 set "b3=B3"
 set "b4=B4"
 
+set brk=^
+
 
 
 call %*
@@ -43,186 +47,765 @@ call %*
 goto :eof
 
 
-:run
+:soft_code
     setlocal
-    rem c, p, s
-    rem P: c 
-    "!nc1!" "!nc2!" "!np1!" "!np2!" "!np3!"
-    "!nc1!" "!nc2!" "!ns1!" "!ns2!" "!ns3!"
 
-    "!np1!" "!np2!" "!ns1!" "!ns2!" "!ns3!"
-    "!np1!" "!np2!" "!nc1!" "!nc2!" "!nc3!"
+    if exist soft.txt ( del soft.txt )
+    call :soft_with_last_encap
+    rem exit /b
+    call :soft_without_last_encap
+    endlocal
+exit /b
 
-    "!ns1!" "!ns2!" "!nc1!" "!nc2!" "!nc3!"
-    "!ns1!" "!ns2!" "!np1!" "!np2!" "!np3!"
+:soft_with_last_encap
+    setlocal
+    
+    call :begin "nc" "T" "np" "0"
+    call :begin "nc" "T" "ns" "0"
 
-    "!ip1!" "!ip2!" "!ic1!" "!ic2!" "!ic3!"
-    "!ip1!" "!ip2!" "!is1!" "!is2!" "!is3!"
+    call :begin "np" "T" "ns" "0"
+    call :begin "np" "T" "nc" "0"
 
-    "!is1!" "!is2!" "!ip1!" "!ip2!" "!ip3!"
-    "!is1!" "!is2!" "!ic1!" "!ic2!" "!ic3!"
+    call :begin "ns" "T" "nc" "0"
+    call :begin "ns" "T" "np" "0"
 
-    "!ic1!" "!ic2!" "!ip1!" "!ip2!" "!ip3!"
-    "!ic1!" "!ic2!" "!is1!" "!is2!" "!is3!"
+    call :begin "ip" "T" "ic" "0"
+    call :begin "ip" "T" "is" "0"
+
+    call :begin "is" "T" "ip" "0"
+    call :begin "is" "T" "ic" "0"
+
+    call :begin "ic" "T" "ip" "0"
+    call :begin "ic" "T" "is" "0"
+
+ECHO ---
+
+
+
+    call :begin "nc" "T" "np" "1"
+    call :begin "nc" "T" "ns" "1"
+
+    call :begin "np" "T" "ns" "1"
+    call :begin "np" "T" "nc" "1"
+
+    call :begin "ns" "T" "nc" "1"
+    call :begin "ns" "T" "np" "1"
+
+    call :begin "ip" "T" "ic" "1"
+    call :begin "ip" "T" "is" "1"
+
+    call :begin "is" "T" "ip" "1"
+    call :begin "is" "T" "ic" "1"
+
+    call :begin "ic" "T" "ip" "1"
+    call :begin "ic" "T" "is" "1"
+rem exit /b
+
+ECHO ---
+
+    call :begin "nc" "T" "np" "2"
+    call :begin "nc" "T" "ns" "2"
+    
+    call :begin "np" "T" "ns" "2"
+    call :begin "np" "T" "nc" "2"
+    
+    call :begin "ns" "T" "nc" "2"
+    call :begin "ns" "T" "np" "2"
+
+    call :begin "ip" "T" "ic" "2"
+    call :begin "ip" "T" "is" "2"
+
+    call :begin "is" "T" "ip" "2"
+    call :begin "is" "T" "ic" "2"
+    
+    call :begin "ic" "T" "ip" "2"
+    call :begin "ic" "T" "is" "2"
+
+
+    ECHO ---
+
+    call :begin "nc" "T" "np" "3"
+    call :begin "nc" "T" "ns" "3"
+
+
+    call :begin "np" "T" "ns" "3"
+    call :begin "np" "T" "nc" "3"
+    
+    call :begin "ns" "T" "nc" "3"
+    call :begin "ns" "T" "np" "3"
+
+    call :begin "ip" "T" "ic" "3"
+    call :begin "ip" "T" "is" "3"
+
+    call :begin "is" "T" "ip" "3"
+    call :begin "is" "T" "ic" "3"
+    
+    call :begin "ic" "T" "ip" "3"
+    call :begin "ic" "T" "is" "3"
+    ECHO ---
+    endlocal
+exit /b
+
+
+
+
+
+:soft_without_last_encap
+    setlocal
+
+    call :begin "nc" "" "np" "0"
+    call :begin "nc" "" "ns" "0"
+
+    call :begin "np" "" "ns" "0"
+    call :begin "np" "" "nc" "0"
+
+    call :begin "ns" "" "nc" "0"
+    call :begin "ns" "" "np" "0"
+
+    call :begin "ip" "" "ic" "0"
+    call :begin "ip" "" "is" "0"
+
+    call :begin "is" "" "ip" "0"
+    call :begin "is" "" "ic" "0"
+
+    call :begin "ic" "" "ip" "0"
+    call :begin "ic" "" "is" "0"
+
+ECHO ---
+
+
+
+    call :begin "nc" "" "np" "1"
+    call :begin "nc" "" "ns" "1"
+
+    call :begin "np" "" "ns" "1"
+    call :begin "np" "" "nc" "1"
+
+    call :begin "ns" "" "nc" "1"
+    call :begin "ns" "" "np" "1"
+
+    call :begin "ip" "" "ic" "1"
+    call :begin "ip" "" "is" "1"
+
+    call :begin "is" "" "ip" "1"
+    call :begin "is" "" "ic" "1"
+
+    call :begin "ic" "" "ip" "1"
+    call :begin "ic" "" "is" "1"
+
+ECHO ---
+
+
+    call :begin "nc" "" "np" "2"
+    call :begin "nc" "" "ns" "2"
+    
+    call :begin "np" "" "ns" "2"
+    call :begin "np" "" "nc" "2"
+    
+    call :begin "ns" "" "nc" "2"
+    call :begin "ns" "" "np" "2"
+
+    call :begin "ip" "" "ic" "2"
+    call :begin "ip" "" "is" "2"
+
+    call :begin "is" "" "ip" "2"
+    call :begin "is" "" "ic" "2"
+    
+    call :begin "ic" "" "ip" "2"
+    call :begin "ic" "" "is" "2"
+
+    ECHO ---
+
+    
+    call :begin "nc" "" "np" "3"
+    call :begin "nc" "" "ns" "3"
+    
+    call :begin "np" "" "ns" "3"
+    call :begin "np" "" "nc" "3"
+    
+    call :begin "ns" "" "nc" "3"
+    call :begin "ns" "" "np" "3"
+
+    call :begin "ip" "" "ic" "3"
+    call :begin "ip" "" "is" "3"
+
+    call :begin "is" "" "ip" "3"
+    call :begin "is" "" "ic" "3"
+    
+    call :begin "ic" "" "ip" "3"
+    call :begin "ic" "" "is" "3"
+    endlocal
+exit /b
+
+
+
+
+
+:begin
+    setlocal
+    
+    rem flags:
+    rem     primary encapsulators (aty=2)
+    rem         nested or indiv
+    rem     optional encapsulators (qty=3)
+    rem         nested or indiv
+    rem     primary encapsulator # 2 -- filled or empty
+
+    rem "nc"
+
+    rem  "0-p2(filled)/1-p2(empty)" 
+    
+    rem "np/ns"
+    
+    rem "0-same optional encap (all n or all i)
+    rem 1-change nth optioanl encap to its opposite
+    rem if n -> i"
+    rem if i -> n""
+
+    set "ptype=%~1"
+    set "pfill=%~2"
+    set "otype=%~3"
+
+    rem numerical value
+    set "o_invert=%~4"
+
+
+
+    rem block if n is in primary and n is in options
+    if "!ptype!" equ "!otype!" (
+        echo SAME PRIME AND SAME OPTION
+        pause
+        exit /b
+    )
+
+
+    set "prime1=!nc1!"
+    set "prime2=!nc2!"
+
+    rem nc np ns ic ip is
+
+    if "!ptype!" equ "np" (
+        set "prime1=!np1!"
+        set "prime2=!np2!"
+    )
+
+    if "!ptype!" equ "ns" (
+        set "prime1=!ns1!"
+        set "prime2=!ns2!"
+
+    )
+    if "!ptype!" equ "ip" (
+        set "prime1=!ip1!"
+        set "prime2=!ip2!"
+        
+    )
+    if "!ptype!" equ "ic" (
+        set "prime1=!ic1!"
+        set "prime2=!ic2!"
+        
+    )
+    if "!ptype!" equ "is" (
+        set "prime1=!is1!"
+        set "prime2=!is2!"
+        
+    )
+
+    if "!pfill!" equ "" (
+        set prime2=
+    )
+
+    set "o1=!nc1!"
+    set "o2=!nc2!"
+    set "o3=!nc3!"
+
+    if "!otype!" equ "np" (
+        set "o1=!np1!"
+        set "o2=!np2!"
+        set "o3=!np3!"
+    )
+    if "!otype!" equ "ns" (
+        set "o1=!ns1!"
+        set "o2=!ns2!"
+        set "o3=!ns3!"
+    )
+    if "!otype!" equ "ic" (
+        set "o1=!ic1!"
+        set "o2=!ic2!"
+        set "o3=!ic3!"
+    )
+    if "!otype!" equ "ip" (
+        set "o1=!ip1!"
+        set "o2=!ip2!"
+        set "o3=!ip3!"
+    )
+    if "!otype!" equ "is" (
+        set "o1=!is1!"
+        set "o2=!is2!"
+        set "o3=!is3!"
+    )
+
+    rem invert n -> i or i -> n but always retain c, s, p
+    if "!o_invert!" equ "1" (
+    
+        call :invert_o "!o1!"
+        for /f "tokens=1 delims=|" %%i in (inverted.txt) do (
+            set "o1=%%i"
+        )
+    ) 
+
+    if "!o_invert!" equ "2" (
+    
+        call :invert_o "!o2!"
+        for /f "tokens=1 delims=|" %%i in (inverted.txt) do (
+            set "o2=%%i"
+        )
+
+
+    ) 
+
+    if "!o_invert!" equ "3" (
+    
+        call :invert_o "!o3!"
+        for /f "tokens=1 delims=|" %%i in (inverted.txt) do (
+            set "o3=%%i"
+        )
+    ) 
+
+    call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+
+    endlocal
+exit /b
+
+
+
+
+
+
+
+:hard_vs_soft
+    setlocal
+   
+   
+    set r=
+    set /a qh=0
+
+    for %%i in ("hard\*") do (
+        set /a qh+=1
+        set "r=%%i"
+        set itm=
+        for /f "tokens=2 delims=\" %%i in ("!r!") do (
+            set "itm=%%i"
+                
+        )
+
+        if exist "soft\!itm!" (
+            del "soft\!itm!"
+            rem del "hard\!itm!"
+            
+        )
+        
+    )
+    set /a s=0
+    set /a h=0
+    for /d %%i in ("soft\*") do (
+        set /a s=!s!+1
+    )
+    for /d %%i in ("hard\*") do (
+        set /a h=!h!+1
+    )
+
+
+    if "!h!" equ "0" (
+       rd "hard\"
+    )
+    if "!s!" equ "0" (
+       rd "soft\"
+    )
+   
+    endlocal
+exit /b
+
+:hard_code
+    setlocal
+    if exist hard.txt ( del hard.txt )
+
+  
+    call :hard_with_last_encap
+    rem EXIT /B
+
+    call :hard_without_last_encap
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+:hard_with_last_encap
+    setlocal
+
+    call :write "!nc1!" "!nc2!" "!np1!" "!np2!" "!np3!" ""
+  call :write "!nc1!" "!nc2!" "!ns1!" "!ns2!" "!ns3!" ""
+
+  call :write "!np1!" "!np2!" "!ns1!" "!ns2!" "!ns3!" ""
+  call :write   "!np1!" "!np2!" "!nc1!" "!nc2!" "!nc3!" ""
+
+   call :write  "!ns1!" "!ns2!" "!nc1!" "!nc2!" "!nc3!" ""
+   call :write  "!ns1!" "!ns2!" "!np1!" "!np2!" "!np3!" ""
+
+   call :write  "!ip1!" "!ip2!" "!ic1!" "!ic2!" "!ic3!" ""
+   call :write  "!ip1!" "!ip2!" "!is1!" "!is2!" "!is3!" ""
+
+  call :write   "!is1!" "!is2!" "!ip1!" "!ip2!" "!ip3!" ""
+   call :write  "!is1!" "!is2!" "!ic1!" "!ic2!" "!ic3!" ""
+
+   call :write  "!ic1!" "!ic2!" "!ip1!" "!ip2!" "!ip3!" ""
+   call :write  "!ic1!" "!ic2!" "!is1!" "!is2!" "!is3!" ""
+   
+
+
+
+
+  call :write   "!nc1!" "!nc2!" "!ip1!" "!np2!" "!np3!" ""
+  call :write   "!nc1!" "!nc2!" "!is1!" "!ns2!" "!ns3!" ""
+
+  call :write   "!np1!" "!np2!" "!is1!" "!ns2!" "!ns3!" ""
+   call :write  "!np1!" "!np2!" "!ic1!" "!nc2!" "!nc3!" ""
+
+  call :write   "!ns1!" "!ns2!" "!ic1!" "!nc2!" "!nc3!" ""
+  call :write   "!ns1!" "!ns2!" "!ip1!" "!np2!" "!np3!" ""
+
+   call :write  "!ip1!" "!ip2!" "!nc1!" "!ic2!" "!ic3!" ""
+   call :write  "!ip1!" "!ip2!" "!ns1!" "!is2!" "!is3!" ""
+
+  call :write   "!is1!" "!is2!" "!np1!" "!ip2!" "!ip3!" ""
+  call :write   "!is1!" "!is2!" "!nc1!" "!ic2!" "!ic3!" ""
+
+   call :write  "!ic1!" "!ic2!" "!np1!" "!ip2!" "!ip3!" ""
+   call :write  "!ic1!" "!ic2!" "!ns1!" "!is2!" "!is3!" ""
+
+
+
+
+
+
+   call :write  "!nc1!" "!nc2!" "!np1!" "!ip2!" "!np3!" ""
+   call :write  "!nc1!" "!nc2!" "!ns1!" "!is2!" "!ns3!" ""
+
+   call :write  "!np1!" "!np2!" "!ns1!" "!is2!" "!ns3!" ""
+   call :write  "!np1!" "!np2!" "!nc1!" "!ic2!" "!nc3!" ""
+
+   call :write  "!ns1!" "!ns2!" "!nc1!" "!ic2!" "!nc3!" ""
+   call :write  "!ns1!" "!ns2!" "!np1!" "!ip2!" "!np3!" ""
+
+  call :write   "!ip1!" "!ip2!" "!ic1!" "!nc2!" "!ic3!" ""
+  call :write   "!ip1!" "!ip2!" "!is1!" "!ns2!" "!is3!" ""
+
+  call :write   "!is1!" "!is2!" "!ip1!" "!np2!" "!ip3!" ""
+  call :write   "!is1!" "!is2!" "!ic1!" "!nc2!" "!ic3!" ""
+
+   call :write  "!ic1!" "!ic2!" "!ip1!" "!np2!" "!ip3!" ""
+   call :write  "!ic1!" "!ic2!" "!is1!" "!ns2!" "!is3!" ""
+
+
+
+
+
+
+
+REM 37
+   call :write  "!nc1!" "!nc2!" "!np1!" "!np2!" "!ip3!" ""
+   call :write  "!nc1!" "!nc2!" "!ns1!" "!ns2!" "!is3!" ""
+
+   call :write  "!np1!" "!np2!" "!ns1!" "!ns2!" "!is3!" ""
+  call :write "!np1!" "!np2!" "!nc1!" "!nc2!" "!ic3!" ""
+
+   call :write  "!ns1!" "!ns2!" "!nc1!" "!nc2!" "!ic3!" ""
+   call :write  "!ns1!" "!ns2!" "!np1!" "!np2!" "!ip3!" ""
+
+   call :write  "!ip1!" "!ip2!" "!ic1!" "!ic2!" "!nc3!" ""
+   call :write  "!ip1!" "!ip2!" "!is1!" "!is2!" "!ns3!" ""
+
+   call :write  "!is1!" "!is2!" "!ip1!" "!ip2!" "!np3!" ""
+   call :write  "!is1!" "!is2!" "!ic1!" "!ic2!" "!nc3!" ""
+
+   call :write  "!ic1!" "!ic2!" "!ip1!" "!ip2!" "!np3!" ""
+   call :write  "!ic1!" "!ic2!" "!is1!" "!is2!" "!ns3!" ""
+    endlocal
+exit /b
+
+
+
+
+
+:hard_without_last_encap
+    setlocal
+
+   call :write  "!nc1!" "" "!np1!" "!np2!" "!np3!" ""
+   call :write  "!nc1!" "" "!ns1!" "!ns2!" "!ns3!" ""
+
+   call :write  "!np1!" "" "!ns1!" "!ns2!" "!ns3!" ""
+   call :write  "!np1!" "" "!nc1!" "!nc2!" "!nc3!" ""
+
+   call :write  "!ns1!" "" "!nc1!" "!nc2!" "!nc3!" ""
+  call :write   "!ns1!" "" "!np1!" "!np2!" "!np3!" ""
+
+  call :write   "!ip1!" "" "!ic1!" "!ic2!" "!ic3!" ""
+  call :write   "!ip1!" "" "!is1!" "!is2!" "!is3!" ""
+
+  call :write   "!is1!" "" "!ip1!" "!ip2!" "!ip3!" ""
+  call :write   "!is1!" "" "!ic1!" "!ic2!" "!ic3!" ""
+
+  call :write   "!ic1!" "" "!ip1!" "!ip2!" "!ip3!" ""
+  call :write   "!ic1!" "" "!is1!" "!is2!" "!is3!" ""
     
 
 
 
 
-    "!nc1!" "!nc2!" "!ip1!" "!np2!" "!np3!"
-    "!nc1!" "!nc2!" "!is1!" "!ns2!" "!ns3!"
-
-    "!np1!" "!np2!" "!is1!" "!ns2!" "!ns3!"
-    "!np1!" "!np2!" "!ic1!" "!nc2!" "!nc3!"
-
-    "!ns1!" "!ns2!" "!ic1!" "!nc2!" "!nc3!"
-    "!ns1!" "!ns2!" "!ip1!" "!np2!" "!np3!"
-
-    "!ip1!" "!ip2!" "!nc1!" "!ic2!" "!ic3!"
-    "!ip1!" "!ip2!" "!ns1!" "!is2!" "!is3!"
-
-    "!is1!" "!is2!" "!np1!" "!ip2!" "!ip3!"
-    "!is1!" "!is2!" "!nc1!" "!ic2!" "!ic3!"
-
-    "!ic1!" "!ic2!" "!np1!" "!ip2!" "!ip3!"
-    "!ic1!" "!ic2!" "!ns1!" "!is2!" "!is3!"
 
 
 
+   call :write  "!nc1!" "" "!ip1!" "!np2!" "!np3!" ""
+   call :write  "!nc1!" "" "!is1!" "!ns2!" "!ns3!" ""
 
-    "!nc1!" "!nc2!" "!np1!" "!ip2!" "!np3!"
-    "!nc1!" "!nc2!" "!ns1!" "!is2!" "!ns3!"
+   call :write  "!np1!" "" "!is1!" "!ns2!" "!ns3!" ""
+   call :write  "!np1!" "" "!ic1!" "!nc2!" "!nc3!" ""
 
-    "!np1!" "!np2!" "!ns1!" "!is2!" "!ns3!"
-    "!np1!" "!np2!" "!nc1!" "!ic2!" "!nc3!"
+   call :write  "!ns1!" "" "!ic1!" "!nc2!" "!nc3!" ""
+   call :write  "!ns1!" "" "!ip1!" "!np2!" "!np3!" ""
 
-    "!ns1!" "!ns2!" "!nc1!" "!ic2!" "!nc3!"
-    "!ns1!" "!ns2!" "!np1!" "!ip2!" "!np3!"
+   call :write  "!ip1!" "" "!nc1!" "!ic2!" "!ic3!" ""
+call :write     "!ip1!" "" "!ns1!" "!is2!" "!is3!" ""
 
-    "!ip1!" "!ip2!" "!ic1!" "!nc2!" "!ic3!"
-    "!ip1!" "!ip2!" "!is1!" "!ns2!" "!is3!"
+call :write     "!is1!" "" "!np1!" "!ip2!" "!ip3!" ""
+call :write     "!is1!" "" "!nc1!" "!ic2!" "!ic3!" ""
 
-    "!is1!" "!is2!" "!ip1!" "!np2!" "!ip3!"
-    "!is1!" "!is2!" "!ic1!" "!nc2!" "!ic3!"
-
-    "!ic1!" "!ic2!" "!ip1!" "!np2!" "!ip3!"
-    "!ic1!" "!ic2!" "!is1!" "!ns2!" "!is3!"
-
-
-
-    "!nc1!" "!nc2!" "!np1!" "!np2!" "!ip3!"
-    "!nc1!" "!nc2!" "!ns1!" "!ns2!" "!is3!"
-
-    "!np1!" "!np2!" "!ns1!" "!ns2!" "!is3!"
-    "!np1!" "!np2!" "!nc1!" "!nc2!" "!ic3!"
-
-    "!ns1!" "!ns2!" "!nc1!" "!nc2!" "!ic3!"
-    "!ns1!" "!ns2!" "!np1!" "!np2!" "!ip3!"
-
-    "!ip1!" "!ip2!" "!ic1!" "!ic2!" "!nc3!"
-    "!ip1!" "!ip2!" "!is1!" "!is2!" "!ns3!"
-
-    "!is1!" "!is2!" "!ip1!" "!ip2!" "!np3!"
-    "!is1!" "!is2!" "!ic1!" "!ic2!" "!nc3!"
-
-    "!ic1!" "!ic2!" "!ip1!" "!ip2!" "!np3!"
-    "!ic1!" "!ic2!" "!is1!" "!is2!" "!ns3!"
+  call :write   "!ic1!" "" "!np1!" "!ip2!" "!ip3!" ""
+  call :write   "!ic1!" "" "!ns1!" "!is2!" "!is3!" ""
 
 
 
 
+   call :write  "!nc1!" "" "!np1!" "!ip2!" "!np3!" ""
+    call :write "!nc1!" "" "!ns1!" "!is2!" "!ns3!" ""
+
+    call :write "!np1!" "" "!ns1!" "!is2!" "!ns3!" ""
+   call :write  "!np1!" "" "!nc1!" "!ic2!" "!nc3!" ""
+
+   call :write  "!ns1!" "" "!nc1!" "!ic2!" "!nc3!" ""
+   call :write  "!ns1!" "" "!np1!" "!ip2!" "!np3!" ""
+
+    call :write "!ip1!" "" "!ic1!" "!nc2!" "!ic3!" ""
+    call :write "!ip1!" "" "!is1!" "!ns2!" "!is3!" ""
+
+    call :write "!is1!" "" "!ip1!" "!np2!" "!ip3!" ""
+    call :write "!is1!" "" "!ic1!" "!nc2!" "!ic3!" ""
+
+    call :write "!ic1!" "" "!ip1!" "!np2!" "!ip3!" ""
+    call :write "!ic1!" "" "!is1!" "!ns2!" "!is3!" ""
+
+
+
+    call :write "!nc1!" "" "!np1!" "!np2!" "!ip3!" ""
+    call :write "!nc1!" "" "!ns1!" "!ns2!" "!is3!" ""
+
+    call :write "!np1!" "" "!ns1!" "!ns2!" "!is3!" ""
+    call :write "!np1!" "" "!nc1!" "!nc2!" "!ic3!" ""
+
+    call :write "!ns1!" "" "!nc1!" "!nc2!" "!ic3!" ""
+    call :write "!ns1!" "" "!np1!" "!np2!" "!ip3!" ""
+
+    call :write "!ip1!" "" "!ic1!" "!ic2!" "!nc3!" ""
+    call :write "!ip1!" "" "!is1!" "!is2!" "!ns3!" ""
+
+    call :write "!is1!" "" "!ip1!" "!ip2!" "!np3!" ""
+    call :write "!is1!" "" "!ic1!" "!ic2!" "!nc3!" ""
+
+    call :write "!ic1!" "" "!ip1!" "!ip2!" "!np3!" ""
+    call :write "!ic1!" "" "!is1!" "!is2!" "!ns3!" ""
+    endlocal
+exit /b
 
 
 
 
 
+:write
+    setlocal
+    rem primary encapsulators
+    set "a=%~1"
+    set "b=%~2"
 
+    rem optional encapsulators
+    set "c=%~3"
+    set "d=%~4"
+    set "e=%~5"
 
-    "!nc1!" "" "!np1!" "!np2!" "!np3!"
-    "!nc1!" "" "!ns1!" "!ns2!" "!ns3!"
+    rem directory destination for created files
+    set "f=%~6"
 
-    "!np1!" "" "!ns1!" "!ns2!" "!ns3!"
-    "!np1!" "" "!nc1!" "!nc2!" "!nc3!"
-
-    "!ns1!" "" "!nc1!" "!nc2!" "!nc3!"
-    "!ns1!" "" "!np1!" "!np2!" "!np3!"
-
-    "!ip1!" "" "!ic1!" "!ic2!" "!ic3!"
-    "!ip1!" "" "!is1!" "!is2!" "!is3!"
-
-    "!is1!" "" "!ip1!" "!ip2!" "!ip3!"
-    "!is1!" "" "!ic1!" "!ic2!" "!ic3!"
-
-    "!ic1!" "" "!ip1!" "!ip2!" "!ip3!"
-    "!ic1!" "" "!is1!" "!is2!" "!is3!"
+    rem Currently unused.
+    set "it1=%~7"
+    set "it2=%~8"
+    set "it3=%~9"
     
+    set "t=!a!!c!!d!!e!!b!"
 
 
+    set "dir=hard"
+    if "!f!" equ "T" (
+        set "dir=soft"
+    )
+
+    if not exist "!dir!" (
+        md "!dir!
+    )
+  
+
+    echo !t! > "!dir!\!t!"
+    endlocal
+exit /b
+
+:invert_o
+    setlocal
+    set "o=%~1"
+    if "!o!" equ "!ns1!" (
+        set "o=!is1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+    )
+    if "!o!" equ "!ns2!" (
+        set "o=!is2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+    if "!o!" equ "!ns3!" (
+        set "o=!is3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+
+    if "!o!" equ "!is1!" (
+        set "o=!ns1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+    if "!o!" equ "!is2!" (
+        set "o=!ns2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+    if "!o!" equ "!is3!" (
+        set "o=!ns3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
 
 
-    "!nc1!" "" "!ip1!" "!np2!" "!np3!"
-    "!nc1!" "" "!is1!" "!ns2!" "!ns3!"
+    if "!o!" equ "!nc1!" (
+        set "o=!ic1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-    "!np1!" "" "!is1!" "!ns2!" "!ns3!"
-    "!np1!" "" "!ic1!" "!nc2!" "!nc3!"
+    )
+    if "!o!" equ "!nc2!" (
+        set "o=!ic2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-    "!ns1!" "" "!ic1!" "!nc2!" "!nc3!"
-    "!ns1!" "" "!ip1!" "!np2!" "!np3!"
+    )
+    if "!o!" equ "!nc3!" (
+        set "o=!ic3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-    "!ip1!" "" "!nc1!" "!ic2!" "!ic3!"
-    "!ip1!" "" "!ns1!" "!is2!" "!is3!"
+    )
 
-    "!is1!" "" "!np1!" "!ip2!" "!ip3!"
-    "!is1!" "" "!nc1!" "!ic2!" "!ic3!"
+    if "!o!" equ "!ic1!" (
+        set "o=!nc1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-    "!ic1!" "" "!np1!" "!ip2!" "!ip3!"
-    "!ic1!" "" "!ns1!" "!is2!" "!is3!"
+    )
+    if "!o!" equ "!ic2!" (
+        set "o=!nc2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
+    )
+    if "!o!" equ "!ic3!" (
+        set "o=!nc3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-
-
-    "!nc1!" "" "!np1!" "!ip2!" "!np3!"
-    "!nc1!" "" "!ns1!" "!is2!" "!ns3!"
-
-    "!np1!" "" "!ns1!" "!is2!" "!ns3!"
-    "!np1!" "" "!nc1!" "!ic2!" "!nc3!"
-
-    "!ns1!" "" "!nc1!" "!ic2!" "!nc3!"
-    "!ns1!" "" "!np1!" "!ip2!" "!np3!"
-
-    "!ip1!" "" "!ic1!" "!nc2!" "!ic3!"
-    "!ip1!" "" "!is1!" "!ns2!" "!is3!"
-
-    "!is1!" "" "!ip1!" "!np2!" "!ip3!"
-    "!is1!" "" "!ic1!" "!nc2!" "!ic3!"
-
-    "!ic1!" "" "!ip1!" "!np2!" "!ip3!"
-    "!ic1!" "" "!is1!" "!ns2!" "!is3!"
-
-
-
-    "!nc1!" "" "!np1!" "!np2!" "!ip3!"
-    "!nc1!" "" "!ns1!" "!ns2!" "!is3!"
-
-    "!np1!" "" "!ns1!" "!ns2!" "!is3!"
-    "!np1!" "" "!nc1!" "!nc2!" "!ic3!"
-
-    "!ns1!" "" "!nc1!" "!nc2!" "!ic3!"
-    "!ns1!" "" "!np1!" "!np2!" "!ip3!"
-
-    "!ip1!" "" "!ic1!" "!ic2!" "!nc3!"
-    "!ip1!" "" "!is1!" "!is2!" "!ns3!"
-
-    "!is1!" "" "!ip1!" "!ip2!" "!np3!"
-    "!is1!" "" "!ic1!" "!ic2!" "!nc3!"
-
-    "!ic1!" "" "!ip1!" "!ip2!" "!np3!"
-    "!ic1!" "" "!is1!" "!is2!" "!ns3!"
+    )
 
 
-    rem P: s
+    if "!o!" equ "!np1!" (
+        set "o=!ip1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
 
-    rem P: p
+    )
+    if "!o!" equ "!np2!" (
+        set "o=!ip2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+
+    if "!o!" equ "!np3!" (
+        set "o=!ip3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+
+    if "!o!" equ "!ip1!" (
+        set "o=!np1!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+    if "!o!" equ "!ip2!" (
+        set "o=!np2!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
+    if "!o!" equ "!ip3!" (
+        set "o=!np3!"
+        set "o=!o!|"
+        echo !o! > "inverted.txt"
+        exit /b
+
+    )
     endlocal
 exit /b
 
