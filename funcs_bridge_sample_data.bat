@@ -50,7 +50,7 @@ goto :eof
 :soft_code
     setlocal
 
-    if exist soft.txt ( del soft.txt )
+    rem if exist soft.txt ( del soft.txt )
     call :soft_with_last_encap
     rem exit /b
     call :soft_without_last_encap
@@ -59,7 +59,17 @@ exit /b
 
 :soft_with_last_encap
     setlocal
-    
+
+    rem primary_type, fill/empty final primary, optn_type, invert_optn_val
+    rem Need spaces, bridges, no spaces
+
+
+    rem Need 1 option, two options, or 3 options
+    rem empty_optn_value (independent of invert_optn_val)
+    rem     ex: o1 o2 o3
+    rem         Inv No No
+    rem         No Empty No vs. Empty No No (overwrites necessity of invert_optn_val)
+    rem         but we could use overlap between inver_val and empty_val to achieve...
     call :begin "nc" "T" "np" "0"
     call :begin "nc" "T" "ns" "0"
 
@@ -371,13 +381,206 @@ exit /b
         )
     ) 
 
-    call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    rem affix the space or bridge to 1 or more options
+    rem Layout of sample file name, where B = "BRIDGE 1"
+    rem enc1 BS (0) o BS (1) o BS (2) o BS (3) enc
+    
 
+    rem BS can be: b only, s only, bs, or sb
+    rem b only (3):
+    rem s only (5):
+    rem bs (7):
+    rem sb (11):
+
+    rem         BS
+    rem     0   1   2   3
+    rem position
+    rem 0
+    rem 1
+    rem 2
+    rem 3
+
+    rem Use 
+    rem x.0: no BS
+    rem x.1: b
+    rem x.2: s
+    rem x.3: bs
+    rem x.4: sb
+
+    rem position 0
+    rem 0.0, 0.1, 0.2, 0.3, 0.4
+
+    rem position 1
+    rem 1.0, 1.1, 1.2, 1.3, 1.4
+
+    rem position 2
+    rem 2.0, 2.1, 2.2, 2.3, 2.4
+
+    rem position 3
+    rem 3.0, 3.1, 3.2, 3.3, 3.4
+
+
+    rem appearance value of option permutation
+    rem show 0 (show 0.0, 0.1, 0.2, 0.3 as a permutation in the file name), disregard 1, 2, 3 (without BS, eg enc)
+    rem show 1, disregard 0, 2, 3
+    rem show 2, disregard 0, 1, 3
+    rem show 3, disregard 0, 1, 2
+
+    rem show 0, 1, disregard 2, 3
+    rem show 0, 2
+    rem show 0, 3
+    rem show 1, 2,
+    rem show 2, 3
+
+
+    rem show 0, 1, 2, disregard 3
+    rem show 1, 2, 3,
+    rem show 2, 3, 0,
+    rem show 3, 0, 1
+
+    rem show 0, 1, 2, 3
+
+
+
+    rem prime numbers: 1, 3, 5, 7, 11, 13, 17, 19, 23
+    rem 3 + 5 = 8
+    rem 3 + 7 = 10
+    rem 3 + 11 = 14
+    rem 5 + 7 = 12
+    rem 5 + 11 = 16
+    rem 7 + 11 = 18
+
+    rem "encap1" "encap2" "optn1 "optn2" "optn3" "to_directory_indicator"
+    rem set "primes=!prime!|!prime2!"
+    rem set "optns=!o1!|!o2!|!o3!"
+    rem no BS
+    call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    
+    set "b=BRIDGE 1"
+    set "s= "
+    set "o1_only=!o1!"
+    set "o2_only=!o2!"
+    set "o3_only=!o3!"
+
+    call :change_o  "1" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    call :change_o  "2" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    call :change_o  "3" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    call :change_o  "4" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    set o1_perms=
+    set o2_perms=
+    set o3_perms=
+    for /f "tokens=*" %%i in (perms.txt) do (
+        set "o1_perms=%%i"
+    )
+
+    rem call :change_o "!o2!"
+    for /f "tokens=*" %%i in (perms.txt) do (
+        set "o2_perms=%%i"
+    )
+
+    rem call :change_o "!o3!"
+    for /f "tokens=*" %%i in (perms.txt) do (
+        set "o3_perms=%%i"
+    )
     endlocal
 exit /b
 
 
 
+:change_o
+    setlocal
+    rem set "o=%~1"
+    set "positn=%~1"
+    set "enc1=%~2"
+    set "enc2=%~3"
+    set "o1=%~4"
+    set "o2=%~5"
+    set "o3=%~6"
+    set "dir_f=%~7"
+    set "b=BRIDGE 1"
+    set "s= "
+
+    set "targ_o=!o1!"
+    if "!positn!" equ "2" (
+        set "targ_o=!o2!"
+    )
+    if "!positn!" equ "3" (
+        set "targ_o=!o3!"
+    )
+
+    if "!positn!" equ "4" (
+        set "targ_o=!o3!"
+    )
+
+    set "bo=!b!!targ_o!"
+    set "so=!s!!targ_o!"
+    set "bso=!b!!s!!targ_o!"
+    set "sbo=!s!!b!!targ_o!"
+
+    if "!positn!" equ "4" (
+        set "bo=!targ_o!!b!"
+        set "so=!targ_o!!s!"
+        set "bso=!targ_o!!b!!s!"
+        set "sbo=!targ_o!!s!!b!"
+    )
+
+    set "perms=!bo!|!so!|!bso!|!sbo!|"
+    echo !perms! > "perms.txt"
+rem call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
+    if "!positn!" equ "1" (
+        call :write "!prime1!" "!prime2!" "!bo!" "!o2!" "!o3!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!so!" "!o2!" "!o3!" "!dir_f!"        
+        call :write "!prime1!" "!prime2!" "!bso!" "!o2!" "!o3!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!sbo!" "!o2!" "!o3!" "!dir_f!"        
+    )
+    if "!positn!" equ "2" (
+        call :write "!prime1!" "!prime2!" "!o1!" "!bo!" "!o3!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!so!" "!o3!" "!dir_f!"        
+        call :write "!prime1!" "!prime2!" "!o1!" "!bso!" "!o3!" "!dir_f!"        
+        call :write "!prime1!" "!prime2!" "!o1!" "!sbo!" "!o3!" "!dir_f!"        
+    )
+    if "!positn!" equ "3" (
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!bo!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!so!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!bso!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!sbo!" "!dir_f!"
+    )
+    if "!positn!" equ "4" (
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!bo!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!so!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!bso!" "!dir_f!"
+        call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!sbo!" "!dir_f!"
+
+    )
+
+
+
+    endlocal
+exit /b
+
+:itemize_perms
+    setlocal
+    set "operms=%~1"
+    set "f=%~2"
+
+    for /f "tokens=1 delims=|" %%i in ("!operms!") do (
+
+    )
+    for /f "tokens=2 delims=|" %%i in ("!operms!") do (
+        
+    )
+    for /f "tokens=3 delims=|" %%i in ("!operms!") do (
+        
+    )
+    for /f "tokens=4 delims=|" %%i in ("!operms!") do (
+        
+    )
+   
+
+
+
+    endlocal
+exit /b
 
 
 
@@ -399,7 +602,7 @@ exit /b
         )
 
         if exist "soft\!itm!" (
-            del "soft\!itm!"
+            rem del "soft\!itm!"
             rem del "hard\!itm!"
             
         )
@@ -655,11 +858,14 @@ exit /b
     
     set "t=!a!!c!!d!!e!!b!"
 
+    rem echo T "!t!"
+
 
     set "dir=hard"
     if "!f!" equ "T" (
-        set "dir=soft"
+        set "dir=soft\!a!"
     )
+
 
     if not exist "!dir!" (
         md "!dir!
@@ -837,18 +1043,22 @@ exit /b
     set "itsb2=!s!!b2!"
     set "itb2s=!b2!!s!"
     
+    rem appearance value 0
     call :inbetweens "!enc1!" "" "" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!its!" "" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itb1!" "" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itsb1!" "" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itb1s!" "" "" "" "" "" "" "!enc2!"
 
+    rem appearance value 0.1
     call :inbetweens "!enc1!" "" "!o1!" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!its!" "!o1!" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itb1!" "!o1!" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itsb1!" "!o1!" "" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "!itb1s!" "!o1!" "" "" "" "" "" "!enc2!"
     
+
+    rem appearance value 
     call :inbetweens "!enc1!" "" "!o1!" "!its!" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "" "!o1!" "!itb1!" "" "" "" "" "!enc2!"
     call :inbetweens "!enc1!" "" "!o1!" "!itsb1!" "" "" "" "" "!enc2!"

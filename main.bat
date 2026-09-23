@@ -47,7 +47,7 @@ set "brid_four=B4"
 
 set brk=^
 
-
+pause
 
 
 rem GROUPER can be:
@@ -165,6 +165,7 @@ call :v_bar "!isp_front_bar_extra!" "|"
 call :v_bar "!isp_mid_bar!" "|"
 call :v_bar "!isp_none!" "|"
 
+
 rem call :all_bridges
 rem call :no_bridges
 rem call :neighb
@@ -172,6 +173,7 @@ rem call :run_samples
 rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
 rem call "funcs_last_sample_data.bat" :last_char
 call "funcs_bridge_sample_data.bat" :hard_code
+
 call "funcs_bridge_sample_data.bat" :soft_code
 call "funcs_bridge_sample_data.bat" :hard_vs_soft
 ECHO ---- DONE ----
@@ -979,7 +981,7 @@ exit /b
     rem A primary, nested, indiv, nested encapsulator only
     rem A primary, indiv, nested, indiv encapsulator only
     rem A primary
-    rem 
+    
     call "funcs_rom_keywords.bat" :start "X [sq]{ hi } B1 A1 {nested {bye} {farewell} here} {there}B2 c2 {far now}BOB!one!B4 C4!two! M4 (M) {bye bye} D1 E1 {encaps {welcome} there} some!ext!"
     exit /b
     call "funcs_rom_keywords.bat" :start "X { hi }{nested {bye} {farewell} here}!one!!two!!ext!"
