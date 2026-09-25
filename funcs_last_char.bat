@@ -510,22 +510,6 @@ exit /b
     )
     
 
-rem    if "!item!" equ " " (
-        
-  rem      echo BLANK "!right_c!"
-     rem   set "old_item=!old_item!|"
-       rem echo !old_item! > "old_item.txt"
-       rem exit /b
-   rem )
-    rem if "!item!" equ "!phrase!" (
-       
-       rem echo PHRASE "!right_c!"
-        rem ECHO ITEM IS "!item!"
-       rem set "old_item=!item!|"
-       rem echo !old_item! > "old_item.txt"
-       rem exit /b
-   rem )
-
 
 
     set /a token+=1
