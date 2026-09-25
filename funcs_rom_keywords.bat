@@ -56,6 +56,579 @@ rem Need to find music in name title that is non-encapsulated
 
 
 
+:exe_loop
+    setlocal
+    set /a q=0
+    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
+        set /a q+=1
+        for /f "tokens=2 delims=\" %%j in ("%%i") do (
+            call :start_kywds "(" ")" "%%j" "[" "]" "{" "}"
+            echo !q!
+        )
+    )
+    endlocal
+exit /b
+
+
+:start_kywds
+    setlocal
+    rem set "token=%~1"
+    set "left_char=%~1"
+    set "right_char=%~2"
+    set "name=%~3"
+    set "optn_one_left=%~4"
+    set "optn_one_right=%~5"
+    set "optn_two_left=%~6"
+    set "optn_two_right=%~7"
+
+    echo "!brk!"
+    echo ----- "!name!" -----
+    call :del_txts
+    
+    rem call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
+    
+    rem new version of finding last character in name
+    echo need to find the first char
+    call "funcs_first_char.bat" :find "!name!"
+    set first_l=
+    set first_r=
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "first_l=%%i"
+    )
+
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "first_r=%%i"
+    )
+    echo first_l "!first_l!"
+    echo first_R "!first_r!"
+    
+    call "funcs_last_char.bat" :find_last_char "" "!name!"
+    
+
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "left_char=%%i"
+    )
+    
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "right_char=%%i"
+    )
+    
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "optn_one_left=%%i"
+    )
+    
+    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
+        set "optn_one_right=%%i"
+    )
+    
+    for /f "tokens=5 delims=|" %%i in (chars.txt) do (
+        set "optn_two_left=%%i"
+    )
+    
+    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
+        set "optn_two_right=%%i"
+    )
+
+    
+    call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    rem call :print_bridge
+    rem call :print_labels
+    rem call :print_nested
+    
+    endlocal
+exit /b
+
+
+
+:del_txts
+    setlocal
+    if exist labels.txt ( del labels.txt)
+    if exist nested.txt ( del nested.txt )
+    if exist %delimtxt% ( del %delimtxt% )
+    if exist %brgtxt% ( del %brgtxt% )
+    if exist "is_nested.txt" ( del "is_nested.txt" )
+    if exist "is_primary_nested.txt" ( del "is_primary_nested.txt" )
+    if exist "is_secondary_nested.txt" ( del "is_secondary_nested.txt" )
+    if exist "bridge.txt" ( del "bridge.txt" )
+    if exist "has_square.txt" ( del "has_square.txt" )
+    if exist "has_curl.txt" ( del "has_curl.txt" )
+    if exist "has_paren.txt" ( del "has_paren.txt" )
+    if exist "last_item.txt" ( del "last_item.txt" )
+    if exist "chars.txt" ( del "chars.txt" )
+    if exist "token.txt" ( del "token.txt" )
+    endlocal
+exit /b
+
+
+
+
+:recurse_on_group2
+    setlocal
+    set "token=%~1"
+    set "left_char=%~2"
+    set "right_char=%~3"
+    set "name=%~4"
+    set "optn_one_left=%~5"
+    set "optn_one_right=%~6"
+    set "optn_two_left=%~7"
+    set "optn_two_right=%~8"
+    rem echo === "!optn_one_right!"
+    rem echo --- "!optn_two_right!"
+
+    set item=
+    call :delim_with_char "!token!" "!right_char!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    
+    
+
+    if "!item!" equ " " (
+        exit /b
+    )
+
+    rem File name does not contain any instances of the primary
+    rem     delimiting character (eg ")"),
+    rem     so we can terminate this recursive search.
+    if "!item!" equ "!name!" (
+        REM exit /b
+    )
+
+    rem Stop at extension
+    rem Situations: a. bridge.d88, or .d88
+    echo ITEM I "!item!"
+    
+
+
+
+
+
+    call :DOIR "1" "]" "!item!"
+
+    rem Unused
+    call :continue_or_stop "!item!"
+     if exist "stop.txt" (
+         del "stop.txt"
+         REM exit /b
+     )
+    
+
+    
+    
+    set bridge=
+    call :delim_with_char "1" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
+    )
+   
+   
+
+    set "primes=!left_char!|!right_char!"
+    set "optn1s=!optn_one_left!|!optn_one_right!"
+    set "optn2s=!optn_two_left!|!optn_two_right!"
+
+    set "delim_chars=!primes!|!optn1s!|!optn2s!"
+    
+    
+    set status=
+    set /a ttoken=!token!
+    
+
+
+    set /a ttoken+=1
+
+    set "primaries=!left_char!|!right_char!"
+    set "optn_ones=!optn_one_left!|!optn_one_right!"
+    set "optn_twos=!optn_two_left!|!optn_two_right!"
+
+    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    endlocal
+exit /b
+
+
+:DOIR
+    setlocal
+    set "token=%~1"
+    set "right=%~2"
+    set "item=%~3"
+
+    
+    call :delim_with_char "!token!" "!right!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bitem=%%i"
+    )
+
+    if "!bitem!" equ " " (
+        exit /b
+    )
+
+    
+    call :DOIL "1" "[" "!bitem!"
+    set /a token+=1
+    
+    call :DOIR "!token!" "!right!" "!item!"
+    endlocal
+exit /b
+
+:DOIL
+    setlocal
+    set "token=%~1"
+    set "right=%~2"
+    set "item=%~3"
+
+    echo ----
+    set "pb_item=PAD\!item!"
+    call :delim_with_char "!token!" "!right!" "!pb_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bitem=%%i"
+    )
+
+    if "!bitem!" equ " " (
+        exit /b
+    )
+
+
+    call :delim_with_char "2" "\" "!bitem!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "filled=%%i"
+    )
+    
+     if "!filled!" neq " " (
+        set "bitem=!filled!"
+    )
+
+    
+    set status=
+    set /a ttoken=!token!
+    if !ttoken! equ 1 (
+        if "!bitem!" neq "!item!" (
+            set "status= UNOFFICIAL BRIDGE"
+            if not exist "is_nested.txt" (
+                set "status=OFFICIAL BRIDGE"
+                REM set "bitem=USE THE ORIG"
+            )
+            
+        ) else (
+            if exist "is_nested.txt" (
+                del "is_nested.txt"
+            )
+            set "status=NESTED LABEL"
+        )
+    )
+
+    if !ttoken! equ 2 (
+        set "status=INDIV LABEL"
+        set /a temp=!ttoken!+1
+        call :delim_with_char "!temp!" "!right!" "!pb_item!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "st=%%i"
+        ) 
+
+        REM echo **** ST **** "!st!"
+        if "!st!" neq " " (
+            REM echo NEQ
+            set "status=NESTED LABEL"
+            echo "" > "is_nested.txt"
+        )
+        if exist "is_nested.txt" (
+            set "status=NESTED LABEL"
+        )
+    )
+
+    if !ttoken! gtr 2 (
+        set "status=NESTED LABEL"
+    )
+
+    
+    
+    if "!bitem!" equ "PAD\ " (
+        set "bitem= "
+    )
+    IF "!bitem!" equ "PAD\" (
+        set "bitem="
+    )
+    ECHO FOUND "!bitem!" "!status!"
+    set /a ttoken+=1
+    
+    call :DOIL "!ttoken!" "!right!" "!item!"
+    endlocal
+exit /b
+
+
+
+
+
+:delim_with_char
+    setlocal
+    rem %~1: token
+    rem %~2: delim char 
+    rem (eg. [, (, {, ], ), or })
+    set "phrase=%~3"
+     rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
+    set d=
+    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
+        set "d=%%i"
+    )
+
+    set "d=!d!|"
+    echo !d! > "%delimtxt%"
+    endlocal
+exit /b
+
+
+
+
+:write_bridge
+    setlocal
+    set "bridge=%~1"
+
+    rem echo  WRITING "!bridge!"
+    set old=
+    set /a item=0
+    if exist %brgtxt% (
+
+    
+        for /f "tokens=*" %%i in (%brgtxt%) do (
+            set "old=!old!!brk!%%i"
+            set /a item+=1
+        )
+    )
+  
+    set "old=!old!!brk!!bridge!"
+  
+    echo !old! > "%brgtxt%"
+    rem echo OLD bridges "!old!"
+    endlocal
+exit /b
+
+
+
+
+:write_ones
+
+    setlocal
+    set "new=%~1"
+    rem echo WRITING a NEW ONE "!new!"
+    set old=
+    if exist %onstxt% (
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            set "old=!old!%%i"
+        )
+    )
+    set "old=!old!!new!"
+    rem echo ** OLD BEFORE ">" "!old!"
+    echo !old! > "%onstxt%"
+    endlocal
+exit /b
+
+:write_group
+    setlocal
+    
+    set old_o=
+    set /a item=0
+    if exist %onstxt% (
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            set "old_o=%%i"
+        )
+    )
+    if exist %onstxt% (
+        del "%onstxt%"
+    )
+    
+
+    set old=
+    if exist %grptxt% (
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            set "old=!old!!brk!%%i"
+            set /a item+=1
+        )
+    )
+    
+    rem if !item! equ 0 (
+    rem     set "old=!old!!old_o!"
+    rem ) else (
+set "old=!old!!brk!!old_o!"
+    rem )
+    
+    echo !old! > "%grptxt%"
+    
+    endlocal
+exit /b
+
+:write_tokens
+    setlocal
+    set "token=%~1"
+   
+
+
+    set old=
+    if exist %toktxt% (
+        for /f "tokens=*" %%i in (%toktxt%) do (
+            set "old=!old!!brk!%%i"
+        )
+    )
+    set "old=!old!!brk!!token!"
+    echo !old! > "%toktxt%"
+    endlocal
+exit /b
+
+:print_group
+    setlocal
+    set "name=%~1"
+    set "primary_char=%~2"
+
+
+    rem to get a pass
+    rem option 1: group = ECHO is empty. & test = name (no delimiting character)
+    rem option 2: group has labels (not = to ECHO is emtpy) & test not = name
+
+    rem test must = name -> +1
+
+    set /a n=0
+    set "r=FAIL"
+
+    call :delim_with_char "1" "!primary_char!" "!name!"
+    set test=
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test=%%i"
+    )
+
+    if "!test!" equ "!name!" (
+        set /a n-=1
+    ) else (
+        set /a n+=1
+    )
+
+    if exist %grptxt% (
+        set /a qty=0
+        set grp=
+        for /f "tokens=*" %%i in (%grptxt%) do (
+            if !qty! equ 0 (
+                set "grp=!grp!%%i"
+            ) else (
+                set "grp=!grp!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+        
+        echo --- GRUPS ----
+        ECHO !grp!
+        if "!grp!" equ "ECHO is off." (
+            set /a n-=1
+        ) else (
+            set /a n+=1
+        )
+    )
+
+    if !n! equ -2 (
+        set "r=PASS"
+    )
+
+    if !n! equ 2 (
+        set "r=PASS"
+    )    
+    ECHO ********************************************************************* "!r!"
+    endlocal
+exit /b
+
+
+:print_bridge
+    setlocal
+
+    set brdg=
+    if exist "%brgtxt%" (
+        set /a qty=0
+        for /f "tokens=*" %%i in (%brgtxt%) do (
+            if !qty! equ 0 (
+                set "brdg=!brdg!%%i"
+            ) else (
+                set "brdg=!brdg!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+    )
+    
+    echo -- BRIDGES --
+    echo !brdg!
+    echo "!brk!"
+    endlocal
+exit /b
+
+:print_ones
+    setlocal
+    set ons=
+    if exist "%onstxt%" (
+        set /a qty=0
+        for /f "tokens=*" %%i in (%onstxt%) do (
+            if !qty! equ 0 (
+                set "ons=!ons!%%i" 
+            ) else (
+                set "ons=!ons!!brk!%%i"
+            )
+            set /a qty+=1
+        )
+    )
+
+    echo -- ONES --
+    echo !ons!
+    endlocal
+exit /b
+
+
+rem Might not need this function, nor collecting tokens
+:print_tokens
+    setlocal
+    set tokens_=
+    for /f "tokens=*" %%i in (%toktxt%) do (
+        set "tokens_=!tokens_!!brk!%%i"
+    )
+
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 rem determine whether file is .d88, .cmt, or .t88
 :find_rom
 
@@ -1307,232 +1880,6 @@ rem echo ONE TAIL "!one_tail!"
     endlocal
 exit /b
 
-:delim_with_char
-    setlocal
-    rem %~1: token
-    rem %~2: delim char 
-    rem (eg. [, (, {, ], ), or })
-    set "phrase=%~3"
-     rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
-    set d=
-    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
-        set "d=%%i"
-    )
-
-    set "d=!d!|"
-    echo !d! > "%delimtxt%"
-    endlocal
-exit /b
-
-:write_bridge
-    setlocal
-    set "bridge=%~1"
-
-    rem echo  WRITING "!bridge!"
-    set old=
-    set /a item=0
-    if exist %brgtxt% (
-
-    
-        for /f "tokens=*" %%i in (%brgtxt%) do (
-            set "old=!old!!brk!%%i"
-            set /a item+=1
-        )
-    )
-  
-    set "old=!old!!brk!!bridge!"
-  
-    echo !old! > "%brgtxt%"
-    rem echo OLD bridges "!old!"
-    endlocal
-exit /b
-
-
-
-
-
-:write_ones
-
-    setlocal
-    set "new=%~1"
-    rem echo WRITING a NEW ONE "!new!"
-    set old=
-    if exist %onstxt% (
-        for /f "tokens=*" %%i in (%onstxt%) do (
-            set "old=!old!%%i"
-        )
-    )
-    set "old=!old!!new!"
-    rem echo ** OLD BEFORE ">" "!old!"
-    echo !old! > "%onstxt%"
-    endlocal
-exit /b
-
-:write_group
-    setlocal
-    
-    set old_o=
-    set /a item=0
-    if exist %onstxt% (
-        for /f "tokens=*" %%i in (%onstxt%) do (
-            set "old_o=%%i"
-        )
-    )
-    if exist %onstxt% (
-        del "%onstxt%"
-    )
-    
-
-    set old=
-    if exist %grptxt% (
-        for /f "tokens=*" %%i in (%grptxt%) do (
-            set "old=!old!!brk!%%i"
-            set /a item+=1
-        )
-    )
-    
-    rem if !item! equ 0 (
-    rem     set "old=!old!!old_o!"
-    rem ) else (
-set "old=!old!!brk!!old_o!"
-    rem )
-    
-    echo !old! > "%grptxt%"
-    
-    endlocal
-exit /b
-
-:write_tokens
-    setlocal
-    set "token=%~1"
-   
-
-
-    set old=
-    if exist %toktxt% (
-        for /f "tokens=*" %%i in (%toktxt%) do (
-            set "old=!old!!brk!%%i"
-        )
-    )
-    set "old=!old!!brk!!token!"
-    echo !old! > "%toktxt%"
-    endlocal
-exit /b
-
-:print_group
-    setlocal
-    set "name=%~1"
-    set "primary_char=%~2"
-
-
-    rem to get a pass
-    rem option 1: group = ECHO is empty. & test = name (no delimiting character)
-    rem option 2: group has labels (not = to ECHO is emtpy) & test not = name
-
-    rem test must = name -> +1
-
-    set /a n=0
-    set "r=FAIL"
-
-    call :delim_with_char "1" "!primary_char!" "!name!"
-    set test=
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "test=%%i"
-    )
-
-    if "!test!" equ "!name!" (
-        set /a n-=1
-    ) else (
-        set /a n+=1
-    )
-
-    if exist %grptxt% (
-        set /a qty=0
-        set grp=
-        for /f "tokens=*" %%i in (%grptxt%) do (
-            if !qty! equ 0 (
-                set "grp=!grp!%%i"
-            ) else (
-                set "grp=!grp!!brk!%%i"
-            )
-            set /a qty+=1
-        )
-        
-        echo --- GRUPS ----
-        ECHO !grp!
-        if "!grp!" equ "ECHO is off." (
-            set /a n-=1
-        ) else (
-            set /a n+=1
-        )
-    )
-
-    if !n! equ -2 (
-        set "r=PASS"
-    )
-
-    if !n! equ 2 (
-        set "r=PASS"
-    )    
-    ECHO ********************************************************************* "!r!"
-    endlocal
-exit /b
-
-
-:print_bridge
-    setlocal
-
-    set brdg=
-    if exist "%brgtxt%" (
-        set /a qty=0
-        for /f "tokens=*" %%i in (%brgtxt%) do (
-            if !qty! equ 0 (
-                set "brdg=!brdg!%%i"
-            ) else (
-                set "brdg=!brdg!!brk!%%i"
-            )
-            set /a qty+=1
-        )
-    )
-    
-    echo -- BRIDGES --
-    echo !brdg!
-    echo "!brk!"
-    endlocal
-exit /b
-
-:print_ones
-    setlocal
-    set ons=
-    if exist "%onstxt%" (
-        set /a qty=0
-        for /f "tokens=*" %%i in (%onstxt%) do (
-            if !qty! equ 0 (
-                set "ons=!ons!%%i" 
-            ) else (
-                set "ons=!ons!!brk!%%i"
-            )
-            set /a qty+=1
-        )
-    )
-
-    echo -- ONES --
-    echo !ons!
-    endlocal
-exit /b
-
-
-rem Might not need this function, nor collecting tokens
-:print_tokens
-    setlocal
-    set tokens_=
-    for /f "tokens=*" %%i in (%toktxt%) do (
-        set "tokens_=!tokens_!!brk!%%i"
-    )
-
-    endlocal
-exit /b
-
 
 
 
@@ -1580,109 +1927,8 @@ exit /b
 
 
 
-:exe_loop
-    setlocal
-    set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
-        set /a q+=1
-        for /f "tokens=2 delims=\" %%j in ("%%i") do (
-            call :start_kywds "(" ")" "%%j" "[" "]" "{" "}"
-            echo !q!
-        )
-        
-        rem pause
-    )
-    endlocal
-exit /b
 
 
-:del_txts
-    setlocal
-    if exist labels.txt ( del labels.txt)
-    if exist nested.txt ( del nested.txt )
-    if exist %delimtxt% ( del %delimtxt% )
-    if exist %brgtxt% ( del %brgtxt% )
-    if exist "is_nested.txt" ( del "is_nested.txt" )
-    if exist "is_primary_nested.txt" ( del "is_primary_nested.txt" )
-    if exist "is_secondary_nested.txt" ( del "is_secondary_nested.txt" )
-    if exist "bridge.txt" ( del "bridge.txt" )
-    if exist "has_square.txt" ( del "has_square.txt" )
-    if exist "has_curl.txt" ( del "has_curl.txt" )
-    if exist "has_paren.txt" ( del "has_paren.txt" )
-    if exist "last_item.txt" ( del "last_item.txt" )
-    if exist "chars.txt" ( del "chars.txt" )
-    if exist "token.txt" ( del "token.txt" )
-    endlocal
-exit /b
-
-:start_kywds
-    setlocal
-    rem set "token=%~1"
-    set "left_char=%~1"
-    set "right_char=%~2"
-    set "name=%~3"
-    set "optn_one_left=%~4"
-    set "optn_one_right=%~5"
-    set "optn_two_left=%~6"
-    set "optn_two_right=%~7"
-
-    echo "!brk!"
-    echo ----- "!name!" -----
-    call :del_txts
-    
-    rem call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
-    
-    rem new version of finding last character in name
-    echo need to find the first char
-    call "funcs_first_char.bat" :find "!name!"
-    set first_l=
-    set first_r=
-    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-        set "first_l=%%i"
-    )
-
-    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-        set "first_r=%%i"
-    )
-    echo first_l "!first_l!"
-    echo first_R "!first_r!"
-    
-    call "funcs_last_char.bat" :find_last_char "" "!name!"
-    
-
-    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-        set "left_char=%%i"
-    )
-    
-    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-        set "right_char=%%i"
-    )
-    
-    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
-        set "optn_one_left=%%i"
-    )
-    
-    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
-        set "optn_one_right=%%i"
-    )
-    
-    for /f "tokens=5 delims=|" %%i in (chars.txt) do (
-        set "optn_two_left=%%i"
-    )
-    
-    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
-        set "optn_two_right=%%i"
-    )
-
-    
-    call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-
-    rem call :print_bridge
-    rem call :print_labels
-    rem call :print_nested
-    
-    endlocal
-exit /b
 
 
 
@@ -1706,204 +1952,6 @@ rem     nested label
 
 
 
-:recurse_on_group2
-    setlocal
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-    set "optn_one_left=%~5"
-    set "optn_one_right=%~6"
-    set "optn_two_left=%~7"
-    set "optn_two_right=%~8"
-    rem echo === "!optn_one_right!"
-    rem echo --- "!optn_two_right!"
-
-    set item=
-    call :delim_with_char "!token!" "!right_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
-    )
-
-    
-    
-
-    if "!item!" equ " " (
-        exit /b
-    )
-
-    rem File name does not contain any instances of the primary
-    rem     delimiting character (eg ")"),
-    rem     so we can terminate this recursive search.
-    if "!item!" equ "!name!" (
-        REM exit /b
-    )
-
-    rem Stop at extension
-    rem Situations: a. bridge.d88, or .d88
-echo ITEM I "!item!"
-    
-
-
-
-
-
-     call :DOIR "1" "]" "!item!"
-
-    rem Unused
-    call :continue_or_stop "!item!"
-     if exist "stop.txt" (
-         del "stop.txt"
-         REM exit /b
-     )
-    
-
-    
-    
-    set bridge=
-    call :delim_with_char "1" "!left_char!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "bridge=%%i"
-    )
-     rem ECHO PRIMARY ITEM "!item!"
-     rem echo PRIMARY BRIDGE  "!bridge!"
-
-
-
-    set "primes=!left_char!|!right_char!"
-    set "optn1s=!optn_one_left!|!optn_one_right!"
-    set "optn2s=!optn_two_left!|!optn_two_right!"
-
-    set "delim_chars=!primes!|!optn1s!|!optn2s!"
-    
-    
-    set status=
-    set /a ttoken=!token!
-    
-
-
-    set /a ttoken+=1
-
-    set "primaries=!left_char!|!right_char!"
-    set "optn_ones=!optn_one_left!|!optn_one_right!"
-    set "optn_twos=!optn_two_left!|!optn_two_right!"
-
- 
-    rem call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!bridge!"
-    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-
-    endlocal
-exit /b
-
-:DOIR
-    setlocal
-    set "token=%~1"
-    set "right=%~2"
-    set "item=%~3"
-
-    
-    call :delim_with_char "!token!" "!right!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "bitem=%%i"
-    )
-
-    if "!bitem!" equ " " (
-        exit /b
-    )
-
-    
-    call :DOIL "1" "[" "!bitem!"
-    set /a token+=1
-    
-    call :DOIR "!token!" "!right!" "!item!"
-    endlocal
-exit /b
-
-:DOIL
-    setlocal
-    set "token=%~1"
-    set "right=%~2"
-    set "item=%~3"
-
-    echo ----
-    set "pb_item=PAD\!item!"
-    call :delim_with_char "!token!" "!right!" "!pb_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "bitem=%%i"
-    )
-
-    if "!bitem!" equ " " (
-        exit /b
-    )
-
-    rem echo bitem "!bitem!"
-
-    call :delim_with_char "2" "\" "!bitem!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "filled=%%i"
-    )
-    
-     if "!filled!" neq " " (
-        set "bitem=!filled!"
-    )
-    rem echo "FILLED" "!filled!"
-
-    
-    set status=
-    set /a ttoken=!token!
-    if !ttoken! equ 1 (
-        if "!bitem!" neq "!item!" (
-            set "status= UNOFFICIAL BRIDGE"
-            if not exist "is_nested.txt" (
-                set "status=OFFICIAL BRIDGE"
-                REM set "bitem=USE THE ORIG"
-            )
-            
-        ) else (
-            if exist "is_nested.txt" (
-                del "is_nested.txt"
-            )
-            set "status=NESTED LABEL"
-        )
-    )
-
-    if !ttoken! equ 2 (
-        set "status=INDIV LABEL"
-        set /a temp=!ttoken!+1
-        call :delim_with_char "!temp!" "!right!" "!pb_item!"
-        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-            set "st=%%i"
-        ) 
-
-        REM echo **** ST **** "!st!"
-        if "!st!" neq " " (
-            REM echo NEQ
-            set "status=NESTED LABEL"
-            echo "" > "is_nested.txt"
-        )
-        if exist "is_nested.txt" (
-            set "status=NESTED LABEL"
-        )
-    )
-
-    if !ttoken! gtr 2 (
-        set "status=NESTED LABEL"
-    )
-
-    
-    
-    if "!bitem!" equ "PAD\ " (
-        set "bitem= "
-    )
-    IF "!bitem!" equ "PAD\" (
-        set "bitem="
-    )
-    ECHO FOUND "!bitem!" "!status!"
-    set /a ttoken+=1
-    
-    call :DOIL "!ttoken!" "!right!" "!item!"
-    endlocal
-exit /b`
 
 
 :recurse_on_item
