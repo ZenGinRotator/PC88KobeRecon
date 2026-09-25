@@ -172,10 +172,12 @@ rem call :neighb
 rem call :run_samples
 rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
 rem call "funcs_last_sample_data.bat" :last_char
-call "funcs_bridge_sample_data.bat" :hard_code
+rem call "funcs_bridge_sample_data.bat" :hard_code
 
-call "funcs_bridge_sample_data.bat" :soft_code
-call "funcs_bridge_sample_data.bat" :hard_vs_soft
+rem call "funcs_bridge_sample_data.bat" :sample_file_names
+rem call "funcs_bridge_sample_data.bat" :hard_vs_soft
+rem call "funcs_last_char.bat" :exe
+call "funcs_rom_keywords.bat" :exe_loop
 ECHO ---- DONE ----
 
 PAUSE

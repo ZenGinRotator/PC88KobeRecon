@@ -47,7 +47,7 @@ call %*
 goto :eof
 
 
-:soft_code
+:sample_file_names
     setlocal
 
     rem if exist soft.txt ( del soft.txt )
@@ -455,33 +455,13 @@ exit /b
     rem set "optns=!o1!|!o2!|!o3!"
     rem no BS
     call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
-    
-    set "b=BRIDGE 1"
-    set "s= "
-    set "o1_only=!o1!"
-    set "o2_only=!o2!"
-    set "o3_only=!o3!"
+
 
     call :change_o  "1" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
     call :change_o  "2" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
     call :change_o  "3" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
     call :change_o  "4" "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
-    set o1_perms=
-    set o2_perms=
-    set o3_perms=
-    for /f "tokens=*" %%i in (perms.txt) do (
-        set "o1_perms=%%i"
-    )
-
-    rem call :change_o "!o2!"
-    for /f "tokens=*" %%i in (perms.txt) do (
-        set "o2_perms=%%i"
-    )
-
-    rem call :change_o "!o3!"
-    for /f "tokens=*" %%i in (perms.txt) do (
-        set "o3_perms=%%i"
-    )
+  
     endlocal
 exit /b
 
@@ -524,8 +504,6 @@ exit /b
         set "sbo=!targ_o!!s!!b!"
     )
 
-    set "perms=!bo!|!so!|!bso!|!sbo!|"
-    echo !perms! > "perms.txt"
 rem call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
     if "!positn!" equ "1" (
         call :write "!prime1!" "!prime2!" "!bo!" "!o2!" "!o3!" "!dir_f!"
@@ -552,30 +530,6 @@ rem call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
         call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!sbo!" "!dir_f!"
 
     )
-
-
-
-    endlocal
-exit /b
-
-:itemize_perms
-    setlocal
-    set "operms=%~1"
-    set "f=%~2"
-
-    for /f "tokens=1 delims=|" %%i in ("!operms!") do (
-
-    )
-    for /f "tokens=2 delims=|" %%i in ("!operms!") do (
-        
-    )
-    for /f "tokens=3 delims=|" %%i in ("!operms!") do (
-        
-    )
-    for /f "tokens=4 delims=|" %%i in ("!operms!") do (
-        
-    )
-   
 
 
 
@@ -863,7 +817,7 @@ exit /b
 
     set "dir=hard"
     if "!f!" equ "T" (
-        set "dir=soft\!a!"
+        set "dir=SAMPLE_FILE_NAMES"
     )
 
 

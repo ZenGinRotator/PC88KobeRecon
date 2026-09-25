@@ -290,7 +290,7 @@ exit /b
     for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
         set "optn2_r=%%i"
     )
-    echo "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" --------------------------------------------NAME "!phrase!"----
+    REM echo "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" --------------------------------------------NAME "!phrase!"----
 
     rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
     rem     or to indicate the end of a bridge
@@ -346,8 +346,8 @@ exit /b
 
 
 
-
-    call :the_last "!last_char!"
+    rem showing the last char as output
+    rem call :the_last "!last_char!"
 
     call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!" ""
 
@@ -382,11 +382,14 @@ exit /b
     
 
     if "!item!" equ ".d88!end_mark!" (
-        echo PASSED
+        echo PASSED LAST CHAR "!right_c!"
+        call :primary_and_optn_chars "!right_c!"
         exit /b
     )
     if "!item!" equ "!end_mark!" (
-        echo PASSED
+        rem unsure if calling this function is necessary
+        call :primary_and_optn_chars "!right_c!"
+        echo PASSED LAST CHAR "!right_c!"
         exit /b
     )
 
@@ -448,6 +451,10 @@ exit /b
 
     if !q! equ 2 (
         echo PASS
+
+        call :primary_and_optn_chars "!right_c!"
+
+
     ) ELSE (
         ECHO FAIL
         pause
@@ -523,5 +530,24 @@ rem    if "!item!" equ " " (
 
     set /a token+=1
     call :recurse_to_end "!token!" "!right_c!" "!phrase!" "!item!" "!end_mark!"
+    endlocal
+exit /b
+
+
+:exe
+    setlocal
+    echo EXE
+    set /a q=0
+    for %%i in ("SAMPLE_FILE_NAMES\*") do (
+        REM echo "%%i"
+        set itm=
+        set /a q+=1
+        echo !q!
+        for /f "tokens=2 delims=\" %%j in ("%%i") do (
+            echo "%%j"
+            call :find_last_char "" "%%j"
+            
+        )
+    )
     endlocal
 exit /b

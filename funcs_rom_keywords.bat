@@ -1580,6 +1580,22 @@ exit /b
 
 
 
+:exe_loop
+    setlocal
+    set /a q=0
+    for %%i in ("SAMPLE_FILE_NAMES_NEST_START\*") do (
+        set /a q+=1
+        for /f "tokens=2 delims=\" %%j in ("%%i") do (
+            call :start_kywds "(" ")" "%%j" "[" "]" "{" "}"
+            echo !q!
+        )
+        
+        rem pause
+    )
+    endlocal
+exit /b
+
+
 :del_txts
     setlocal
     if exist labels.txt ( del labels.txt)
@@ -1614,7 +1630,12 @@ exit /b
     echo ----- "!name!" -----
     call :del_txts
     
-    call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
+    rem call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
+    
+    rem new version of finding last character in name
+    echo need to find the first char
+    pause
+    call "funcs_last_char.bat" :find_last_char "" "!name!"
     
 
     for /f "tokens=1 delims=|" %%i in (chars.txt) do (
@@ -1677,6 +1698,7 @@ exit /b
     )
 
     
+    
 
     if "!item!" equ " " (
         exit /b
@@ -1686,17 +1708,19 @@ exit /b
     rem     delimiting character (eg ")"),
     rem     so we can terminate this recursive search.
     if "!item!" equ "!name!" (
-        exit /b
+        REM exit /b
     )
 
     rem Stop at extension
     rem Situations: a. bridge.d88, or .d88
-
+echo ITEM I "!item!"
     
+
+    rem Unused
     call :continue_or_stop "!item!"
      if exist "stop.txt" (
          del "stop.txt"
-         exit /b
+         REM exit /b
      )
     
 
@@ -1707,21 +1731,10 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
-    rem ECHO PRIMARY ITEM "!item!"
-    rem echo PRIMARY BRIDGE  "!bridge!"
+     rem ECHO PRIMARY ITEM "!item!"
+     rem echo PRIMARY BRIDGE  "!bridge!"
 
-    if "!item!" equ "!bridge!" (
-        echo T "!item!"
-        rem echo "!item!" is nested
-        rem echo delete "is_primary_nested.txt"
-        set /a token+=1
-        call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-        exit /b
-    )
 
-    rem if not exist "is_primary_nested.txt" (
-    rem     echo 
-    rem )
 
     set "primes=!left_char!|!right_char!"
     set "optn1s=!optn_one_left!|!optn_one_right!"
@@ -1730,8 +1743,11 @@ exit /b
     set "delim_chars=!primes!|!optn1s!|!optn2s!"
     
     
-    call :count_optn "!delim_chars!" "PAD!item!" "!bridge!"
-     rem call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!token!"
+    rem call :count_optn "!delim_chars!" "PAD!item!" "!bridge!"
+    
+    
+    
+    rem call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!token!"
     rem set /a t=0
     rem for /f "tokens=*" %%i in (token.txt) do (
     rem     set /a "t=%%i"
@@ -1782,6 +1798,7 @@ exit /b
 
     endlocal
 exit /b
+
 
 :recurse_on_item
     setlocal
@@ -2249,33 +2266,123 @@ rem     encapsulator in the bridge (or not).
         set "optn2_right=%%i"
     )
 
-
+ rem echo "!delim_chars!" "!optn1_left!" "!optn2_left!"
+ rem echo BRIDGE IS "!bridge!"
+ rem echo Item is "!item!"
+    
     
 
-
+    rem echo COUNT_OPTN
     ECHO ITEM "!item!"
     echo BRIDGE "!bridge!"
 
 
-    call :recurse_with_left "2" "!prime_left!" "!item!"
     
-    call :delim_with_char "1" "!optn1_left!" "!item!"
+    
+    call :delim_with_char "1" "!optn1_left!" "!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "left1=%%i"
     )
-    call :delim_with_char "1" "!optn2_left!" "!item!"
+    call :delim_with_char "1" "!optn2_left!" "!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "left2=%%i"
     )
+rem echo ITEM IS "!item!"
+rem pause
 
+    rem ECHO left1 "!left1!"  "!optn1_left!"
+    rem echo left2 "!left2!" "!optn2_left!"
+
+    set use1=
+    set use2=
     set /a q=0
-    if "!left1!" neq "!item!" (
+    if "!left1!" neq "!bridge!" (
         set /a q+=1
+        set "use1=!optn1_left!"
     )
-    if "!left2!" neq "!item!" (
+    if "!left2!" neq "!bridge!" (
         set /a q+=1
+        set "use2=!optn2_left!"
     )
-    echo QTY "!q!"
+
+    if !q! equ 0 (
+        rem echo a bridge without any optional encaps
+        rem echo could have a space???
+        rem echo could be a non-gap????
+        exit /b
+    )
+    rem echo OPTN QTY "!q!" IN BRIDGE "!bridge!"
+    if "!use1!" neq "" (
+        rem echo USE1 DO "!optn1_left!"
+    call :rec_bridge "1" "!optn1_left!" "!optn1_right!" "!bridge!"
+    )
+
+    IF "!use2!" neq "" (
+        rem echo USE2 DO "!optn2_left!"
+    call :rec_bridge "1" "!optn2_left!" "!optn2_right!" "!bridge!"
+    )
+
+
+
+    
+    rem call :recurse_with_left "2" "!prime_left!" "!item!"
+
+
+    endlocal
+exit /b
+
+
+
+rem NAME "(P1 +) BRIDGE 1                                                               ***[S1 +][S2 +][S3 +]"----
+rem NAME "(P1 +) (P2 +) BRIDGE 1                                                        ***[S1 +][S2 +][S3 +]"----
+rem NAME "(P1 +) (P2 +) (P1.0 + (P1.1 +) (P1.2 +) P1.N + ) BRIDGE 1                     ***[S1 +][S2 +][S3 +]"----
+
+rem NAME "(P1 +) BRIDGE 1 [S1 +][S2 +][S3 +]                                            ***(PN +)"----
+rem NAME "(P1 +) (P2 +) BRIDGE 1 [S1 +][S2 +][S3 +]                                     ***(PN +)"----
+rem NAME "(P1 +) (P2 +) (P1.0 + (P1.1 +) (P1.2 +) P1.N + ) BRIDGE 1 [S1 +][S2 +][S3 +]  ***(PN +)"----
+
+rem BRIDGE 1 [S [S] S] -> pad BRIDGE 1 [S [S] S]
+rem     1     2  3             1        2  3
+
+rem PAD(INDIV)
+REM PAD (NESTED () )
+REM PADbridge
+:rec_bridge
+    setlocal
+    set "token=%~1"
+    set "optn_l=%~2"
+    set "optn_r=%~3"
+    set "bridge=%~4"
+    rem echo REC BRIDGE LEFT AND RIGHT "!optn_l!" "!optn_r!"
+    rem pause
+    set item_b=
+    call :delim_with_char "!token!" "!optn_r!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item_b=%%i"
+    )
+
+    if "!item_b!" equ " " (
+        exit /b
+    )
+
+rem echo ITEM_B "!item_b!"
+
+    rem assume ITEM_B IS bridge
+
+    rem Assume ITEM_B is NESTED
+    rem set type="###     NESTED      ####"
+    
+    set "pad_item=PAD!item_b!"
+    rem echo ITEM B "!item_b!"
+    rem (P1 +) [S1 +][S2 +][S3.0 + [S3.1 +] [S3.2 +] S3.n +](P2 +)" -- " [s1..." causes loop to finish too soon 
+    rem echo P ITEM "!pad_item!"    LEFT CHAR "!optn_l!" RIGHT CHAR "!optn_r!"
+    rem echo PAD_ITEM "!pad_item!"
+    rem echo ITEM _ B "!item_b!"
+    call :recurse_with_left "1" "!optn_l!" "!pad_item!" "!item_b!" ""
+
+    set /a token+=1
+
+    call :rec_bridge "!token!" "!optn_l!" "!optn_r!" "!bridge!" 
 
     endlocal
 exit /b
@@ -2284,26 +2391,103 @@ exit /b
     setlocal
     set "token=%~1"
     set "left=%~2"
-    set "item=%~3"
+    set "pitem=%~3"
+    set "orig_itm=%~4"
+    set "past_label=%~5"
+rem echo Left "!left!"
+REM echo P_ITEM "!pitem!"
+REM ECHO ORIG_ITEM "!orig_itm!"
+rem echo TOKEN "!token!"
 
     set t=
-    call :delim_with_char "!token!" "!left!" "!item!"
+    call :delim_with_char "!token!" "!left!" "!pitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "t=%%i"
     )
 
+
     if "!t!" equ " " (
         exit /b
     )
+   
+   rem set orig_bridge=
+   rem call :delim_with_char "!token!" "!left!" "!orig_itm!"
+   rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+   rem     set "orig_bridge=%%i"
+   rem  )
 
-    echo T "!t!"
+
+
+
+
+    call :delim_with_char "2" "!left!" "!orig_itm!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "v=%%i"
+    )
+    call :delim_with_char "1" "!left!" "!orig_itm!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "orig_bridge=%%i"
+    )
+
+    rem echo orig bridge "!orig_bridge!"
+    rem echo past label "!past_label!"
+    set "temp_t=!t!"
+
+    if "!v!" neq " " (
+        if "!token!" equ "1" (
+            rem if "!past_label!" neq "!orig_bridge!" (
+        set "t=!orig_bridge!"
+        rem )
+        set /a temp=!token!+1
+        call :delim_with_char "!temp!" "!left!" "!pitem!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            rem echo J "%%i"
+            rem set "past_label=%%i"
+        )
+        )
+    )
+
+        rem changing a non-existent bridge that appears before optional character, so that it disappears at output
+    if "!temp_t!" equ "PAD" ( set "t=" )
+
+    rem changing bridge that appears after optional encapsulator - does this work for last nested label?
+    if "!temp_t!" equ "!pitem!" ( set "t=!orig_itm!")
+
+    rem
+    if "!past_label!" equ "!t!" (
+        if "!past_label!" neq  "" (
+        echo ER "!past_label!"
+        pause
+    )
+        
+    )
+    echo TT "!t!" "!token!"
 
 
     set /a !token+=1
-    call :recurse_with_left "!token!" "!left!" "!item!"
+    call :recurse_with_left "!token!" "!left!" "!pitem!" "!orig_itm!" "!t!"
     endlocal
 exit /b
 
+:rec_on_space
+    setlocal
+    set "token=%~1"
+    set "bridge=%~2"
+    endlocal
+
+    set b=
+    call :delim_with_char "!token!" " " "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "b=%%i"
+    )
+
+    if "!b!" equ " " (
+        exit /b
+    )
+    echo B "!b!"
+    set /a token+=1
+    call :rec_on_space "!token!" "!bridge!"
+exit /b
 
 
 
