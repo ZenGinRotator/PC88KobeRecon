@@ -204,7 +204,7 @@ exit /b
 
 
 
-
+    rem this is hardcoded
     call :DOIR "1" "]" "!item!"
 
     rem Unused
