@@ -1583,7 +1583,7 @@ exit /b
 :exe_loop
     setlocal
     set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES_NEST_START\*") do (
+    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
         set /a q+=1
         for /f "tokens=2 delims=\" %%j in ("%%i") do (
             call :start_kywds "(" ")" "%%j" "[" "]" "{" "}"
@@ -1634,7 +1634,19 @@ exit /b
     
     rem new version of finding last character in name
     echo need to find the first char
-    pause
+    call "funcs_first_char.bat" :find "!name!"
+    set first_l=
+    set first_r=
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "first_l=%%i"
+    )
+
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "first_r=%%i"
+    )
+    echo first_l "!first_l!"
+    echo first_R "!first_r!"
+    
     call "funcs_last_char.bat" :find_last_char "" "!name!"
     
 
@@ -1674,7 +1686,23 @@ exit /b
 
 
 
+rem if t=1
+rem     if item!=b
+rem         unofficial bridge
+rem         if is not nested
+rem             official bridge
+rem     else nested label
 
+rem if t=2
+rem         indiv label
+rem         if (t+1, c)!=blank
+rem             nested label
+rem         if is nested
+rem             nested label
+
+
+rem if t > 2
+rem     nested label
 
 
 
@@ -1716,6 +1744,12 @@ exit /b
 echo ITEM I "!item!"
     
 
+
+
+
+
+     call :DOIR "1" "]" "!item!"
+
     rem Unused
     call :continue_or_stop "!item!"
      if exist "stop.txt" (
@@ -1743,50 +1777,12 @@ echo ITEM I "!item!"
     set "delim_chars=!primes!|!optn1s!|!optn2s!"
     
     
-    rem call :count_optn "!delim_chars!" "PAD!item!" "!bridge!"
-    
-    
-    
-    rem call :start_recurse_bridge "!left_char!" "!right_char!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!" "!token!"
-    rem set /a t=0
-    rem for /f "tokens=*" %%i in (token.txt) do (
-    rem     set /a "t=%%i"
-    rem )
+    set status=
+    set /a ttoken=!token!
     
 
-    rem set read_right_char=
-    rem for /f "tokens=1" %%i in (chars.txt) do (
-    rem    set "read_right_char=%%i"
-    rem )
-    REM echo "tok=" "!t!"
-    REM echo "read_right_char=" "!read_right_char!"
-    REM echo "name " "!name!"
-    rem call :tokenize_name "!t!" "!read_right_char!" "!name!" "!left_char!"
 
-   
-    rem test for .d88, .t88, or .cmt extension
-    rem if one of these extensions is found, then cancel
-    rem the algorithm with exit /b
-
-    rem echo * R "!optn_one_right!"
-    rem echo ** R "!optn_two_right!"
-    rem call :send_bridge_filter "PRIMARY" "!token!" "!bridge!" "!optn_one_right!" "!optn_two_right!" "!token!"
-
-    
-    rem set nested_test=
-    rem call :delim_with_char "3" "!left_char!" "!pad_item!"
-    rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-    rem     set "nested_test=%%i"
-    rem )
-
-    rem echo NESTED TEST "!nested_test!" AFTER pad item "!pad_item!"
-    rem if "!nested_test!" neq " " (
-    rem     echo "" > "is_nested.txt"
-    rem )
-
-
-
-    set /a token+=1
+    set /a ttoken+=1
 
     set "primaries=!left_char!|!right_char!"
     set "optn_ones=!optn_one_left!|!optn_one_right!"
@@ -1794,10 +1790,120 @@ echo ITEM I "!item!"
 
  
     rem call :recurse_on_item "2" "!primaries!" "!pad_item!" "!optn_ones!" "!optn_twos!" "!item!|!bridge!"
-    call :recurse_on_group2 "!token!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
 
     endlocal
 exit /b
+
+:DOIR
+    setlocal
+    set "token=%~1"
+    set "right=%~2"
+    set "item=%~3"
+
+    
+    call :delim_with_char "!token!" "!right!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bitem=%%i"
+    )
+
+    if "!bitem!" equ " " (
+        exit /b
+    )
+
+    
+    call :DOIL "1" "[" "!bitem!"
+    set /a token+=1
+    
+    call :DOIR "!token!" "!right!" "!item!"
+    endlocal
+exit /b
+
+:DOIL
+    setlocal
+    set "token=%~1"
+    set "right=%~2"
+    set "item=%~3"
+
+    echo ----
+    set "pb_item=PAD\!item!"
+    call :delim_with_char "!token!" "!right!" "!pb_item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bitem=%%i"
+    )
+
+    if "!bitem!" equ " " (
+        exit /b
+    )
+
+    rem echo bitem "!bitem!"
+
+    call :delim_with_char "2" "\" "!bitem!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "filled=%%i"
+    )
+    
+     if "!filled!" neq " " (
+        set "bitem=!filled!"
+    )
+    rem echo "FILLED" "!filled!"
+
+    
+    set status=
+    set /a ttoken=!token!
+    if !ttoken! equ 1 (
+        if "!bitem!" neq "!item!" (
+            set "status= UNOFFICIAL BRIDGE"
+            if not exist "is_nested.txt" (
+                set "status=OFFICIAL BRIDGE"
+                REM set "bitem=USE THE ORIG"
+            )
+            
+        ) else (
+            if exist "is_nested.txt" (
+                del "is_nested.txt"
+            )
+            set "status=NESTED LABEL"
+        )
+    )
+
+    if !ttoken! equ 2 (
+        set "status=INDIV LABEL"
+        set /a temp=!ttoken!+1
+        call :delim_with_char "!temp!" "!right!" "!pb_item!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "st=%%i"
+        ) 
+
+        REM echo **** ST **** "!st!"
+        if "!st!" neq " " (
+            REM echo NEQ
+            set "status=NESTED LABEL"
+            echo "" > "is_nested.txt"
+        )
+        if exist "is_nested.txt" (
+            set "status=NESTED LABEL"
+        )
+    )
+
+    if !ttoken! gtr 2 (
+        set "status=NESTED LABEL"
+    )
+
+    
+    
+    if "!bitem!" equ "PAD\ " (
+        set "bitem= "
+    )
+    IF "!bitem!" equ "PAD\" (
+        set "bitem="
+    )
+    ECHO FOUND "!bitem!" "!status!"
+    set /a ttoken+=1
+    
+    call :DOIL "!ttoken!" "!right!" "!item!"
+    endlocal
+exit /b`
 
 
 :recurse_on_item

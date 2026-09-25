@@ -25,7 +25,6 @@ goto :eof
     setlocal
     set "name=%~1"
 
-rem echo FIND
     set "padname=PAD!name!"
 
     set first=
@@ -36,7 +35,11 @@ rem echo FIND
     )
 
     if "!hd!" neq "!padname!" (
-        echo "!padname!" "("
+        rem echo "!padname!" "("
+        call "funcs_last_char.bat" :primary_and_optn_chars ")"
+        for /f "tokens=*" %%i in (chars.txt) do (
+            echo "%%i"
+        )
         exit /b
     )
 
@@ -48,7 +51,12 @@ rem echo FIND
     )
 
     if "!hd2!" neq "!hd!" (
-        echo "!padname!" "{"
+        rem echo "!padname!" "{"
+        call "funcs_last_char.bat" :primary_and_optn_chars "}"
+        for /f "tokens=*" %%i in (chars.txt) do (
+            echo "%%i"
+        )
+
         exit /b
     )
 
@@ -59,9 +67,18 @@ rem echo FIND
     )
 
     if "!hd3!" neq "!hd2!" (
-        echo "!padname!" "["
+        rem echo "!padname!" "["
+        call "funcs_last_char.bat" :primary_and_optn_chars "]"
+        for /f "tokens=*" %%i in (chars.txt) do (
+            echo "%%i"
+        )
+
         exit /b
     )
-    echo END
+    set "r=|"
+    echo !r! > chars.txt
+    rem for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        rem echo chars "%%i"
+    rem )
     endlocal
 exit /b
