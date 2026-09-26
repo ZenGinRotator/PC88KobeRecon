@@ -27,121 +27,186 @@ rem Work In Progress - might not need
     set "name=%~1"
 
     set "padname=PAD!name!"
+    echo "!brk!"
     echo PADNAME "!padname!"
 
-    set first=
-    set h_par=
+    set c=
+    set p=
+    set s=
     call "funcs_rom_keywords.bat" :delim_with_char "1" "(" "!padname!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "h_par=%%i"
+        set "p=%%i"
     )
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!padname!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "c=%%i"
+    )
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!padname!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "s=%%i"
+    )
+
+    rem change when character p, c, or s does not exist in name
+    set /a fqty=3
+    set /a total=9
+    if "!p!" equ "!padname!" (
+        set "p="
+        set /a fqty-=1
+        echo NOT P
+        set /a total-=1
+    )
+    if "!c!" equ "!padname!" (
+        set "c="
+        set /a fqty-=1
+        echo NOT C
+        set /a total-=3
+    )
+    if "!s!" equ "!padname!" (
+        set "s="
+        set /a fqty-=1
+        echo NOT S
+        set /a total-=5
+    )
+    if "!fqty!" equ "2" (
+        set /a fqty=1
+    )
+
+    set answ=
+    if "!total!" equ "1" (
+        set "answ=()"
+
+    )
+    if "!total!" equ "3" (
+        set "answ={}"
+    )
+    if "!total!" equ "5" (
+        set "answ=[]"
+    )
+
+    if "!total!" neq "9" (
+        echo first char is "!answ!"
+rem exit /b
+    )
+
+    if exist "stop.txt" ( del "stop.txt" )
+
+    call :sum_em "!p!" "!s!" "!c!" "!fqty!" "("
+
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "p=%%i"
+    )
+
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "s=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "c=%%i"
+    )
+
+    if exist "stop.txt" ( exit /b )
+ 
+    call :sum_em "!p!" "!s!" "!c!" "!fqty!" "["
     
-    set t_sqr=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!h_par!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "t_sqr=%%i"
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "p=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "s=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "c=%%i"
     )
 
-    if "!t_sqr!" neq "!h_par!" (
-        set "first=["
+    if exist "stop.txt" ( exit /b )
+
+    call :sum_em "!p!" "!s!" "!c!" "!fqty!" "{"
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "p=%%i"
     )
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "s=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "c=%%i"
+    )
+
     
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!t_sqr!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "t_cur=%%i"
-    )
-
-    if "!t_cur!" neq "!t_sqr!" (
-        set "first={"
-    )
-
-    echo "first=" "!first!"
 
 
-exit /b
-
-
-
-    if "!hs!" equ "PAD" (
-        ECHO "()"
-        exit /b
-    )
-    rem set hs=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!hs!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "hs=%%i"
-    )
-    if "!hs!" equ "PAD" (
-        ECHO "{"
-        exit  /b
-    )
-
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!hs!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "hs=%%i"
-    )
-
-    if "!hs!" equ "PAD" (
-        echo "[]"
-        exit /b
-    )
-
-    exit /b
-
-    if "!hd!" neq "!padname!" (
-        rem echo "!padname!" "("
-        call "funcs_last_char.bat" :primary_and_optn_chars ")"
-        for /f "tokens=*" %%i in (chars.txt) do (
-            echo "!padname!" "%%i"
-        )
-        exit /b
-    )
-
-    set hd2=
-
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!hd!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "hd2=%%i"
-        
-    )
-
-    if "!hd2!" neq "!hd!" (
-        rem echo "!padname!" "{"
-        call "funcs_last_char.bat" :primary_and_optn_chars "}"
-        for /f "tokens=*" %%i in (chars.txt) do (
-            echo "!padname!" "%%i"
-            
-        )
-
-        exit /b
-    )
-
-    set hd3=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!hd2!" 
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "hd3=%%i"
-    )
-
-    if "!hd3!" neq "!hd2!" (
-        rem echo "!padname!" "["
-        call "funcs_last_char.bat" :primary_and_optn_chars "]"
-        for /f "tokens=*" %%i in (chars.txt) do (
-            echo "!padname!" "%%i"
-        )
-
-        exit /b
-    )
-    set "r=|"
-    rem echo "!padname!" R "!r!"
-    echo !r! > chars.txt
-    rem for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-        rem echo chars "%%i"
-    rem )
     endlocal
 exit /b
 
 :isolate
     setlocal
+    set "p=%~1"
+    set "s=%~2"
+    set "c=%~3"
+    set "fqty=%~4"
+    endlocal
+exit /b
+
+:sum_em
+    setlocal
+    set "delimp=%~1"
+    set "delims=%~2"
+    set "delimc=%~3"
+    set "fqty=%~4"
+    set "char=%~5"
+rem echo "delimp" "!delimp!"
+rem echo "delims" "!delims!"
+rem echo "delimc" "!delimc!"
+rem echo fqty "!fqty!"
+rem echo char "!char!"
+rem pause
+    set p=
+    set s=
+    set c=
+    if "!delimp!" neq  " " (
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!char!" "!delimp!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+       set "p=%%i" 
+    )
+    )
+
+    if "!delims!" neq " " (
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!char!" "!delims!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+       set "s=%%i" 
+    )
+    )
+
+    if "!delimc!" neq " " (
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!char!" "!delimc!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+       set "c=%%i" 
+    )
+    )
+rem pause
+    set "chars=!p!|!s!|!c!|"
+    echo "CHARS" "!chars!"
+    echo !chars! > "chars.txt"
+
+    set /a q=0
+    if "!p!" equ "!s!" (
+        set /a q+=1
+        
+    )
+    if "!p!" equ "!c!" (
+        set /a q+=1
+        
+    )
+    
+    if "!c!" equ "!s!" (
+        set /a q+=1
+    )
+
+    if "!q!" neq "!fqty!" (
+        echo NOT BIG ENOUGH, Q "!q!", F "!fqty!"
+        EXIT /b 
+    )
+
+    ECHO FOUND A FIRST "!char!" "!fqty!"
+    echo "" > "stop.txt"
 
     endlocal
 exit /b

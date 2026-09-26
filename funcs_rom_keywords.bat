@@ -199,6 +199,12 @@ exit /b
     rem Stop at extension
     rem Situations: a. bridge.d88, or .d88
     echo ITEM I "!item!"
+
+    REM ****** To Do: ***********
+    rem Need to find first character and make sure that
+    rem     first character exists in item before calling
+    rem     :DOIL
+    call :DOIL "!token!" "!left_char!" "!item!"
     
     set has1=
     set has2=
@@ -293,12 +299,12 @@ exit /b
 :DOIL
     setlocal
     set "token=%~1"
-    set "right=%~2"
+    set "left=%~2"
     set "item=%~3"
 
-    echo ----
+    rem echo ----
     set "pb_item=PAD\!item!"
-    call :delim_with_char "!token!" "!right!" "!pb_item!"
+    call :delim_with_char "!token!" "!left!" "!pb_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bitem=%%i"
     )
@@ -339,7 +345,7 @@ exit /b
     if !ttoken! equ 2 (
         set "status=INDIV LABEL"
         set /a temp=!ttoken!+1
-        call :delim_with_char "!temp!" "!right!" "!pb_item!"
+        call :delim_with_char "!temp!" "!left!" "!pb_item!"
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "st=%%i"
         ) 
@@ -370,7 +376,7 @@ exit /b
     ECHO FOUND "!bitem!" "!status!"
     set /a ttoken+=1
     
-    call :DOIL "!ttoken!" "!right!" "!item!"
+    call :DOIL "!ttoken!" "!left!" "!item!"
     endlocal
 exit /b
 
