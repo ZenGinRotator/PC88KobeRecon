@@ -88,19 +88,19 @@ exit /b
     rem call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
     
     rem new version of finding last character in name
-    echo need to find the first char
-    call "funcs_first_char.bat" :find "!name!"
+    rem echo need to find the first char
+    rem call "funcs_first_char.bat" :find "!name!"
     set first_l=
     set first_r=
-    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-        set "first_l=%%i"
-    )
+    rem for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+    rem     set "first_l=%%i"
+    rem )
 
-    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-        set "first_r=%%i"
-    )
-    echo first_l "!first_l!"
-    echo first_R "!first_r!"
+    rem for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+    rem     set "first_r=%%i"
+    rem )
+    rem echo first_l "!first_l!"
+    rem echo first_R "!first_r!"
     
     call "funcs_last_char.bat" :find_last_char "" "!name!"
     
@@ -200,13 +200,30 @@ exit /b
     rem Situations: a. bridge.d88, or .d88
     echo ITEM I "!item!"
     
+    set has1=
+    set has2=
+    call :delim_with_char "1" "!optn_one_right!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has1=%%i"
+    )
+    if "!has1!" neq "PAD!item!" (
+        call :DOIR "1" "!optn_one_right!" "!item!"
+    )
+    call :delim_with_char "1" "!optn_two_right!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has2=%%i"
+    )
+    if "!has2!" neq "PAD!item!" (
+        call :DOIR "1" "!optn_two_right!" "!item!"    
+    )
 
 
-
-
+    echo "optn1_r" "!optn_one_right!"
+    echo "optn2_r" "!optn_two_right!"
+    pause
     rem this is hardcoded
-    call :DOIR "1" "]" "!item!"
-
+    
+    
     rem Unused
     call :continue_or_stop "!item!"
      if exist "stop.txt" (
