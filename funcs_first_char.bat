@@ -107,7 +107,57 @@ exit /b
     )
 echo FIRST CHAR "!char!"
     
+    call :verify_f "!padname!" "!char!"
+
+    endlocal
+exit /b
+
+:verify_f
+    setlocal
+    set "name=%~1"
+    set "first_c=%~2"
+
+    rem Assume first_c=(
+    set "t1=["
+    set "t2={"
+
+    if "!first_c!" equ "{" (
+        set "t1=["
+        set "t2=("
+    )
+    if "!first_c!" equ "[" (
+        set "t1={"
+        set "t2=("
+    )
+    
+
+    set t_first=
+    set t_name1=
+    set t_name2=
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!first_c!" "!name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "t_first=%%i"
+    )
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!t1!" "!t_first!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "t_name1=%%i"
+    )
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!t2!" "!t_first!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "t_name2=%%i"
+    )
 
 
+    set "e_status=FAIL"
+
+    if "!t_name1!" equ "!t_first!" (
+        set "e_status=PASSED"
+    )
+    if "!t_name2!" equ "!t_first!" (
+        set "e_status=PASSED"
+    )
+
+    echo "!e_status!"
     endlocal
 exit /b
