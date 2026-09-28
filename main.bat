@@ -47,7 +47,7 @@ set "brid_four=B4"
 
 set brk=^
 
-pause
+
 
 
 rem GROUPER can be:
@@ -178,6 +178,20 @@ rem call "funcs_bridge_sample_data.bat" :sample_file_names
 rem call "funcs_bridge_sample_data.bat" :hard_vs_soft
 rem call "funcs_last_char.bat" :exe
 
+
+rem identify-first-char permutation types
+rem Rom name with:
+rem no encapsulators
+rem 1 encapsulator
+rem 2 encapsulators (all distinct, all same)
+rem 3 encapsulators (all distinct, all same, some distinct)
+rem 4 encapsulators (2 same-remaining distinct, 2 same-remaining same)
+
+rem for sample data with 1, 2, 3, or 4 encapsulators, also need sample data with:
+rem spaces in between ecapsulators
+rem bridges in between encapsulators
+rem spaces and bridges in between encapsulators
+
 call "funcs_first_char.bat" :find "Rom"
 
   call "funcs_first_char.bat" :find "Rom[]"
@@ -186,7 +200,9 @@ call "funcs_first_char.bat" :find "Rom"
   call "funcs_first_char.bat" :find "{}"
   call "funcs_first_char.bat" :find "()"
   call "funcs_first_char.bat" :find "[]"
-
+  echo "!brk!"
+echo two encaps
+echo "!brk!"
   call "funcs_first_char.bat" :find "Rom[]()"
   call "funcs_first_char.bat" :find "Rom[]{}"
 
@@ -196,8 +212,9 @@ call "funcs_first_char.bat" :find "Rom"
 
   call "funcs_first_char.bat" :find "Rom{}[]"
   call "funcs_first_char.bat" :find "Rom{}()"
-
-  
+echo "!brk!"
+  echo three encaps
+  echo "!brk!"
  call "funcs_first_char.bat" :find "Rom[]{}()"
  call "funcs_first_char.bat" :find "Rom[](){}"
 
@@ -210,10 +227,7 @@ call "funcs_first_char.bat" :find "Rom"
  
   call "funcs_first_char.bat" :find "{}()[]"
  call "funcs_first_char.bat" :find "()[]{}"
-  call "funcs_first_char.bat" :find "Rom"
-  call "funcs_first_char.bat" :find "() []"
-  call "funcs_first_char.bat" :find "[]{}"
-  call "funcs_first_char.bat" :find "(){}"
+ 
 
 rem call "funcs_rom_keywords.bat" :exe_loop
 ECHO ---- DONE ----
