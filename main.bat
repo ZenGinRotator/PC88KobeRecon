@@ -178,14 +178,36 @@ rem call "funcs_bridge_sample_data.bat" :sample_file_names
 rem call "funcs_bridge_sample_data.bat" :hard_vs_soft
 rem call "funcs_last_char.bat" :exe
 
+call "funcs_first_char.bat" :find "Rom"
 
   call "funcs_first_char.bat" :find "Rom[]"
+  call "funcs_first_char.bat" :find "Rom{}"
+  call "funcs_first_char.bat" :find "Rom()"
   call "funcs_first_char.bat" :find "{}"
   call "funcs_first_char.bat" :find "()"
+  call "funcs_first_char.bat" :find "[]"
 
-  call "funcs_first_char.bat" :find "Rom"
+  call "funcs_first_char.bat" :find "Rom[]()"
+  call "funcs_first_char.bat" :find "Rom[]{}"
 
+  call "funcs_first_char.bat" :find "Rom(){}"
+  call "funcs_first_char.bat" :find "Rom()[]"
+
+
+  call "funcs_first_char.bat" :find "Rom{}[]"
+  call "funcs_first_char.bat" :find "Rom{}()"
+
+  
  call "funcs_first_char.bat" :find "Rom[]{}()"
+ call "funcs_first_char.bat" :find "Rom[](){}"
+
+ call "funcs_first_char.bat" :find "Rom(){}[]"
+ call "funcs_first_char.bat" :find "Rom()[]{}"
+ 
+ call "funcs_first_char.bat" :find "Rom[]{}()"
+ call "funcs_first_char.bat" :find "Rom[](){}"
+ 
+ 
   call "funcs_first_char.bat" :find "{}()[]"
  call "funcs_first_char.bat" :find "()[]{}"
   call "funcs_first_char.bat" :find "Rom"

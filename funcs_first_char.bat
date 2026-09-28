@@ -52,19 +52,19 @@ rem Work In Progress - might not need
     if "!p!" equ "!padname!" (
         set "p="
         set /a fqty-=1
-        echo NOT P
+        rem echo NOT P
         set /a total-=1
     )
     if "!c!" equ "!padname!" (
         set "c="
         set /a fqty-=1
-        echo NOT C
+        rem echo NOT C
         set /a total-=3
     )
     if "!s!" equ "!padname!" (
         set "s="
         set /a fqty-=1
-        echo NOT S
+        rem echo NOT S
         set /a total-=5
     )
     if "!fqty!" equ "2" (
@@ -83,9 +83,15 @@ rem Work In Progress - might not need
         set "answ=[]"
     )
 
-    if "!total!" neq "9" (
+    rem if "!total!" neq "9" (
+        rem if "!fqty!" equ "1" (
+            if "!answ!" neq "" (
         echo first char is "!answ!"
-rem exit /b
+  exit /b
+    )
+    if "!fqty!" equ "0" (
+        echo file is encap-free
+        exit /b
     )
 
     if exist "stop.txt" ( del "stop.txt" )
@@ -183,7 +189,7 @@ rem pause
     )
 rem pause
     set "chars=!p!|!s!|!c!|"
-    echo "CHARS" "!chars!"
+    rem echo "CHARS" "!chars!"
     echo !chars! > "chars.txt"
 
     set /a q=0
@@ -201,11 +207,11 @@ rem pause
     )
 
     if "!q!" neq "!fqty!" (
-        echo NOT BIG ENOUGH, Q "!q!", F "!fqty!"
-        EXIT /b 
+        rem echo NOT BIG ENOUGH, Q "!q!", F "!fqty!"
+        rem EXIT /b 
     )
 
-    ECHO FOUND A FIRST "!char!" "!fqty!"
+    ECHO FOUND A FIRST "!char!"
     echo "" > "stop.txt"
 
     endlocal
