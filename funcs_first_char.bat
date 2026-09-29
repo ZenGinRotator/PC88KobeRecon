@@ -22,13 +22,13 @@ call %*
 goto :eof
 
 rem Work In Progress - might not need
-:find
+:find_first_char
     setlocal
     set "name=%~1"
 
     set "padname=PAD!name!"
-    echo "!brk!"
-    echo PADNAME "!padname!"
+    rem echo "!brk!"
+    rem echo PADNAME "!padname!"
 
     set c=
     set p=
@@ -105,7 +105,7 @@ exit /b
     if "!q!" neq "3" (
         exit /b
     )
-echo FIRST CHAR "!char!"
+    REM echo FIRST CHAR "!char!"
     
     call :verify_f "!padname!" "!char!"
 
@@ -158,6 +158,11 @@ exit /b
         set "e_status=PASSED"
     )
 
-    echo "!e_status!"
+    echo "!name!" FIRST CHAR "!first_c!" "!e_status!"
+
+    if "!e_status!" equ "FAIL" (
+        echo FIRST CHAR FAIL
+        pause
+    )
     endlocal
 exit /b

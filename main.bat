@@ -177,6 +177,7 @@ rem call "funcs_bridge_sample_data.bat" :hard_code
 rem call "funcs_bridge_sample_data.bat" :sample_file_names
 rem call "funcs_bridge_sample_data.bat" :hard_vs_soft
 rem call "funcs_last_char.bat" :exe
+rem exit /b
 
 
 rem identify-first-char permutation types
@@ -192,41 +193,41 @@ rem spaces in between ecapsulators
 rem bridges in between encapsulators
 rem spaces and bridges in between encapsulators
 
-call "funcs_first_char.bat" :find "Rom"
+call "funcs_first_char.bat" :find_first_char "Rom"
 
-  call "funcs_first_char.bat" :find "Rom[]"
-  call "funcs_first_char.bat" :find "Rom{}"
-  call "funcs_first_char.bat" :find "Rom()"
-  call "funcs_first_char.bat" :find "{}"
-  call "funcs_first_char.bat" :find "()"
-  call "funcs_first_char.bat" :find "[]"
+  call "funcs_first_char.bat" :find_first_char "Rom[]"
+  call "funcs_first_char.bat" :find_first_char "Rom{}"
+  call "funcs_first_char.bat" :find_first_char "Rom()"
+  call "funcs_first_char.bat" :find_first_char "{}"
+  call "funcs_first_char.bat" :find_first_char "()"
+  call "funcs_first_char.bat" :find_first_char "[]"
   echo "!brk!"
 echo two encaps
 echo "!brk!"
-  call "funcs_first_char.bat" :find "Rom[]()"
-  call "funcs_first_char.bat" :find "Rom[]{}"
+  call "funcs_first_char.bat" :find_first_char "Rom[]()"
+  call "funcs_first_char.bat" :find_first_char "Rom[]{}"
 
-  call "funcs_first_char.bat" :find "Rom(){}"
-  call "funcs_first_char.bat" :find "Rom()[]"
+  call "funcs_first_char.bat" :find_first_char "Rom(){}"
+  call "funcs_first_char.bat" :find_first_char "Rom()[]"
 
 
-  call "funcs_first_char.bat" :find "Rom{}[]"
-  call "funcs_first_char.bat" :find "Rom{}()"
+  call "funcs_first_char.bat" :find_first_char "Rom{}[]"
+  call "funcs_first_char.bat" :find_first_char "Rom{}()"
 echo "!brk!"
   echo three encaps
   echo "!brk!"
- call "funcs_first_char.bat" :find "Rom[]{}()"
- call "funcs_first_char.bat" :find "Rom[](){}"
+ call "funcs_first_char.bat" :find_first_char "Rom[]{}()"
+ call "funcs_first_char.bat" :find_first_char "Rom[](){}"
 
- call "funcs_first_char.bat" :find "Rom(){}[]"
- call "funcs_first_char.bat" :find "Rom()[]{}"
+ call "funcs_first_char.bat" :find_first_char "Rom(){}[]"
+ call "funcs_first_char.bat" :find_first_char "Rom()[]{}"
  
- call "funcs_first_char.bat" :find "Rom[]{}()"
- call "funcs_first_char.bat" :find "Rom[](){}"
+ call "funcs_first_char.bat" :find_first_char "Rom[]{}()"
+ call "funcs_first_char.bat" :find_first_char "Rom[](){}"
  
  
-  call "funcs_first_char.bat" :find "{}()[]"
- call "funcs_first_char.bat" :find "()[]{}"
+  call "funcs_first_char.bat" :find_first_char "{}()[]"
+ call "funcs_first_char.bat" :find_first_char "()[]{}"
  
 
 rem call "funcs_rom_keywords.bat" :exe_loop

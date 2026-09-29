@@ -85,7 +85,7 @@ exit /b
     echo ----- "!name!" -----
     call :del_txts
     
-    rem call "funcs_last_char.bat" :find_last_delim_char "!right_char!" "!name!" "!optn_one_right!" "!optn_two_right!"
+   
     
     rem new version of finding last character in name
     rem echo need to find the first char

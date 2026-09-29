@@ -9,58 +9,6 @@ goto :eof
 
 
 
-:find_last_delim_char
-    setlocal
-    rem set "left_char=%~1"
-    set "right_char=%~1"
-    set "name=%~2"
-    rem set "optn_one_left=%~4"
-    set "optn_one_right=%~3"
-    rem set "optn_two_left=%~6"
-    set "optn_two_right=%~4"
-
-    
-    set primary_item=
-    call :recurse_to_ext "1" "!right_char!" "!name!" ""
-    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
-        set "primary_item=%%i"
-    )
-    
-    call :parse_item_with_ext "!primary_item!" "!right_char!" "!optn_one_right!" "!optn_two_right!" "!name!"
-
-    if exist has_paren.txt (
-        exit /b
-    )
-    del last_item.txt
-    
-    
-    
-    set secondary_item=
-    call :recurse_to_ext "1" "!optn_one_right!" "!primary_item!" ""
-    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
-        set "secondary_item=%%i"
-    )
-
-    call :parse_item_with_ext "!secondary_item!" "!optn_one_right!" "!optn_two_right!" "!right_char!" "!name!"
-    if exist has_curl.txt (
-        exit /b
-    )
-    del last_item.txt
-    
-    set tertiary_item=
-    call :recurse_to_ext "1" "!optn_two_right!" "!secondary_item!" ""
-    for /f "tokens=1 delims=|" %%i in (last_item.txt) do (
-        set "tertiary_item=%%i"
-    )
-    
-    call :parse_item_with_ext "!tertiary_item!" "!optn_two_right!" "!right_char!" "!optn_one_right!" "!name!"
-    if exist has_square.txt (
-        exit /b
-    )
-    del last_item.txt
-
-    endlocal
-exit /b
 
 
 
@@ -118,7 +66,7 @@ exit /b
             REM echo  --- "!result!"
         )
         if "!result!" equ "FAIL" (
-            echo !!!!!! FAIL
+            echo !!!!!! LAST CHAR FAIL
 
 
         )
@@ -220,43 +168,127 @@ exit /b
     endlocal
 exit /b
 
-:primary_and_optn_chars
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:exe
     setlocal
-    set "right_char=%~1"
+    echo EXE
+    set /a q=0
+    for %%i in ("SAMPLE_FILE_NAMES\*") do (
+        REM echo "%%i"
+        set itm=
+        set /a q+=1
+        echo "!brk!"
+        echo !q!
+        for /f "tokens=2 delims=\" %%j in ("%%i") do (
+            echo "%%j"
+            call :find_last_char "" "%%j"
 
-    set left_char=
-    if "!right_char!" equ ")" (
-        set "left_char=("
+            rem Finding the first char
+            call "funcs_first_char.bat" :find_first_char "%%j"
+            
+        )
     )
-
-    set "optn_one_left={"
-    set "optn_one_right=}"
-
-    set "optn_two_left=["
-    set "optn_two_right=]"
-
-    if "!right_char!" equ "}" (
-        set "left_char={"
-        set "optn_one_left=["
-        set "optn_one_right=]"
-        set "optn_two_left=("
-        set "optn_two_right=)"
-    )
-    if "!right_char!" equ "]" (
-        set "left_char=["
-        set "optn_one_left=("
-        set "optn_one_right=)"
-        set "optn_two_left={"
-        set "optn_two_right=}"
-    )
-
-    set "prime=!left_char!|!right_char!"
-    set "optn1=!optn_one_left!|!optn_one_right!"
-    set "optn2=!optn_two_left!|!optn_two_right!"
-
-    set "chars=!prime!|!optn1!|!optn2!|"
-    echo !chars! > "chars.txt"
-
     endlocal
 exit /b
 
@@ -381,6 +413,7 @@ exit /b
     rem )
     
 
+    rem need to account for .d88, .t88, and .cmt
     if "!item!" equ ".d88!end_mark!" (
         echo PASSED LAST CHAR "!right_c!"
         call :primary_and_optn_chars "!right_c!"
@@ -402,6 +435,47 @@ exit /b
 
     set /a token+=1
     call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!" "!item!"
+
+    endlocal
+exit /b
+
+
+:primary_and_optn_chars
+    setlocal
+    set "right_char=%~1"
+
+    set left_char=
+    if "!right_char!" equ ")" (
+        set "left_char=("
+    )
+
+    set "optn_one_left={"
+    set "optn_one_right=}"
+
+    set "optn_two_left=["
+    set "optn_two_right=]"
+
+    if "!right_char!" equ "}" (
+        set "left_char={"
+        set "optn_one_left=["
+        set "optn_one_right=]"
+        set "optn_two_left=("
+        set "optn_two_right=)"
+    )
+    if "!right_char!" equ "]" (
+        set "left_char=["
+        set "optn_one_left=("
+        set "optn_one_right=)"
+        set "optn_two_left={"
+        set "optn_two_right=}"
+    )
+
+    set "prime=!left_char!|!right_char!"
+    set "optn1=!optn_one_left!|!optn_one_right!"
+    set "optn2=!optn_two_left!|!optn_two_right!"
+
+    set "chars=!prime!|!optn1!|!optn2!|"
+    echo !chars! > "chars.txt"
 
     endlocal
 exit /b
@@ -456,7 +530,7 @@ exit /b
 
 
     ) ELSE (
-        ECHO FAIL
+        ECHO LAST CHAR FAIL
         pause
     )
 
@@ -517,21 +591,3 @@ exit /b
     endlocal
 exit /b
 
-
-:exe
-    setlocal
-    echo EXE
-    set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES\*") do (
-        REM echo "%%i"
-        set itm=
-        set /a q+=1
-        echo !q!
-        for /f "tokens=2 delims=\" %%j in ("%%i") do (
-            echo "%%j"
-            call :find_last_char "" "%%j"
-            
-        )
-    )
-    endlocal
-exit /b

@@ -272,11 +272,18 @@ exit /b
     rem if n -> i"
     rem if i -> n""
 
+    REM --- primary encapsulator (encap that appears first) ---
+    rem primary encapsulator type
     set "ptype=%~1"
+
+    rem make the 2nd (last encapsulator) in file name, empty or fill
     set "pfill=%~2"
+
+    rem --- optional encapsulator (an encap that appears after primary encap) ---
     set "otype=%~3"
 
-    rem numerical value
+    rem The optional encapsulator that will be invereted,
+    rem     as in nested to indiv, or indiv into nested
     set "o_invert=%~4"
 
 
@@ -466,7 +473,7 @@ exit /b
 exit /b
 
 
-
+rem Inserting bridge, space, bridge & space, or space & bridge into optional character
 :change_o
     setlocal
     rem set "o=%~1"
@@ -535,6 +542,48 @@ rem call :write "!prime1!" "!prime2!" "!o1!" "!o2!" "!o3!" "T"
 
     endlocal
 exit /b
+
+
+
+:write
+    setlocal
+    rem primary encapsulators
+    set "a=%~1"
+    set "b=%~2"
+
+    rem optional encapsulators
+    set "c=%~3"
+    set "d=%~4"
+    set "e=%~5"
+
+    rem directory destination for created files
+    set "f=%~6"
+
+    rem Currently unused.
+    set "it1=%~7"
+    set "it2=%~8"
+    set "it3=%~9"
+    
+    set "t=!a!!c!!d!!e!!b!"
+
+    rem echo T "!t!"
+
+
+    set "dir=hard"
+    if "!f!" equ "T" (
+        set "dir=SAMPLE_FILE_NAMES"
+    )
+
+
+    if not exist "!dir!" (
+        md "!dir!
+    )
+  
+
+    echo !t! > "!dir!\!t!"
+    endlocal
+exit /b
+
 
 
 
@@ -790,45 +839,6 @@ exit /b
 
 
 
-
-:write
-    setlocal
-    rem primary encapsulators
-    set "a=%~1"
-    set "b=%~2"
-
-    rem optional encapsulators
-    set "c=%~3"
-    set "d=%~4"
-    set "e=%~5"
-
-    rem directory destination for created files
-    set "f=%~6"
-
-    rem Currently unused.
-    set "it1=%~7"
-    set "it2=%~8"
-    set "it3=%~9"
-    
-    set "t=!a!!c!!d!!e!!b!"
-
-    rem echo T "!t!"
-
-
-    set "dir=hard"
-    if "!f!" equ "T" (
-        set "dir=SAMPLE_FILE_NAMES"
-    )
-
-
-    if not exist "!dir!" (
-        md "!dir!
-    )
-  
-
-    echo !t! > "!dir!\!t!"
-    endlocal
-exit /b
 
 :invert_o
     setlocal
