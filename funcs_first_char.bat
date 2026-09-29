@@ -58,7 +58,10 @@ rem Work In Progress - might not need
     )
 
     if "!q!" equ "3" (
-        echo NO ENCAPS 
+        echo "!name!" NO ENCAPS 
+        set "err=|"
+        echo !err! > "chars.txt"
+        rem call :read_c
         exit /b
     )
 
@@ -66,6 +69,14 @@ rem Work In Progress - might not need
     call :count_it "!c!" "{"
     call :count_it "!s!" "["
     
+exit /b
+
+:read_c
+    setlocal
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        echo READ "%%i"
+    )
+    endlocal
 exit /b
 
 :count_it
@@ -163,6 +174,11 @@ exit /b
     if "!e_status!" equ "FAIL" (
         echo FIRST CHAR FAIL
         pause
+    ) else (
+        rem write to a file the last character
+        set "first_c=!first_c!|"
+        echo !first_c! > "chars.txt"
+        rem call :read_c
     )
     endlocal
 exit /b

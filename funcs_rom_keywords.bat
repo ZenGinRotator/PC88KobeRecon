@@ -198,13 +198,25 @@ exit /b
 
     rem Stop at extension
     rem Situations: a. bridge.d88, or .d88
-    echo ITEM I "!item!"
+    rem echo ITEM I "!item!"
 
+    set first_c_as_l=
+     call "funcs_first_char.bat" :find_first_char "!item!"
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "first_c_as_r=%%i"
+    )
+    rem echo --- "!first_c_as_l!"
+
+
+   
+    echo === "!first_c_as_r!"
     REM ****** To Do: ***********
     rem Need to find first character and make sure that
     rem     first character exists in item before calling
     rem     :DOIL
-    call :DOIL "!token!" "!left_char!" "!item!"
+    if "!first_c_as_r!" neq " " (
+        call :DOIL "!token!" "!first_c_as_r!" "!item!"
+    )
     
     set has1=
     set has2=

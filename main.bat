@@ -179,58 +179,9 @@ rem call "funcs_bridge_sample_data.bat" :hard_vs_soft
 rem call "funcs_last_char.bat" :exe
 rem exit /b
 
+rem call "funcs_first_char_sample_data.bat" :small_data
 
-rem identify-first-char permutation types
-rem Rom name with:
-rem no encapsulators
-rem 1 encapsulator
-rem 2 encapsulators (all distinct, all same)
-rem 3 encapsulators (all distinct, all same, some distinct)
-rem 4 encapsulators (2 same-remaining distinct, 2 same-remaining same)
-
-rem for sample data with 1, 2, 3, or 4 encapsulators, also need sample data with:
-rem spaces in between ecapsulators
-rem bridges in between encapsulators
-rem spaces and bridges in between encapsulators
-
-call "funcs_first_char.bat" :find_first_char "Rom"
-
-  call "funcs_first_char.bat" :find_first_char "Rom[]"
-  call "funcs_first_char.bat" :find_first_char "Rom{}"
-  call "funcs_first_char.bat" :find_first_char "Rom()"
-  call "funcs_first_char.bat" :find_first_char "{}"
-  call "funcs_first_char.bat" :find_first_char "()"
-  call "funcs_first_char.bat" :find_first_char "[]"
-  echo "!brk!"
-echo two encaps
-echo "!brk!"
-  call "funcs_first_char.bat" :find_first_char "Rom[]()"
-  call "funcs_first_char.bat" :find_first_char "Rom[]{}"
-
-  call "funcs_first_char.bat" :find_first_char "Rom(){}"
-  call "funcs_first_char.bat" :find_first_char "Rom()[]"
-
-
-  call "funcs_first_char.bat" :find_first_char "Rom{}[]"
-  call "funcs_first_char.bat" :find_first_char "Rom{}()"
-echo "!brk!"
-  echo three encaps
-  echo "!brk!"
- call "funcs_first_char.bat" :find_first_char "Rom[]{}()"
- call "funcs_first_char.bat" :find_first_char "Rom[](){}"
-
- call "funcs_first_char.bat" :find_first_char "Rom(){}[]"
- call "funcs_first_char.bat" :find_first_char "Rom()[]{}"
- 
- call "funcs_first_char.bat" :find_first_char "Rom[]{}()"
- call "funcs_first_char.bat" :find_first_char "Rom[](){}"
- 
- 
-  call "funcs_first_char.bat" :find_first_char "{}()[]"
- call "funcs_first_char.bat" :find_first_char "()[]{}"
- 
-
-rem call "funcs_rom_keywords.bat" :exe_loop
+call "funcs_rom_keywords.bat" :exe_loop
 ECHO ---- DONE ----
 
 PAUSE
