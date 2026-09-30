@@ -27,6 +27,7 @@ rem Work In Progress - might not need
     set "name=%~1"
 
     set "padname=PAD!name!"
+    set "show=%~3"
     rem echo "!brk!"
     rem echo PADNAME "!padname!"
 
@@ -65,9 +66,9 @@ rem Work In Progress - might not need
         exit /b
     )
 
-    call :count_it "!p!" "("
-    call :count_it "!c!" "{"
-    call :count_it "!s!" "["
+    call :count_it "!p!" "(" "!show!"
+    call :count_it "!c!" "{" "!show!"
+    call :count_it "!s!" "[" "!show!"
     
 exit /b
 
@@ -82,7 +83,8 @@ exit /b
 :count_it
     setlocal
     set "delim=%~1"
-    set "char=%~2"
+    set "left_c=%~2"
+    set "show=%~3"
     rem set "delim=PAD!delim!"
     set del_p=
     set del_c=
@@ -118,7 +120,7 @@ exit /b
     )
     REM echo FIRST CHAR "!char!"
     
-    call :verify_f "!padname!" "!char!"
+    call :verify_f "!padname!" "!left_c!" "!show!"
 
     endlocal
 exit /b
@@ -127,6 +129,7 @@ exit /b
     setlocal
     set "name=%~1"
     set "first_c=%~2"
+    set "show=%~3"
 
     rem Assume first_c=(
     set "t1=["
@@ -169,16 +172,31 @@ exit /b
         set "e_status=PASSED"
     )
 
-    echo "!name!" FIRST CHAR "!first_c!" "!e_status!"
-
+    REM echo "!name!" FIRST CHAR "!first_c!" "!e_status!"
+    call "funcs_last_char.bat" :outcome "!name!" "FIRST" "!first_c!" "!e_status!: VERIFY_F" "!show!"
     if "!e_status!" equ "FAIL" (
-        echo FIRST CHAR FAIL
+REM         echo FIRST CHAR FAIL
+        call "funcs_last_char.bat" :outcome "!name!" "FIRST" "!first_c!" "!e_status!: VERIFY_F" "!show!"
         pause
-    ) else (
-        rem write to a file the last character
-        set "first_c=!first_c!|"
-        echo !first_c! > "chars.txt"
-        rem call :read_c
+        exit /b
     )
+    rem write to a file the last character
+    rem set "first_c=!first_c!|"
+
+
+    set "first_as_r=)"
+
+    if "!first_c!" equ "{" (
+        set "first_as_r=}"
+    )
+
+    if "!first_c!" equ "[" (
+        set "first_as_r=]"
+    )
+
+    set "chrs=!first_c!|!first_as_r!|"
+    echo !chrs! > "chars.txt"
+    rem call :read_c
+    
     endlocal
 exit /b

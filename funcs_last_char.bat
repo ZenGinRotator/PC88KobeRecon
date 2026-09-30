@@ -269,12 +269,12 @@ exit /b
 
 
 
-
+rem SAMPLE_FILE_NAMES_INDIV_START\*
 :exe
     setlocal
     echo EXE
     set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES\*") do (
+    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
         REM echo "%%i"
         set itm=
         set /a q+=1
@@ -282,11 +282,10 @@ exit /b
         echo !q!
         for /f "tokens=2 delims=\" %%j in ("%%i") do (
             echo "%%j"
-            call :find_last_char "" "%%j"
-
-            rem Finding the first char
-            call "funcs_first_char.bat" :find_first_char "%%j"
-            
+            call "funcs_first_char.bat" :find_first_char "%%j" ""
+            call :find_last_char "" "%%j" ""
+             
+            pause
         )
     )
     endlocal
@@ -296,6 +295,7 @@ exit /b
     setlocal
     set "delim_chars=%~1"
     set "phrase=%~2"
+    set "show=%~3"
 
 
     set prime_l=
@@ -332,6 +332,7 @@ exit /b
     
     
     
+    
     if exist old_item.txt ( del old_item.txt )
 
 
@@ -344,8 +345,11 @@ exit /b
         set "read_item=%%i"
     )
 
-    
+    rem ECHO ---- THIS MIGHT BE THE SOURCE OF THE ERROR WHERE A ")" APPEARS WHEN NO ")" EXISTS WITHIN FILE NAME
     if "!old_item!" neq "!phrase!" (
+        rem echo OLD_ITEM "!old_item!"
+        rem echo PHRASE "!phrase!"
+        rem ECHO OLD ITEM NEQ PHRASE
         set "last_char=)"
     )
 
@@ -381,7 +385,7 @@ exit /b
     rem showing the last char as output
     rem call :the_last "!last_char!"
 
-    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!" ""
+    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!" "" "!show!"
 
 
     endlocal
@@ -394,6 +398,7 @@ exit /b
     set "phrase=%~3"
     set "end_mark=%~4"
     SET "old_item=%~5"
+    set "show=%~6"
 
     set item=
     call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
@@ -415,27 +420,43 @@ exit /b
 
     rem need to account for .d88, .t88, and .cmt
     if "!item!" equ ".d88!end_mark!" (
-        echo PASSED LAST CHAR "!right_c!"
+        rem echo PASSED LAST CHAR "!right_c!"
+        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: verify_lc" "!show!"
         call :primary_and_optn_chars "!right_c!"
         exit /b
     )
     if "!item!" equ "!end_mark!" (
         rem unsure if calling this function is necessary
+        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: verify_lc" "!show!"
         call :primary_and_optn_chars "!right_c!"
-        echo PASSED LAST CHAR "!right_c!"
         exit /b
     )
 
     if "!item!" equ " " (
         rem We traversed the entire phrase but need to evaluate whether
         rem     the previous item contains optional delimiting characters
-        call :evalOI "!old_item!" "!right_c!"
+        call :evalOI "!old_item!" "!right_c!" "!show!"
         exit /b
     )
 
     set /a token+=1
     call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!" "!item!"
 
+    endlocal
+exit /b
+
+:outcome
+    setlocal
+    set "phrase=%~1"
+    set "type=%~2"
+    set "char=%~3"
+    set "status=%~4"
+    set "show=%~5"
+
+    if "!show!" equ "" (
+        set phrase=
+    )
+    echo "!phrase!" "!type! CHAR" "!char!" -- "!status!"
     endlocal
 exit /b
 
@@ -476,6 +497,7 @@ exit /b
 
     set "chars=!prime!|!optn1!|!optn2!|"
     echo !chars! > "chars.txt"
+    
 
     endlocal
 exit /b
@@ -484,6 +506,7 @@ exit /b
     setlocal
     set "old_item=%~1"
     set "right_c=%~2"
+    set "show=%~3"
 
     set optn1_r=
     set optn2_r=
@@ -524,13 +547,15 @@ exit /b
     )
 
     if !q! equ 2 (
-        echo PASS
+        REM echo PASS it
+        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: evalOI" "!show!"
 
         call :primary_and_optn_chars "!right_c!"
 
 
     ) ELSE (
         ECHO LAST CHAR FAIL
+        call :outcome "!phrase!" "LAST" "!right_c!" "FAIL: evalOI" "!show!"
         pause
     )
 

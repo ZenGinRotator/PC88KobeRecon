@@ -181,7 +181,9 @@ rem exit /b
 
 rem call "funcs_first_char_sample_data.bat" :small_data
 
+rem call "funcs_last_char.bat" :exe
 call "funcs_rom_keywords.bat" :exe_loop
+
 ECHO ---- DONE ----
 
 PAUSE

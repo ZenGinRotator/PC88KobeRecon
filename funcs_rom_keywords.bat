@@ -102,9 +102,11 @@ exit /b
     rem echo first_l "!first_l!"
     rem echo first_R "!first_r!"
     
-    call "funcs_last_char.bat" :find_last_char "" "!name!"
+    call "funcs_match_chars.bat" :start_n_end_matches "!name!"
     
-
+    for /f "tokens=*" %%i in (chars.txt) do (
+        echo "%%i"
+    )
     for /f "tokens=1 delims=|" %%i in (chars.txt) do (
         set "left_char=%%i"
     )
@@ -181,7 +183,7 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "item=%%i"
     )
-
+    rem ECHO JI "!item!"
     
     
 
@@ -198,25 +200,92 @@ exit /b
 
     rem Stop at extension
     rem Situations: a. bridge.d88, or .d88
-    rem echo ITEM I "!item!"
+     echo ITEM I "!item!" 
 
-    set first_c_as_l=
-     call "funcs_first_char.bat" :find_first_char "!item!"
-    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-        set "first_c_as_r=%%i"
+
+    
+    
+    set bridge=
+    call :delim_with_char "1" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "bridge=%%i"
     )
-    rem echo --- "!first_c_as_l!"
+   
+    rem Bridge has portion of item that does not contain left_char
+    rem left_char inclusive portion is removed from bridge
+
+
+    echo BRIDGE FROM ITEM "!bridge!"
+
+    
+    set has1=
+    set has2=
+    call :delim_with_char "1" "!optn_one_right!" "PAD!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has1=%%i"
+    )
+    if "!has1!" neq "PAD!bridge!" (
+        call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!"
+    )
+    call :delim_with_char "1" "!optn_two_right!" "PAD!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has2=%%i"
+    )
+    if "!has2!" neq "PAD!bridge!" (
+        call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!"    
+    )
+
+    rem Item can contain primary left
+    rem if "!bridge!" neq "!item!" (
+    rem call :DOIL "1" "!left_char!" "!item!"
+    rem )
+    rem Item can contain optn1_right
+
+    rem Item can contain optn2_right
+    
+    rem call :process
+    
+
+    set "primes=!left_char!|!right_char!"
+    set "optn1s=!optn_one_left!|!optn_one_right!"
+    set "optn2s=!optn_two_left!|!optn_two_right!"
+
+    set "delim_chars=!primes!|!optn1s!|!optn2s!"
+    
+    
+    set status=
+    set /a ttoken=!token!
+    
+
+
+    set /a ttoken+=1
+
+    set "primaries=!left_char!|!right_char!"
+    set "optn_ones=!optn_one_left!|!optn_one_right!"
+    set "optn_twos=!optn_two_left!|!optn_two_right!"
+
+    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    endlocal
+exit /b
+
+
+:process
+    setlocal
+
+    rem
+    call "funcs_match_chars.bat" :start_n_end_matches "!item!"
 
 
    
-    echo === "!first_c_as_r!"
+    rem echo === "!first_c_as_r!"
     REM ****** To Do: ***********
     rem Need to find first character and make sure that
     rem     first character exists in item before calling
     rem     :DOIL
-    if "!first_c_as_r!" neq " " (
-        call :DOIL "!token!" "!first_c_as_r!" "!item!"
-    )
+    rem if "!first_c_as_r!" neq " " (
+    call :DOIL "!token!" "!first_c_as_r!" "!item!"
+    rem )
     
     set has1=
     set has2=
@@ -243,52 +312,24 @@ exit /b
     
     
     rem Unused
-    call :continue_or_stop "!item!"
-     if exist "stop.txt" (
-         del "stop.txt"
+    rem call :continue_or_stop "!item!"
+    rem  if exist "stop.txt" (
+    rem      del "stop.txt"
          REM exit /b
-     )
+    rem )
     
-
-    
-    
-    set bridge=
-    call :delim_with_char "1" "!left_char!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "bridge=%%i"
-    )
-   
-   
-
-    set "primes=!left_char!|!right_char!"
-    set "optn1s=!optn_one_left!|!optn_one_right!"
-    set "optn2s=!optn_two_left!|!optn_two_right!"
-
-    set "delim_chars=!primes!|!optn1s!|!optn2s!"
-    
-    
-    set status=
-    set /a ttoken=!token!
-    
-
-
-    set /a ttoken+=1
-
-    set "primaries=!left_char!|!right_char!"
-    set "optn_ones=!optn_one_left!|!optn_one_right!"
-    set "optn_twos=!optn_two_left!|!optn_two_right!"
-
-    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
 
     endlocal
 exit /b
 
-
 :DOIR
     setlocal
     set "token=%~1"
-    set "right=%~2"
-    set "item=%~3"
+    set "left=%~2"
+    set "right=%~3"
+    set "item=%~4"
+
+  
 
     
     call :delim_with_char "!token!" "!right!" "!item!"
@@ -301,7 +342,7 @@ exit /b
     )
 
     
-    call :DOIL "1" "[" "!bitem!"
+    call :DOIL "1" "!left!" "!bitem!"
     set /a token+=1
     
     call :DOIR "!token!" "!right!" "!item!"
