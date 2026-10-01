@@ -59,11 +59,11 @@ rem Need to find music in name title that is non-encapsulated
 :exe_loop
     setlocal
     set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
+    for %%i in ("SAMPLE_FILE_NAMES_PRIME\*") do (
         set /a q+=1
         for /f "tokens=2 delims=\" %%j in ("%%i") do (
-            call :start_kywds "(" ")" "%%j" "[" "]" "{" "}"
-            echo !q!
+            call :start_kywds "%%j"
+            echo Q !q!
         )
     )
     endlocal
@@ -73,13 +73,13 @@ exit /b
 :start_kywds
     setlocal
     rem set "token=%~1"
-    set "left_char=%~1"
-    set "right_char=%~2"
-    set "name=%~3"
-    set "optn_one_left=%~4"
-    set "optn_one_right=%~5"
-    set "optn_two_left=%~6"
-    set "optn_two_right=%~7"
+    rem set "left_char=%~1"
+rem     set "right_char=%~2"
+    set "name=%~1"
+ rem    set "optn_one_left=%~4"
+   rem  set "optn_one_right=%~5"
+   rem  set "optn_two_left=%~6"
+   rem  set "optn_two_right=%~7"
 
     echo "!brk!"
     echo ----- "!name!" -----
@@ -102,6 +102,7 @@ exit /b
     rem echo first_l "!first_l!"
     rem echo first_R "!first_r!"
     
+    rem this function calls find_last_char, which populates chars.txt wit primary and option 1 & 2 chars
     call "funcs_match_chars.bat" :start_n_end_matches "!name!"
     
     for /f "tokens=*" %%i in (chars.txt) do (
@@ -200,8 +201,9 @@ exit /b
 
     rem Stop at extension
     rem Situations: a. bridge.d88, or .d88
-     echo ITEM I "!item!" 
+    REM echo TOKEN "!token!"
 
+     echo ITEM I ---------"!item!" 
 
     
     
@@ -215,7 +217,9 @@ exit /b
     rem left_char inclusive portion is removed from bridge
 
 
-    echo BRIDGE FROM ITEM "!bridge!"
+    rem echo BRIDGE FROM ITEM "!bridge!"
+    rem echo "!optn_one_left! !optn_one_right!"
+    rem echo "!optn_two_left! !optn_two_right!"
 
     
     set has1=
@@ -225,15 +229,56 @@ exit /b
         set "has1=%%i"
     )
     if "!has1!" neq "PAD!bridge!" (
-        call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!"
+        rem echo HAS 1
+        rem PAUSE
+        call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_two_left!"
     )
     call :delim_with_char "1" "!optn_two_right!" "PAD!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has2=%%i"
     )
     if "!has2!" neq "PAD!bridge!" (
-        call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!"    
+        rem ECHO Has 2 
+        rem pause
+        call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_two_left!"
     )
+
+  
+
+    set no_o1=
+    set no_o2=
+    set /a no_o=0
+    
+    call :delim_with_char "1" "!optn_one_right!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "no_o1=%%i"
+    )
+
+    call :delim_with_char "1" "!optn_two_right!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "no_o2=%%i"
+    )
+
+    if "!no_o1!" equ "!item!" (
+        set /a no_o+=1
+    )
+
+    if "!no_o2!" equ "!item!" (
+        set /a no_o+=1
+    )
+
+
+    rem if item does not have primary left_char , block item to DOIL
+    set has_lp=
+    call :delim_with_char "1" "!left_char!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has_lp=%%i"
+    )
+    rem if "!has_lp!" neq "!item!" (
+    call :DOIL "1" "!left_char!" "!item!" "!optn_one_left!" "!optn_two_left!"
+    rem )
+
+
 
     rem Item can contain primary left
     rem if "!bridge!" neq "!item!" (
@@ -270,57 +315,7 @@ exit /b
 exit /b
 
 
-:process
-    setlocal
 
-    rem
-    call "funcs_match_chars.bat" :start_n_end_matches "!item!"
-
-
-   
-    rem echo === "!first_c_as_r!"
-    REM ****** To Do: ***********
-    rem Need to find first character and make sure that
-    rem     first character exists in item before calling
-    rem     :DOIL
-    rem if "!first_c_as_r!" neq " " (
-    call :DOIL "!token!" "!first_c_as_r!" "!item!"
-    rem )
-    
-    set has1=
-    set has2=
-    call :delim_with_char "1" "!optn_one_right!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "has1=%%i"
-    )
-    if "!has1!" neq "PAD!item!" (
-        call :DOIR "1" "!optn_one_right!" "!item!"
-    )
-    call :delim_with_char "1" "!optn_two_right!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "has2=%%i"
-    )
-    if "!has2!" neq "PAD!item!" (
-        call :DOIR "1" "!optn_two_right!" "!item!"    
-    )
-
-
-    echo "optn1_r" "!optn_one_right!"
-    echo "optn2_r" "!optn_two_right!"
-    pause
-    rem this is hardcoded
-    
-    
-    rem Unused
-    rem call :continue_or_stop "!item!"
-    rem  if exist "stop.txt" (
-    rem      del "stop.txt"
-         REM exit /b
-    rem )
-    
-
-    endlocal
-exit /b
 
 :DOIR
     setlocal
@@ -328,6 +323,8 @@ exit /b
     set "left=%~2"
     set "right=%~3"
     set "item=%~4"
+    set "optn1_left=%~5"
+    set "optn2_left=%~6"
 
   
 
@@ -342,10 +339,10 @@ exit /b
     )
 
     
-    call :DOIL "1" "!left!" "!bitem!"
+    call :DOIL "1" "!left!" "!bitem!" "!optn1_left!" "!optn2_left!"
     set /a token+=1
     
-    call :DOIR "!token!" "!right!" "!item!"
+    call :DOIR "!token!" "!left!" "!right!" "!item!" "!optn1_left!" "!optn2_left!"
     endlocal
 exit /b
 
@@ -354,6 +351,8 @@ exit /b
     set "token=%~1"
     set "left=%~2"
     set "item=%~3"
+    set "optn1_left=%~4"
+    set "optn2_left=%~5"
 
     rem echo ----
     set "pb_item=PAD\!item!"
@@ -372,7 +371,7 @@ exit /b
         set "filled=%%i"
     )
     
-     if "!filled!" neq " " (
+    if "!filled!" neq " " (
         set "bitem=!filled!"
     )
 
@@ -381,7 +380,7 @@ exit /b
     set /a ttoken=!token!
     if !ttoken! equ 1 (
         if "!bitem!" neq "!item!" (
-            set "status= UNOFFICIAL BRIDGE"
+            set "status=UNOFFICIAL BRIDGE"
             if not exist "is_nested.txt" (
                 set "status=OFFICIAL BRIDGE"
                 REM set "bitem=USE THE ORIG"
@@ -424,12 +423,47 @@ exit /b
         set "bitem= "
     )
     IF "!bitem!" equ "PAD\" (
-        set "bitem="
+        set bitem=
     )
-    ECHO FOUND "!bitem!" "!status!"
+
+    set /a eq=0
+    if "!optn1_left!" equ "!left!" (
+        set /a eq+=1
+    )
+
+    if "!optn2_left!" equ "!left!" (
+        set /a eq+=1
+    )
+
+    rem echo "!left!" "!optn1_left!" "!optn2_left!"
+    rem remove any strings containing the optn chars from output
+    set has_o1=
+    set has_o2=
+    call :delim_with_char "1" "!optn1_left!" "!bitem!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has_o1=%%i"
+    )
+    call :delim_with_char "1" "!optn2_left!" "!bitem!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has_o2=%%i"
+    )
+    rem echo has o1 o2, "!has_o1! !has_o2!"
+    set /a eq=0
+    if "!has_o1!" neq "!bitem!" (
+        set /a eq+=1
+    )
+    if "!has_o2!" neq "!bitem!" (
+        set /a eq+=1
+    )
+    rem echo eq !eq!
+
+     if "!eq!" equ "0" (
+    
+    ECHO FOUND "!bitem!" "!status!" "!left!" "!optn1_left!" "!optn2_left!" token "!ttoken!"
+     )
     set /a ttoken+=1
     
-    call :DOIL "!ttoken!" "!left!" "!item!"
+    call :DOIL "!ttoken!" "!left!" "!item!" "!optn1_left!" "!optn2_left!"
     endlocal
 exit /b
 
