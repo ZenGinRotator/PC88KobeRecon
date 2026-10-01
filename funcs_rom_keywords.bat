@@ -185,7 +185,7 @@ exit /b
         set "item=%%i"
     )
     rem ECHO JI "!item!"
-    
+    rem echo called ROG2 "!left_char!" "!right_char!" "!optn_one_left!"  "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     
 
     if "!item!" equ " " (
@@ -193,7 +193,7 @@ exit /b
     )
 
 
-     rem echo ITEM I ---------"!item!" 
+     echo ITEM I ---------"!item!" 
 
     
     
@@ -202,6 +202,15 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bridge=%%i"
     )
+
+    set alt_br=
+    call :delim_with_char "1" "!left_char!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "alt_b=%%i"
+    )
+
+    rem ecHO ALT BRID "!alt_b!"
+
    
 
     rem echo BRIDGE FROM ITEM "!bridge!"
@@ -216,7 +225,7 @@ exit /b
     if "!has1!" neq "PAD!bridge!" (
         rem echo HAS 1
         rem PAUSE
-        call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_two_left!"
+        call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     )
     call :delim_with_char "1" "!optn_two_right!" "PAD!bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -225,7 +234,7 @@ exit /b
     if "!has2!" neq "PAD!bridge!" (
         rem ECHO Has 2 
         rem pause
-        call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_two_left!"
+        call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     )
 
   
@@ -260,7 +269,7 @@ exit /b
         set "has_lp=%%i"
     )
     rem if "!has_lp!" neq "!item!" (
-    call :DOIL "1" "!left_char!" "!item!" "!optn_one_left!" "!optn_two_left!"
+    call :DOIL "1" "!left_char!" "!right_char!" "!item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
     rem )
 
 
@@ -309,7 +318,12 @@ exit /b
     set "right=%~3"
     set "item=%~4"
     set "optn1_left=%~5"
-    set "optn2_left=%~6"
+    set "optn1_right=%~6"
+    set "optn2_left=%~7"
+    set "optn2_right=%~8"
+
+    rem echo called DOIR  "!left!" "!right!" "!optn1_left!"  "!optn1_right!" "!optn2_left!" "!optn2_right!"
+
 
   
 
@@ -324,10 +338,10 @@ exit /b
     )
 
     
-    call :DOIL "1" "!left!" "!bitem!" "!optn1_left!" "!optn2_left!"
+    call :DOIL "1" "!left!" "!right!" "!bitem!" "!optn1_left!" "!optn1_right!" "!optn2_left!" "!optn2_right!"
     set /a token+=1
     
-    call :DOIR "!token!" "!left!" "!right!" "!item!" "!optn1_left!" "!optn2_left!"
+    call :DOIR "!token!" "!left!" "!right!" "!item!" "!optn1_left!" "!optn1_right!" "!optn2_left!" "!optn2_right!"
     endlocal
 exit /b
 
@@ -335,9 +349,14 @@ exit /b
     setlocal
     set "token=%~1"
     set "left=%~2"
-    set "item=%~3"
-    set "optn1_left=%~4"
-    set "optn2_left=%~5"
+    set "right=%~3"
+    set "item=%~4"
+    set "optn1_left=%~5"
+    set "optn1_right=%~6"
+    set "optn2_left=%~7"
+    set "optn2_right=%~8"
+
+    rem echo called DOIL  "!left!" "!right!" "!optn1_left!"  "!optn1_right!" "!optn2_left!" "!optn2_right!"
 
     set "pb_item=PAD\!item!"
     call :delim_with_char "!token!" "!left!" "!pb_item!"
@@ -424,26 +443,61 @@ exit /b
     call :delim_with_char "1" "!optn1_left!" "!bitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has_o1=%%i"
+        
     )
     call :delim_with_char "1" "!optn2_left!" "!bitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has_o2=%%i"
+
     )
 
-    set /a eq=0
-    if "!has_o1!" neq "!bitem!" (
-        set /a eq+=1
+
+    set "use_l=!left!"
+    if "!ttoken!" equ "1" (
+        set use_l=
     )
-    if "!has_o2!" neq "!bitem!" (
-        set /a eq+=1
+
+    rem if "!ttoken!" equ "2" (
+       rem if "!bitem!" equ "!pb_item!" (
+          rem  set use_left=
+        rem )
+    rem )
+
+
+    rem echO LAST
+    rem ECHO "!bitem!" "!item!" "!pb_item!"
+    set "use_r=!right!"
+    if "!ttoken!" equ "1" (
+        if "!bitem!" neq "!item!" (
+            set use_r=
+        )
+        if "!status!" equ "OFFICIAL BRIDGE" (
+            set use_r=
+        )
+        
     )
+
+    if "!ttoken!" equ "2" (
+        set /a temp_t=!ttoken!+1
+        set test_s=
+        call :delim_with_char "!temp_t!" "!left!" "!pb_item!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "test_s=%%i"
+        )
+        if "!test_s!" neq " " (
+            set use_r=
+        )
+    )
+
    
     if "!eq!" equ "0" (
-        ECHO FOUND "!bitem!" "!status!" "!left!" "!optn1_left!" "!optn2_left!" token "!ttoken!"
+        
+        rem ECHO FOUND "!bitem!" "!status!" LEFT "!left!" Right "!right!" OPTIONS "!optn1_left!" "!optn1_right!" "!optn2_left!" "!optn2_right!" token "!ttoken!"
+        echo found "!use_l!!bitem!!use_r!" "!status!" "!ttoken!"
     )
     set /a ttoken+=1
     
-    call :DOIL "!ttoken!" "!left!" "!item!" "!optn1_left!" "!optn2_left!"
+    call :DOIL "!ttoken!" "!left!" "!right!" "!item!" "!optn1_left!" "!optn1_right! "!optn2_left!" "!optn2_right!"
     endlocal
 exit /b
 
