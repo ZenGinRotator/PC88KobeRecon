@@ -192,18 +192,8 @@ exit /b
         exit /b
     )
 
-    rem File name does not contain any instances of the primary
-    rem     delimiting character (eg ")"),
-    rem     so we can terminate this recursive search.
-    if "!item!" equ "!name!" (
-        REM exit /b
-    )
 
-    rem Stop at extension
-    rem Situations: a. bridge.d88, or .d88
-    REM echo TOKEN "!token!"
-
-     echo ITEM I ---------"!item!" 
+     rem echo ITEM I ---------"!item!" 
 
     
     
@@ -213,13 +203,8 @@ exit /b
         set "bridge=%%i"
     )
    
-    rem Bridge has portion of item that does not contain left_char
-    rem left_char inclusive portion is removed from bridge
 
-
-    echo BRIDGE FROM ITEM "!bridge!"
-    rem echo "!optn_one_left! !optn_one_right!"
-    rem echo "!optn_two_left! !optn_two_right!"
+    rem echo BRIDGE FROM ITEM "!bridge!"
 
     
     set has1=
@@ -354,7 +339,6 @@ exit /b
     set "optn1_left=%~4"
     set "optn2_left=%~5"
 
-    rem echo ----
     set "pb_item=PAD\!item!"
     call :delim_with_char "!token!" "!left!" "!pb_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -383,22 +367,14 @@ exit /b
             set "status=UNOFFICIAL BRIDGE"
             if not exist "is_nested.txt" (
                 set "status=OFFICIAL BRIDGE"
-                REM set "bitem=USE THE ORIG"
             )
             
         ) else (
+            set "status=OFFICIAL BRIDGE"
+
             if exist "is_nested.txt" (
                 del "is_nested.txt"
-            )
-            echo *** BITEM "!bitem!"
-            set "status=NESTED LABEL"
-            set no_nest=
-            call :delim_with_char "3" "!left!" "PAD!bitem!"
-            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-                set "no_nest=%%i"
-            )
-            if "!no_nest!" equ " " (
-                set "status=OFFICIAL BRIDGE"
+                set "status=NESTED LABEL"
             )
         )
     )
@@ -411,9 +387,7 @@ exit /b
             set "st=%%i"
         ) 
 
-        REM echo **** ST **** "!st!"
         if "!st!" neq " " (
-            REM echo NEQ
             set "status=NESTED LABEL"
             echo "" > "is_nested.txt"
         )
@@ -444,7 +418,6 @@ exit /b
         set /a eq+=1
     )
 
-    rem echo "!left!" "!optn1_left!" "!optn2_left!"
     rem remove any strings containing the optn chars from output
     set has_o1=
     set has_o2=
@@ -456,7 +429,7 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has_o2=%%i"
     )
-    rem echo has o1 o2, "!has_o1! !has_o2!"
+
     set /a eq=0
     if "!has_o1!" neq "!bitem!" (
         set /a eq+=1
@@ -464,12 +437,10 @@ exit /b
     if "!has_o2!" neq "!bitem!" (
         set /a eq+=1
     )
-    rem echo eq !eq!
-
-     if "!eq!" equ "0" (
-    
-    ECHO FOUND "!bitem!" "!status!" "!left!" "!optn1_left!" "!optn2_left!" token "!ttoken!"
-     )
+   
+    if "!eq!" equ "0" (
+        ECHO FOUND "!bitem!" "!status!" "!left!" "!optn1_left!" "!optn2_left!" token "!ttoken!"
+    )
     set /a ttoken+=1
     
     call :DOIL "!ttoken!" "!left!" "!item!" "!optn1_left!" "!optn2_left!"
