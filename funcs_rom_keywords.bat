@@ -217,7 +217,7 @@ exit /b
     rem left_char inclusive portion is removed from bridge
 
 
-    rem echo BRIDGE FROM ITEM "!bridge!"
+    echo BRIDGE FROM ITEM "!bridge!"
     rem echo "!optn_one_left! !optn_one_right!"
     rem echo "!optn_two_left! !optn_two_right!"
 
@@ -390,7 +390,16 @@ exit /b
             if exist "is_nested.txt" (
                 del "is_nested.txt"
             )
+            echo *** BITEM "!bitem!"
             set "status=NESTED LABEL"
+            set no_nest=
+            call :delim_with_char "3" "!left!" "PAD!bitem!"
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                set "no_nest=%%i"
+            )
+            if "!no_nest!" equ " " (
+                set "status=OFFICIAL BRIDGE"
+            )
         )
     )
 
