@@ -59,7 +59,7 @@ rem Work In Progress - might not need
     )
 
     if "!q!" equ "3" (
-        echo "!name!" NO ENCAPS 
+        echo "!name!" NO ENCAPS AS FIRST CHAR
         set "err=|"
         echo !err! > "chars.txt"
         rem call :read_c

@@ -12,269 +12,12 @@ goto :eof
 
 
 
-:char_to_barrier_file
-    setlocal
-    set "right_char=%~1"
-    set "name=%~2"
-
-    set hst=has_square.txt
-    set hct=has_curl.txt
-    set hpt=has_paren.txt
-
-    set file=!hst!
-
-    if "!right_char!" equ "}" (
-        set file=!hct!
-    )
-    if "!right_char!" equ ")" (
-        set file=!hpt!
-    )
-
-    set item=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!right_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
-    )
-
-    if "!item!" neq "!name!" (
-        echo "" > !file!
-    )
-
-    endlocal
-exit /b
-
-
-:verify_last_char
-    setlocal
-    
-    set "token=%~1"
-    set "right_char=%~2"
-    set "!name!=%~3"
-    set "old_item=%~4"
-    set "phrase=%~5"
-
-    set item=
-    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
-    )
-
-    if "!item!" equ " " (
-        set "result=FAIL"
-        if "!phrase!" equ "!old_item!" (
-            set "result=PASS"
-            REM echo  --- "!result!"
-        )
-        if "!result!" equ "FAIL" (
-            echo !!!!!! LAST CHAR FAIL
-
-
-        )
-        exit /b 
-    )
-
-    
-    set /a token+=1
-    call :verify_last_char "!token!" "!right_char!" "!name!" "!item!" "!phrase!"
-    endlocal
-exit /b
-
-
-:recurse_to_ext
-    setlocal
-    set "token=%~1"
-    set "right_char=%~2"
-    set "name=%~3"
-    set "old_item=%~4"
-   
-   
-    set item=
-    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_char!" "!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
-    )
-
-
-    if "!item!" equ " " (
-        set "old_item=!old_item!|"
-        echo !old_item! > "last_item.txt"
-        exit /b
-    )
-
-
-
-    set ext=
-    call "funcs_rom_keywords.bat" :delim_with_char "2" "." "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "ext=%%i"
-    )
-
-    set /a ext_qty=0
-    call "funcs_rom_keywords.bat" :ext_qty "!ext!"
-    for /f "tokens=*" %%i in (ext_qty.txt) do (
-        set /a ext_qty=%%i
-    )
-
-    set /a token+=1
-    call :recurse_to_ext "!token!" "!right_char!" "!name!" "!item!"
-    endlocal
-exit /b
-
-
-:parse_item_with_ext
-    setlocal
-    set "phrase=%~1"
-    set "right_char=%~2"
-    set "optn_one_right=%~3"
-    set "optn_two_right=%~4"
-    set "name=%~5"
-    
-
-
-    set opt1=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn_one_right!" "!phrase!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "opt1=%%i"
-    )
-
-
-    set opt2=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn_two_right!" "!phrase!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "opt2=%%i"
-    )
-
-    set /a qty=0
-    if "!opt1!" neq "!phrase!" (
-        set /a qty+=1
-    )
-    if "!opt2!" neq "!phrase!" (
-        set /a qty+=1
-    )
-
-    if !qty! equ 0 (
-        
-        call :char_to_barrier_file "!right_char!"
-        rem echo R "!phrase!" "!r!" "!right_char!" "!name!"
-        rem echo Use right_char "!right_char!" to determine option 1 and 2 characters
-        if exist "chars.txt" ( del "chars.txt" )
-        call :primary_and_optn_chars "!right_char!"
-
-        rem CALLING A FUNCTIONT TO VERIFY CORRECTNESS OF OUR DISCOVERED RIGHT_CHAR
-        call :verify_last_char "1" "!right_char!" "!name!" "" "!phrase!"
-    )
-    
-    rem echo PHRASE "!phrase!" RR "!r!" "!right_char!"
-    endlocal
-exit /b
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 rem SAMPLE_FILE_NAMES_INDIV_START\*
 :exe
     setlocal
     echo EXE
     set /a q=0
-    for %%i in ("SAMPLE_FILE_NAMES_INDIV_START\*") do (
+    for %%i in ("SAMPLE_FILE_NAMES_PRIME\*") do (
         REM echo "%%i"
         set itm=
         set /a q+=1
@@ -282,10 +25,8 @@ rem SAMPLE_FILE_NAMES_INDIV_START\*
         echo !q!
         for /f "tokens=2 delims=\" %%j in ("%%i") do (
             echo "%%j"
-            call "funcs_first_char.bat" :find_first_char "%%j" ""
-            call :find_last_char "" "%%j" ""
-             
-            pause
+            rem call "funcs_first_char.bat" :find_first_char "%%j" ""
+            call :find_last_char "%%j"
         )
     )
     endlocal
@@ -293,50 +34,37 @@ exit /b
 
 :find_last_char
     setlocal
-    set "delim_chars=%~1"
-    set "phrase=%~2"
-    set "show=%~3"
+    set "phrase=%~1"
 
-
-    set prime_l=
-    set prime_r=
-    set optn1_l=
-    set optn1_r=
-    set optn2_l=
-    set optn2_r=
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "prime_l=%%i"
-    )
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "prime_r=%%i"
-    )
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "optn1_l=%%i"
-    )
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "optn1_r=%%i"
-    )
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "optn2_l=%%i"
-    )
-    for /f "tokens=1 delims=|" %%i in ("!delim_chars!") do (
-        set "optn2_r=%%i"
-    )
-    REM echo "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" "!brk!" --------------------------------------------NAME "!phrase!"----
 
     rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
     rem     or to indicate the end of a bridge
     rem In both instances, we need to find the last character in the name/bridge
-    set "end_mark=#"
+    set "end_mark=*"
     set "phrase=!phrase!!end_mark!"
+    rem set "phrase=!phrase!"
     
     
     
-    
+    rem Delete file from previous run of the algorithm
     if exist old_item.txt ( del old_item.txt )
+    if exist token.txt ( del token.txt )
 
 
+    rem Assume ")" is the last character in the file name
 
+    rem These will be token values for identifying the last
+    rem     item within the file name when using
+    rem     parentheses, square and/or curly brackets.
+    set /a p_token=0
+    set /a c_token=0
+    set /a s_token=0
+
+    rem These will be used to store bridges (non-encapsulated text) that 
+    rem appear after the last character in the file name.
+    set p_bridge=
+    set c_bridge=
+    set s_bridge=
 
     set read_item=
     set last_char=
@@ -345,12 +73,20 @@ exit /b
         set "read_item=%%i"
     )
 
-    rem ECHO ---- THIS MIGHT BE THE SOURCE OF THE ERROR WHERE A ")" APPEARS WHEN NO ")" EXISTS WITHIN FILE NAME
-    if "!old_item!" neq "!phrase!" (
-        rem echo OLD_ITEM "!old_item!"
-        rem echo PHRASE "!phrase!"
-        rem ECHO OLD ITEM NEQ PHRASE
+    for /f "tokens=1 delims=|" %%i in (token.txt) do (
+        set /a p_token=%%i
+    )
+
+    if exist token.txt ( del token.txt )
+
+
+    set "p_bridge=!read_item!"
+    if "!read_item!" equ "!end_mark!" (
+        
         set "last_char=)"
+        call :verify_2 "!p_token!" "!last_char!" "!phrase!" "!end_mark!"
+
+        exit /b
     )
 
 
@@ -358,92 +94,111 @@ exit /b
 
 
     call :recurse_to_end "1" "}" "!read_item!" "" "!end_mark!"
-    set "old_item=!read_item!"
+
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
     )
-    if "!read_item!" neq "!old_item!" (
+    for /f "tokens=1 delims=|" %%i in (token.txt) do (
+        set /a c_token=%%i
+    )
+
+    if exist token.txt ( del token.txt )
+
+
+    set "c_bridge=!read_item!"
+    if "!read_item!" equ "!end_mark!" (
         set "last_char=}"
+        call :verify_2 "!c_token!" "!last_char!" "!phrase!" "!end_mark!"
+        exit /b
+
     )
 
 
 
 
-    set "old_item=!read_item!"
-    call :recurse_to_end "1" "]" "!old_item!" "" "!end_mark!"
+    call :recurse_to_end "1" "]" "!read_item!" "" "!end_mark!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
     )
 
-    if "!read_item!" neq "!old_item!" (
-        set "last_char=]"
+    for /f "tokens=1 delims=|" %%i in (token.txt) do (
+        set /a s_token=%%i
     )
 
+    if exist token.txt ( del token.txt )
+   
 
+    set "s_bridge=!read_item!"
+    if "!read_item!" equ "!end_mark!" (
+        set "last_char=]"
+        call :verify_2 "!s_token!" "!last_char!" "!phrase!" "!end_mark!"
+        exit /b
 
+    )
 
-    rem showing the last char as output
-    rem call :the_last "!last_char!"
+    rem ------------- FINDING LAST CHARS IN FILE NAMES WHERE A BRIDGE APPEARS AFTER THE LAST CHARACTER ----
+    set /a same=0
+    set bride_with_mark=
+    set char_token=
 
-    call :verify_lc "1" "!last_char!" "!phrase!" "!end_mark!" "" "!show!"
+    rem if bridge_1 equ bridge_2
+    rem Both bridge_1 and bridge_2 contain last_char L,
+    rem     which is why they are equivalent.
+    if "!p_bridge!" equ "!c_bridge!" (
+        rem ECHO last is S
+        set "last_char=]"
+        set /a same+=1
+        set "bridge_with_mark=!s_bridge!"
+        set "char_token=!s_token!"
+    )
 
+    if "!c_bridge!" equ "!s_bridge!" (
+        rem echo LAST IS P
+        set "last_char=)"
+        set /a same+=1
+        set "bridge_with_mark=!p_bridge!"
+        set "char_token=!p_token!"
+    )
+
+    IF "!p_bridge!" equ "!s_bridge!" (
+        rem echo LAST IS C
+        set "last_char=}"
+        set /a same+=1
+        set "bridge_with_mark=!c_bridge!"
+        set "char_token=!c_token!"
+    )
+
+  
+
+    if "!same!" equ "3" (
+        ECHO has no last char
+        exit /b
+    )
+    echo LAST CHAR IS "!last_char!" with bridge_and_mark "!bridge_with_mark!" and Token "!char_token!"
+
+    call :verify_2 "!char_token!" "!last_char!" "!phrase!" "!bridge_with_mark!"
 
     endlocal
 exit /b
 
-:verify_lc
+:verify_2
     setlocal
     set "token=%~1"
-    set "right_c=%~2"
+    set "last_char=%~2"
     set "phrase=%~3"
     set "end_mark=%~4"
-    SET "old_item=%~5"
-    set "show=%~6"
 
-    set item=
-    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
+    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!last_char!" "!phrase!"
+    set test=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
+        set "test=%%i"
     )
-
-
-    set end=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!end_mark!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "end=%%i"
-    )
-
-    rem if "!end!" neq "!item!" (
-    rem     echo END "!end!"
-    rem )
-    
-
-    rem need to account for .d88, .t88, and .cmt
-    if "!item!" equ ".d88!end_mark!" (
-        rem echo PASSED LAST CHAR "!right_c!"
-        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: verify_lc" "!show!"
-        call :primary_and_optn_chars "!right_c!"
-        exit /b
-    )
-    if "!item!" equ "!end_mark!" (
-        rem unsure if calling this function is necessary
-        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: verify_lc" "!show!"
-        call :primary_and_optn_chars "!right_c!"
-        exit /b
-    )
-
-    if "!item!" equ " " (
-        rem We traversed the entire phrase but need to evaluate whether
-        rem     the previous item contains optional delimiting characters
-        call :evalOI "!old_item!" "!right_c!" "!show!"
-        exit /b
-    )
-
-    set /a token+=1
-    call :verify_lc "!token!" "!right_c!" "!phrase!" "!end_mark!" "!item!"
-
+    if "!test!" equ "!end_mark!" (
+        echo PASSS LAST CHAR "!last_char!"
+    ) else ( ECHO FAIL LAST CHAR "!last_char!" )
     endlocal
 exit /b
+
 
 :outcome
     setlocal
@@ -502,75 +257,7 @@ exit /b
     endlocal
 exit /b
 
-:evalOI
-    setlocal
-    set "old_item=%~1"
-    set "right_c=%~2"
-    set "show=%~3"
 
-    set optn1_r=
-    set optn2_r=
-    call :primary_and_optn_chars "!right_c!"
-    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
-        set "optn1_r=%%i"
-    )
-    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
-        set "optn2_r=%%i"
-    )
-
-    
-
-    set res1=
-    set res2=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn1_r!" "!old_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "res1=%%i"
-    )
-
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!optn2_r!" "!old_item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "res2=%%i"
-    )
-
-    set /a q=0
-
-    if "!res1!" equ "!old_item!" (
-        rem Returns the entire item when the optional delimiting 
-        rem     character does not exist with the item.
-        rem An item as defined as a string containing the end-mark 
-        rem     character.
-        set /a q+=1
-    )
-
-    if "!res2!" equ "!old_item!" (
-        set /a q+=1
-    )
-
-    if !q! equ 2 (
-        REM echo PASS it
-        call :outcome "!phrase!" "LAST" "!right_c!" "PASS: evalOI" "!show!"
-
-        call :primary_and_optn_chars "!right_c!"
-
-
-    ) ELSE (
-        ECHO LAST CHAR FAIL
-        call :outcome "!phrase!" "LAST" "!right_c!" "FAIL: evalOI" "!show!"
-        pause
-    )
-
-    
-
-
-    endlocal
-exit /b
-
-:the_last
-    setlocal
-    set "last_char=%~1"
-    echo =================================================== LAST CHAR "!last_char!"
-    endlocal
-exit /b
 
 :recurse_to_end
     setlocal
@@ -580,9 +267,10 @@ exit /b
     set "old_item=%~4"
     set "end_mark=%~5"
 
-    if "!phrase!" equ "" (
-        exit /b
-    )
+    rem Possibly a stopping point for a file name without an encapsulating character.
+    rem if "!phrase!" equ "" (
+     rem    exit /b
+    rem )
 
     set item=
     call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
@@ -590,24 +278,16 @@ exit /b
         set "item=%%i"
     )
      
-    rem echo RIGHT_C "!right_c!"
-    rem echo OLD ITEM "!old_item!"
 
-    set "oi=!item!"
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!end_mark!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "item=%%i"
-    )
-     rem echo OI "!oi!"
-     rem echo read ITEM "!item!" 
-     rem echo END MARK "!end_mark!"
-    if "!item!" neq "!oi!" (
-        rem echo NEQ "!right_c!"
-        set "item=!item!!end_mark!"
-        echo !item! > "old_item.txt"
+
+    if "!item!" equ " " (
+        set "old_item=!old_item!|"
+        echo !old_item! > "old_item.txt"
+        set /a temp=!token!-1
+        echo !temp! > "token.txt"
         exit /b
     )
-    
+     
 
 
 
