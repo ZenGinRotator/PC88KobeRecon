@@ -181,9 +181,14 @@ rem exit /b
 
 rem call "funcs_first_char_sample_data.bat" :small_data
 
-call "funcs_last_char.bat" :exe
-rem call "funcs_rom_keywords.bat" :exe_loop
+rem call "funcs_last_char.bat" :exe
+call "funcs_last_sample_data.bat" :all_indiv
+call "funcs_last_sample_data.bat" :all_nested
+call "funcs_last_sample_data.bat" :after_1st_indiv
+call "funcs_last_sample_data.bat" :after_1st_nested
 
+rem call "funcs_rom_keywords.bat" :exe_loop
+rem ------------------------- DONE ----------------------------------
 ECHO ---- DONE ----
 
 PAUSE

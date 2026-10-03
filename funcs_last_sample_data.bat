@@ -43,6 +43,419 @@ call %*
 goto :eof
 
 
+rem Permutations for last character data
+
+rem 0 encapsulators
+rem no encapsulators
+
+
+rem single encapsulators
+rem need 6 versions: ic, is, ip, nc, ns, np
+rem an indiv
+rem an indiv, bridge
+rem nested
+rem nested, bridge
+
+rem two encapsulators
+rem nested variant, indiv variant
+rem with bridge, where bridge B can be: "", "BRIDGE", " BRIDGE", "BRIDGE ", " BRIDGE "
+rem c, s
+rem s, c
+rem c, p
+rem p, c
+rem s, p
+rem p, s
+rem c, c,
+rem s, s
+rem p, p
+
+:all_indiv
+    setlocal
+    call :make_indiv "c" "1" ""
+    call :make_indiv "s" "1" ""
+    call :make_indiv "p" "1" ""
+    endlocal
+exit /B
+
+:all_nested
+    setlocal
+    call :make_nested "c" "1"
+    call :make_nested "s" "1"
+    call :make_nested "p" "1"
+    endlocal
+exit /b
+
+
+:double_i
+    setlocal
+    set fpath=
+    for %%i in ("SAMPLE_INDIV\*") do (
+        set "fpath=%%i"
+        set file=
+        for /f "tokens=2 delims=\" %%j in ("!fpath!") do (
+            set "file=%%j"
+            echo "!file!"
+
+            call :append_n_write "!file!" "c" "2" ""
+            call :append_n_write "!file!" "p" "2" ""
+            call :append_n_write "!file!" "s" "2" ""
+
+            call :append_n_write "!file!" "c" "2" "BRIDGE 1"
+            call :append_n_write "!file!" "p" "2" "BRIDGE 1"
+            call :append_n_write "!file!" "s" "2" "BRIDGE 1"
+
+        )
+
+
+    )
+    endlocal
+exit /b
+
+:after_1st_indiv
+    setlocal
+    set fpath=
+    for %%i in ("SAMPLE_INDIV\*") do (
+        set "fpath=%%i"
+        set file=
+        for /f "tokens=2 delims=\" %%j in ("!fpath!") do (
+            set "file=%%j"
+            echo "!file!"
+
+            
+            call :add_bridge "!file!" " "
+
+            call :add_indiv "!file!" "c" "" "2"
+            call :add_indiv "!file!" "p" "" "2"
+            call :add_indiv "!file!" "s" "" "2"
+
+            call :add_indiv "!file!" "c" "" "2"
+            call :add_indiv "!file!" "p" "" "2"
+            call :add_indiv "!file!" "s" "" "2"
+
+
+            call :add_indiv "!file!" "c" "BRIDGE 1" "2" 
+            call :add_indiv "!file!" "p" "BRIDGE 1" "2" 
+            call :add_indiv "!file!" "s" "BRIDGE 1" "2" 
+
+
+            call :add_indiv "!file!" "c" " BRIDGE 1" "2" 
+            call :add_indiv "!file!" "p" " BRIDGE 1" "2" 
+            call :add_indiv "!file!" "s" " BRIDGE 1" "2" 
+
+            call :add_indiv "!file!" "c" "BRIDGE 1 " "2" 
+            call :add_indiv "!file!" "p" "BRIDGE 1 " "2" 
+            call :add_indiv "!file!" "s" "BRIDGE 1 " "2" 
+
+            call :add_indiv "!file!" "c" " BRIDGE 1 " "2" 
+            call :add_indiv "!file!" "p" " BRIDGE 1 " "2" 
+            call :add_indiv "!file!" "s" " BRIDGE 1 " "2" 
+
+            
+
+
+
+            call :add_nested "!file!" "c" "" "1"
+            call :add_nested "!file!" "p" "" "1"
+            call :add_nested "!file!" "s" "" "1"
+
+            call :add_nested "!file!" "c" "" "1"
+            call :add_nested "!file!" "p" "" "1"
+            call :add_nested "!file!" "s" "" "1"
+
+
+            call :add_nested "!file!" "c" "BRIDGE 1" "1" 
+            call :add_nested "!file!" "p" "BRIDGE 1" "1" 
+            call :add_indiv "!file!" "s" "BRIDGE 1" "1" 
+
+
+            call :add_nested "!file!" "c" " BRIDGE 1" "1" 
+            call :add_nested "!file!" "p" " BRIDGE 1" "1" 
+            call :add_nested "!file!" "s" " BRIDGE 1" "1" 
+
+            call :add_nested "!file!" "c" "BRIDGE 1 " "1" 
+            call :add_nested "!file!" "p" "BRIDGE 1 " "1" 
+            call :add_nested "!file!" "s" "BRIDGE 1 " "1" 
+
+            call :add_nested "!file!" "c" " BRIDGE 1 " "1" 
+            call :add_nested "!file!" "p" " BRIDGE 1 " "1" 
+            call :add_nested "!file!" "s" " BRIDGE 1 " "1" 
+
+
+
+
+        )
+
+
+    )
+
+    endlocal
+exit /b
+
+:add_bridge
+    setlocal
+    set "file=%~1"
+
+    set bridge=
+    call :make_bridge "1"
+    for /f "tokens=1 delims=|" %%i in (bridge.txt) do (
+        set "bridge=%%i"
+        echo "!file!!bridge!"
+        echo "!file!!bridge! "
+        echo "!file! !bridge!"
+        echo "!file! !bridge! "
+
+    )
+    endlocal
+exit /b
+
+:make_bridge
+    setlocal
+    set "num=%~1"
+    set "bridge=BRIDGE!|"
+    echo !bridge! > bridge.txt
+    endlocal
+exit /b
+
+
+:add_indiv
+    setlocal
+    set "file=%~1"
+    set "char=%~2"
+    
+    set "bridge=%~3"
+    set "num=%~4"
+    set indiv=
+    call :make_indiv "!char!" "!num!" "*"
+    for /f "tokens=1 delims=|" %%i in (indiv.txt) do (
+        set "indiv=%%i"
+        set "file=!file!!bridge!!indiv!"
+        echo "!file!"
+    )
+    endlocal
+exit /b
+
+:double_n
+    setlocal
+    endlocal
+exit /b
+
+
+:make_indiv
+    setlocal
+    set "char=%~1"
+    set "num=%~2"
+    set "dest_dir=%~3"
+
+    set "enc_l=("
+    set "enc_r=)"
+    set "cap_c=P"
+
+    if "!char!" equ "c" (
+        set "enc_l={"
+        set "enc_r=}"
+        set "cap_c=C"
+    )
+
+    if "!char!" equ "s" (
+        set "enc_l=["
+        set "enc_r=]"
+        set "cap_c=S"
+    )
+
+    set "name=!enc_l!!cap_c!!num! +!enc_r!"
+    set "dir=SAMPLE_INDIV"
+
+    if "!dest_dir!" neq "" (
+        set "name=!name!|"
+        echo !name! > indiv.txt
+        exit /b
+    )
+
+
+
+    if not exist "!dir!" (
+        md "!dir!"
+    )
+    echo !name! > "!dir!\!name!"
+    endlocal
+exit /b
+
+
+:after_1st_nested
+    setlocal
+    set fpath=
+    for %%i in ("SAMPLE_NESTED\*") do (
+        set "fpath=%%i"
+            set file=
+        for /f "tokens=2 delims=\" %%i in ("!fpath!") do (
+            set "file=%%i"
+            echo "!file!"
+
+            call :add_bridge "!file!" " "
+
+
+
+            call :add_nested "!file!" "c" "" "2"
+            call :add_nested "!file!" "p" "" "2"
+            call :add_nested "!file!" "s" "" "2"
+
+            call :add_nested "!file!" "c" "" "2"
+            call :add_nested "!file!" "p" "" "2"
+            call :add_nested "!file!" "s" "" "2"
+
+
+            call :add_nested "!file!" "c" "BRIDGE 1" "2" 
+            call :add_nested "!file!" "p" "BRIDGE 1" "2" 
+            call :add_indiv "!file!" "s" "BRIDGE 1" "2" 
+
+
+            call :add_nested "!file!" "c" " BRIDGE 1" "2" 
+            call :add_nested "!file!" "p" " BRIDGE 1" "2" 
+            call :add_nested "!file!" "s" " BRIDGE 1" "2" 
+
+            call :add_nested "!file!" "c" "BRIDGE 1 " "2" 
+            call :add_nested "!file!" "p" "BRIDGE 1 " "2" 
+            call :add_nested "!file!" "s" "BRIDGE 1 " "2" 
+
+            call :add_nested "!file!" "c" " BRIDGE 1 " "2" 
+            call :add_nested "!file!" "p" " BRIDGE 1 " "2" 
+            call :add_nested "!file!" "s" " BRIDGE 1 " "2" 
+
+
+
+
+
+        
+        call :add_indiv "!file!" "c" "" "1"
+        call :add_indiv "!file!" "p" "" "1"
+        call :add_indiv "!file!" "s" "" "1"
+
+        call :add_indiv "!file!" "c" "" "1"
+        call :add_indiv "!file!" "p" "" "1"
+        call :add_indiv "!file!" "s" "" "1"
+
+
+        call :add_indiv "!file!" "c" "BRIDGE 1" "1" 
+        call :add_indiv "!file!" "p" "BRIDGE 1" "1" 
+        call :add_indiv "!file!" "s" "BRIDGE 1" "1" 
+
+
+        call :add_indiv "!file!" "c" " BRIDGE 1" "1" 
+        call :add_indiv "!file!" "p" " BRIDGE 1" "1" 
+        call :add_indiv "!file!" "s" " BRIDGE 1" "1" 
+
+        call :add_indiv "!file!" "c" "BRIDGE 1 " "1" 
+        call :add_indiv "!file!" "p" "BRIDGE 1 " "1" 
+        call :add_indiv "!file!" "s" "BRIDGE 1 " "1" 
+
+        call :add_indiv "!file!" "c" " BRIDGE 1 " "1" 
+        call :add_indiv "!file!" "p" " BRIDGE 1 " "1" 
+        call :add_indiv "!file!" "s" " BRIDGE 1 " "1" 
+
+    )
+
+    )
+    endlocal
+exit /b
+
+:add_nested
+    setlocal
+        set "file=%~1"
+    set "char=%~2"
+    
+    set "bridge=%~3"
+    set "num=%~4"
+    set indiv=
+    call :make_nested "!char!" "!num!" "*"
+    for /f "tokens=1 delims=|" %%i in (nested.txt) do (
+        set "indiv=%%i"
+        set "file=!file!!bridge!!indiv!"
+        echo "!file!"
+    )
+    endlocal
+exit /b
+
+:make_nested
+    setlocal
+    set "char=%~1"
+    set "num=%~2"
+    set "dest_dir=%~3"
+
+    set "enc_l=("
+    set "enc_r=)"
+    set "cap_c=P"
+
+    if "!char!" equ "c" (
+        set "enc_l={"
+        set "enc_r=}"
+        set "cap_c=C"
+    )
+
+    if "!char!" equ "s" (
+        set "enc_l=["
+        set "enc_r=]"
+        set "cap_c=S"
+    )
+
+    set "name=!enc_l!!cap_c!!num!.0 + !enc_l!!cap_c!!num!.1 +!enc_r! !enc_l!!cap_c!!num!.2 +!enc_r! !cap_c!!num!.n +!enc_r!"
+    set "dir=SAMPLE_NESTED"
+
+
+    if "!dest_dir!" neq "" (
+        set "name=!name!|"
+        echo !name! > nested.txt
+        exit /b
+    )
+
+
+    if not exist "!dir!" (
+        md "!dir!"
+    )
+    echo !name! > "!dir!\!name!"
+    endlocal
+exit /b
+
+:write
+    setlocal
+    endlocal
+exit /b
+
+
+
+:one
+    setlocal
+    endlocal
+exit /b
+
+
+rem three encapsulators
+rem indiv-only, nested-only, 
+rem with and without terminating bridge
+rem s, s, s,
+rem c, c, c
+rem p, p, p
+
+rem mixed varianet
+rem with and without terminating bridge
+
+rem indiv, indiv, indiv
+rem indiv, indiv, indiv, bridge
+rem nested, nested, nested
+rem nested, nested, nested, bridge
+rem nested, indiv, nested
+rem nested, indiv, nested, bridge
+rem nested, nested, indiv
+rem nested, nested, indiv, bridge
+rem indiv, nested, nested
+rem indiv, nested, nested, bridge
+rem indiv, nested, indiv
+rem indiv, nested, indiv, bridge
+
+
+rem four (3 = all 3 + 1 repeated) encapsulators
+
+rem
+
 
 :last_char
     setlocal
