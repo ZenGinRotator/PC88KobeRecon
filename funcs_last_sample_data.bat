@@ -114,6 +114,8 @@ exit /b
 :after_1st_indiv
     setlocal
     set fpath=
+    set "bri_num=%~1"
+    set "enc_num=%~2"
     for %%i in ("SAMPLE_INDIV\*") do (
         set "fpath=%%i"
         set file=
@@ -124,61 +126,59 @@ exit /b
             
             call :add_bridge "!file!" " "
 
-            call :add_indiv "!file!" "c" "" "2"
-            call :add_indiv "!file!" "p" "" "2"
-            call :add_indiv "!file!" "s" "" "2"
 
-            call :add_indiv "!file!" "c" "" "2"
-            call :add_indiv "!file!" "p" "" "2"
-            call :add_indiv "!file!" "s" "" "2"
+            call :add_indiv "!file!" "c" "" "!enc_num!"
+            call :add_indiv "!file!" "p" "" "!enc_num!"
+            call :add_indiv "!file!" "s" "" "!enc_num!"
+
+            set "b=BRIDGE !bri_num!"
+            set "sb= !b!"
+            set "bs=!b! "
+            set "sbs= !b! "
+
+            call :add_indiv "!file!" "c" "!b!" "!enc_num!" 
+            call :add_indiv "!file!" "p" "!b!" "!enc_num!" 
+            call :add_indiv "!file!" "s" "!b!" "!enc_num!" 
 
 
-            call :add_indiv "!file!" "c" "BRIDGE 1" "2" 
-            call :add_indiv "!file!" "p" "BRIDGE 1" "2" 
-            call :add_indiv "!file!" "s" "BRIDGE 1" "2" 
+            call :add_indiv "!file!" "c" "!sb!" "!enc_num!" 
+            call :add_indiv "!file!" "p" "!sb!" "!enc_num!" 
+            call :add_indiv "!file!" "s" "!sb!" "!enc_num!" 
 
+            call :add_indiv "!file!" "c" "!bs!" "!enc_num!" 
+            call :add_indiv "!file!" "p" "!bs!" "!enc_num!" 
+            call :add_indiv "!file!" "s" "!bs!" "!enc_num!" 
 
-            call :add_indiv "!file!" "c" " BRIDGE 1" "2" 
-            call :add_indiv "!file!" "p" " BRIDGE 1" "2" 
-            call :add_indiv "!file!" "s" " BRIDGE 1" "2" 
-
-            call :add_indiv "!file!" "c" "BRIDGE 1 " "2" 
-            call :add_indiv "!file!" "p" "BRIDGE 1 " "2" 
-            call :add_indiv "!file!" "s" "BRIDGE 1 " "2" 
-
-            call :add_indiv "!file!" "c" " BRIDGE 1 " "2" 
-            call :add_indiv "!file!" "p" " BRIDGE 1 " "2" 
-            call :add_indiv "!file!" "s" " BRIDGE 1 " "2" 
+            call :add_indiv "!file!" "c" "!sbs!" "!enc_num!" 
+            call :add_indiv "!file!" "p" "!sbs!" "!enc_num!" 
+            call :add_indiv "!file!" "s" "!sbs!" "!enc_num!" 
 
             
 
+            set /a enc_num_=!enc_num!-1
+            rem echo ENC !enc_num!
+
+            call :add_nested "!file!" "c" "" "!enc_num_!"
+            call :add_nested "!file!" "p" "" "!enc_num_!"
+            call :add_nested "!file!" "s" "" "!enc_num_!"
 
 
-            call :add_nested "!file!" "c" "" "1"
-            call :add_nested "!file!" "p" "" "1"
-            call :add_nested "!file!" "s" "" "1"
-
-            call :add_nested "!file!" "c" "" "1"
-            call :add_nested "!file!" "p" "" "1"
-            call :add_nested "!file!" "s" "" "1"
+            call :add_nested "!file!" "c" "!b!" "!enc_num_!" 
+            call :add_nested "!file!" "p" "!b!" "!enc_num_!" 
+            call :add_nested "!file!" "s" "!b!" "!enc_num_!" 
 
 
-            call :add_nested "!file!" "c" "BRIDGE 1" "1" 
-            call :add_nested "!file!" "p" "BRIDGE 1" "1" 
-            call :add_indiv "!file!" "s" "BRIDGE 1" "1" 
+            call :add_nested "!file!" "c" "!sb!" "!enc_num_!" 
+            call :add_nested "!file!" "p" "!sb!" "!enc_num_!" 
+            call :add_nested "!file!" "s" "!sb!" "!enc_num_!" 
 
+            call :add_nested "!file!" "c" "!bs!" "!enc_num_!" 
+            call :add_nested "!file!" "p" "!bs!" "!enc_num_!" 
+            call :add_nested "!file!" "s" "!bs!" "!enc_num_!" 
 
-            call :add_nested "!file!" "c" " BRIDGE 1" "1" 
-            call :add_nested "!file!" "p" " BRIDGE 1" "1" 
-            call :add_nested "!file!" "s" " BRIDGE 1" "1" 
-
-            call :add_nested "!file!" "c" "BRIDGE 1 " "1" 
-            call :add_nested "!file!" "p" "BRIDGE 1 " "1" 
-            call :add_nested "!file!" "s" "BRIDGE 1 " "1" 
-
-            call :add_nested "!file!" "c" " BRIDGE 1 " "1" 
-            call :add_nested "!file!" "p" " BRIDGE 1 " "1" 
-            call :add_nested "!file!" "s" " BRIDGE 1 " "1" 
+            call :add_nested "!file!" "c" "!sbs!" "!enc_num_!" 
+            call :add_nested "!file!" "p" "!sbs!" "!enc_num_!" 
+            call :add_nested "!file!" "s" "!sbs!" "!enc_num_!" 
 
 
 
@@ -284,12 +284,14 @@ exit /b
 :after_1st_nested
     setlocal
     set fpath=
+    set "bri_num=%~1"
+    set "enc_num=%~2"
     for %%i in ("SAMPLE_NESTED\*") do (
         set "fpath=%%i"
             set file=
         for /f "tokens=2 delims=\" %%i in ("!fpath!") do (
             set "file=%%i"
-            echo "!file!"
+            echo FILE IN DIRECTORY= "!file!"
 
             call :add_bridge "!file!" " "
 
@@ -299,58 +301,55 @@ exit /b
             call :add_nested "!file!" "p" "" "2"
             call :add_nested "!file!" "s" "" "2"
 
-            call :add_nested "!file!" "c" "" "2"
-            call :add_nested "!file!" "p" "" "2"
-            call :add_nested "!file!" "s" "" "2"
+            set "b=BRIDGE !bri_num!"
+            set "sb= !b!"
+            set "bs=!b! "
+            set "sbs= !b! "
+
+            call :add_nested "!file!" "c" "!b!" "2" 
+            call :add_nested "!file!" "p" "!b!" "2" 
+            call :add_nested "!file!" "s" "!b!" "2" 
 
 
-            call :add_nested "!file!" "c" "BRIDGE 1" "2" 
-            call :add_nested "!file!" "p" "BRIDGE 1" "2" 
-            call :add_indiv "!file!" "s" "BRIDGE 1" "2" 
+            call :add_nested "!file!" "c" "!sb!" "2" 
+            call :add_nested "!file!" "p" "!sb!" "2" 
+            call :add_nested "!file!" "s" "!sb!" "2" 
 
+            call :add_nested "!file!" "c" "!bs!" "2" 
+            call :add_nested "!file!" "p" "!bs!" "2" 
+            call :add_nested "!file!" "s" "!bs!" "2" 
 
-            call :add_nested "!file!" "c" " BRIDGE 1" "2" 
-            call :add_nested "!file!" "p" " BRIDGE 1" "2" 
-            call :add_nested "!file!" "s" " BRIDGE 1" "2" 
-
-            call :add_nested "!file!" "c" "BRIDGE 1 " "2" 
-            call :add_nested "!file!" "p" "BRIDGE 1 " "2" 
-            call :add_nested "!file!" "s" "BRIDGE 1 " "2" 
-
-            call :add_nested "!file!" "c" " BRIDGE 1 " "2" 
-            call :add_nested "!file!" "p" " BRIDGE 1 " "2" 
-            call :add_nested "!file!" "s" " BRIDGE 1 " "2" 
-
-
+            call :add_nested "!file!" "c" "!sbs!" "2" 
+            call :add_nested "!file!" "p" "!sbs!" "2" 
+            call :add_nested "!file!" "s" "!sbs!" "2" 
 
 
 
-        
-        call :add_indiv "!file!" "c" "" "1"
-        call :add_indiv "!file!" "p" "" "1"
-        call :add_indiv "!file!" "s" "" "1"
-
-        call :add_indiv "!file!" "c" "" "1"
-        call :add_indiv "!file!" "p" "" "1"
-        call :add_indiv "!file!" "s" "" "1"
+            set /a enc_num_=!enc_num!-1
+            rem echo ENC !enc_num!
 
 
-        call :add_indiv "!file!" "c" "BRIDGE 1" "1" 
-        call :add_indiv "!file!" "p" "BRIDGE 1" "1" 
-        call :add_indiv "!file!" "s" "BRIDGE 1" "1" 
+        call :add_indiv "!file!" "c" "" "!enc_num_!"
+        call :add_indiv "!file!" "p" "" "!enc_num_!"
+        call :add_indiv "!file!" "s" "" "!enc_num_!"
 
 
-        call :add_indiv "!file!" "c" " BRIDGE 1" "1" 
-        call :add_indiv "!file!" "p" " BRIDGE 1" "1" 
-        call :add_indiv "!file!" "s" " BRIDGE 1" "1" 
+        call :add_indiv "!file!" "c" "!b!" "!enc_num_!" 
+        call :add_indiv "!file!" "p" "!b!" "!enc_num_!" 
+        call :add_indiv "!file!" "s" "!b!" "!enc_num_!" 
 
-        call :add_indiv "!file!" "c" "BRIDGE 1 " "1" 
-        call :add_indiv "!file!" "p" "BRIDGE 1 " "1" 
-        call :add_indiv "!file!" "s" "BRIDGE 1 " "1" 
 
-        call :add_indiv "!file!" "c" " BRIDGE 1 " "1" 
-        call :add_indiv "!file!" "p" " BRIDGE 1 " "1" 
-        call :add_indiv "!file!" "s" " BRIDGE 1 " "1" 
+        call :add_indiv "!file!" "c" "!sb!" "!enc_num_!" 
+        call :add_indiv "!file!" "p" "!sb!" "!enc_num_!" 
+        call :add_indiv "!file!" "s" "!sb!" "!enc_num_!" 
+
+        call :add_indiv "!file!" "c" "!bs!" "!enc_num_!" 
+        call :add_indiv "!file!" "p" "!bs!" "!enc_num_!" 
+        call :add_indiv "!file!" "s" "!bs!" "!enc_num_!" 
+
+        call :add_indiv "!file!" "c" "!sbs!" "!enc_num_!" 
+        call :add_indiv "!file!" "p" "!sbs!" "!enc_num_!" 
+        call :add_indiv "!file!" "s" "!sbs!" "!enc_num_!" 
 
     )
 

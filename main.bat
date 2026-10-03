@@ -182,10 +182,12 @@ rem exit /b
 rem call "funcs_first_char_sample_data.bat" :small_data
 
 rem call "funcs_last_char.bat" :exe
+
+rem need bridges before the first, single encap
 call "funcs_last_sample_data.bat" :all_indiv
 call "funcs_last_sample_data.bat" :all_nested
-call "funcs_last_sample_data.bat" :after_1st_indiv
-call "funcs_last_sample_data.bat" :after_1st_nested
+call "funcs_last_sample_data.bat" :after_1st_indiv "1" "2"
+call "funcs_last_sample_data.bat" :after_1st_nested "1" "2"
 
 rem call "funcs_rom_keywords.bat" :exe_loop
 rem ------------------------- DONE ----------------------------------
