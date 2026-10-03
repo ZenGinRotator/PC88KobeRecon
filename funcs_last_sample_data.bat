@@ -86,31 +86,6 @@ exit /B
 exit /b
 
 
-:double_i
-    setlocal
-    set fpath=
-    for %%i in ("SAMPLE_INDIV\*") do (
-        set "fpath=%%i"
-        set file=
-        for /f "tokens=2 delims=\" %%j in ("!fpath!") do (
-            set "file=%%j"
-            echo "!file!"
-
-            call :append_n_write "!file!" "c" "2" ""
-            call :append_n_write "!file!" "p" "2" ""
-            call :append_n_write "!file!" "s" "2" ""
-
-            call :append_n_write "!file!" "c" "2" "BRIDGE 1"
-            call :append_n_write "!file!" "p" "2" "BRIDGE 1"
-            call :append_n_write "!file!" "s" "2" "BRIDGE 1"
-
-        )
-
-
-    )
-    endlocal
-exit /b
-
 :after_1st_indiv
     setlocal
     set fpath=
@@ -277,6 +252,30 @@ exit /b
         md "!dir!"
     )
     echo !name! > "!dir!\!name!"
+
+    call :prepend_bridge "!name!" "!dir!"
+
+    set "name"
+    endlocal
+exit /b
+
+:prepend_bridge
+    setlocal
+    set "name=%~1"
+    set "dir=%~2"
+    set "b=BRIDGE 0"
+    set "sb= !b!"
+    set "bs=!b! "
+    set "sbs= !b! "
+
+    set "bn=!b!!name!"
+    set "sbn=!sb!!name!"
+    set "bsn=!bs!!name!"
+    set "sbsn=!sbs!!name!"
+    echo !bn! > "!dir!\!bn!"
+    echo !sbn! > "!dir!\!sbn!"
+    echo !bsn! > "!dir!\!bsn!"
+    echo !sbsn! > "!dir!\!sbsn!"
     endlocal
 exit /b
 
@@ -411,6 +410,8 @@ exit /b
         md "!dir!"
     )
     echo !name! > "!dir!\!name!"
+
+    call :prepend_bridge "!name!" "!dir!"
     endlocal
 exit /b
 
