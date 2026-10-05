@@ -183,15 +183,49 @@ rem call "funcs_first_char_sample_data.bat" :small_data
 
 rem call "funcs_last_char.bat" :exe
 
+
+rem output directories for sample: indiv & nested
+rem SAMPLE\*
+rem *INDV
+rem *NEST
+rem **NO_ENCAP - a bridge that can serve as a rom name (do this later)
+REM **STAGE_1
+REM     bridge & encap,
+
+rem **STAGE_2
+rem     bridge & encap & bridge & encap
+
+
+rem **STAGE_3
+rem     bridge & encap & bridge & encap & bridge & encap
+
+rem **STAGE_4
+rem     bridge & encap, bridge & encap, bridge & encap, bridge & encap
+
+rem ARGUEMENTS FOR FUNCTION CALLS
+rem char: c, p, s
+rem char_num: 1, 2, 3, 4
+rem bridge_num: 0 (indicates space), 1, 2, 3,
+rem src_dir: 0 (none), 1, 2, 3
+rem dest_dir: 1, 2, 3, 4
+rem ** unsure of what arguements required for mixed (nested with indiv and vice-versa)
+
+set "sampl=SAMPLE"
+set "indv=INDIV"
+set "nest=NESTED"
+set "dirs=!sampl!|!indv!|!nest!"
+REM declared in each function
+set "stage=STAGE"
+
 rem need bridges before the first, single encap
-call "funcs_last_sample_data.bat" :all_indiv
-call "funcs_last_sample_data.bat" :all_nested
+REM call "funcs_last_sample_data.bat" :all_indiv "!dirs!"
+call "funcs_last_sample_data.bat" :all_nested "!dirs!"
 
 rem Needs its own folder SAMPLE_INDIV\TWO_ENCAPS
 REM Beginning encap is indiv, has concluding encaps as the following:
 rem * indivs
 rem * nested
-call "funcs_last_sample_data.bat" :after_1st_indiv "1" "2" "SAMPLE_INDIV\TWO_ENCAPS"
+rem call "funcs_last_sample_data.bat" :after_1st_indiv "1" "2" "SAMPLE_INDIV\TWO_ENCAPS"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "2" "3" "SAMPLE_INDIV\THREE_ENCAPS"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "3" "4" "SAMPLE_INDIV\FOUR_ENCAPS"
 
@@ -200,7 +234,7 @@ REM Beginning encap is nested, has concluding encaps as the following:
 rem * nested
 rem * indiv
 
-call "funcs_last_sample_data.bat" :after_1st_nested "1" "2" "SAMPLE_NESTED\TWO_NECAPS"
+rem call "funcs_last_sample_data.bat" :after_1st_nested "1" "2" "SAMPLE_NESTED\TWO_NECAPS"
 REM call "funcs_last_sample_data.bat" :after_1st_indiv "2" "3" "SAMPLE_NESTED\THREE_ENCAPS"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "3" "4" "SAMPLE_NESTED\FOUR_ENCAPS"
 

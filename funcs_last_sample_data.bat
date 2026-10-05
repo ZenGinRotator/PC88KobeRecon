@@ -71,17 +71,35 @@ rem p, p
 
 :all_indiv
     setlocal
-    call :make_indiv "c" "1" ""
-    call :make_indiv "s" "1" ""
-    call :make_indiv "p" "1" ""
+    set "dirs=%~1"
+
+
+    set "char_num=1"
+    set "brid_num=1"
+    set "func_encap="
+
+    set "args=!char_num!|!brid_num!|!func_encap!"
+    call :make_indiv "!dirs!" "c" "!args!"
+    call :make_indiv "!dirs!" "s" "!args!"
+    call :make_indiv "!dirs!" "p" "!args!"
     endlocal
 exit /B
 
 :all_nested
     setlocal
-    call :make_nested "c" "1"
-    call :make_nested "s" "1"
-    call :make_nested "p" "1"
+
+    set "dirs=%~1"
+
+    
+    set "char_num=1"
+    set "brid_num=1"
+    set "func_encap="
+
+    set "args=!char_num!|!brid_num!|!func_encap!"
+
+    call :make_nested "!dirs!" "c" "!args!"
+    call :make_nested "!dirs!" "s" "!args!"
+    call :make_nested "!dirs!" "p" "!args!"
     endlocal
 exit /b
 
@@ -237,9 +255,40 @@ exit /b
 
 :make_indiv
     setlocal
-    set "char=%~1"
-    set "num=%~2"
-    set "dest_dir=%~3"
+    set "dirs=%~1"
+    set "char=%~2"
+    set "args=%~3"
+
+    echo MAKE_INDIV_DIRS "!dirs!"
+    echo ARSGS "!args!"
+    set smpl=
+    set indv=
+    set nest=
+    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+        set "smpl=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        set "indv=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
+        set "nest=%%i"
+    )
+
+
+    set char_num=
+    set brid_num=
+    set func_encap=
+    for /f "tokens=1 delims=|" %%i in ("!args!") do (
+        set "char_num=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!args!") do (
+        set "brid_num=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!args!") do (
+        set "func_encap=%%i"
+    )
+
+    
 
     set "enc_l=("
     set "enc_r=)"
@@ -257,10 +306,10 @@ exit /b
         set "cap_c=S"
     )
 
-    set "name=!enc_l!!cap_c!!num! +!enc_r!"
-    set "dir=SAMPLE_INDIV"
+    set "name=!enc_l!!cap_c!!char_num! +!enc_r!"
+    set "dest_dir=!smpl!\!indv!"
 
-    if "!dest_dir!" neq "" (
+    if "!func_encap!" equ "*" (
         set "name=!name!|"
         echo !name! > indiv.txt
         exit /b
@@ -268,12 +317,12 @@ exit /b
 
 
 
-    if not exist "!dir!" (
-        md "!dir!"
+    if not exist "!dest_dir!" (
+        md "!dest_dir!"
     )
-    echo !name! > "!dir!\!name!"
+    echo !name! > "!dest_dir!\!name!"
 
-    call :prepend_bridge "!name!" "!dir!"
+    call :prepend_bridge "!name!" "!brid_num!" "!dest_dir!"
 
     
     endlocal
@@ -282,8 +331,11 @@ exit /b
 :prepend_bridge
     setlocal
     set "name=%~1"
-    set "dir=%~2"
-    set "b=BRIDGE 0"
+    set "brid_num=%~2"
+    set "dir=%~3"
+
+
+    set "b=BRIDGE !brid_num!"
     set "sb= !b!"
     set "bs=!b! "
     set "sbs= !b! "
@@ -390,7 +442,7 @@ exit /b
     
     set "bridge=%~3"
     set "num=%~4"
-    set "dir=%~5
+    set "dir=%~5"
     set indiv=
     call :make_nested "!char!" "!num!" "*"
     for /f "tokens=1 delims=|" %%i in (nested.txt) do (
@@ -408,9 +460,36 @@ exit /b
 
 :make_nested
     setlocal
-    set "char=%~1"
-    set "num=%~2"
-    set "dest_dir=%~3"
+    set "dirs=%~1"
+    set "char=%~2"
+    set "args=%~3"
+
+    set smpl=
+    set indv=
+    set nest=
+    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+        set "smpl=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        set "indv=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
+        set "nest=%%i"
+    )
+
+
+    set char_num=
+    set brid_num=
+    set func_encap=
+    for /f "tokens=1 delims=|" %%i in ("!args!") do (
+        set "char_num=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!args!") do (
+        set "brid_num=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!args!") do (
+        set "func_encap=%%i"
+    )
 
     set "enc_l=("
     set "enc_r=)"
@@ -429,22 +508,21 @@ exit /b
     )
 
     set "name=!enc_l!!cap_c!!num!.0 + !enc_l!!cap_c!!num!.1 +!enc_r! !enc_l!!cap_c!!num!.2 +!enc_r! !cap_c!!num!.n +!enc_r!"
-    set "dir=SAMPLE_NESTED"
+    set "dest_dir=!smpl!\!nest!"
 
-
-    if "!dest_dir!" neq "" (
+    if "!dest_dir!" EQU "*" (
         set "name=!name!|"
         echo !name! > nested.txt
         exit /b
     )
 
 
-    if not exist "!dir!" (
-        md "!dir!"
+    if not exist "!dest_dir!" (
+        md "!dest_dir!"
     )
-    echo !name! > "!dir!\!name!"
+    echo !name! > "!dest_dir!\!name!"
 
-    call :prepend_bridge "!name!" "!dir!"
+    call :prepend_bridge "!name!" "!brid_num!" "!dest_dir!"
     endlocal
 exit /b
 
@@ -458,8 +536,8 @@ exit /b
     if not exist "!path!" (
         md "!path!"
     )
-    rem echo "!path!\!file!"
-    rem exit /b
+    echo "!path!\!file!"
+    exit /b
     echo !file! > "!path!\!file!"
     endlocal
 exit /b
