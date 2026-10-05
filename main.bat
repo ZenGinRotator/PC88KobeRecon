@@ -186,8 +186,23 @@ rem call "funcs_last_char.bat" :exe
 rem need bridges before the first, single encap
 call "funcs_last_sample_data.bat" :all_indiv
 call "funcs_last_sample_data.bat" :all_nested
-call "funcs_last_sample_data.bat" :after_1st_indiv "1" "2"
-call "funcs_last_sample_data.bat" :after_1st_nested "1" "2"
+
+rem Needs its own folder SAMPLE_INDIV\TWO_ENCAPS
+REM Beginning encap is indiv, has concluding encaps as the following:
+rem * indivs
+rem * nested
+call "funcs_last_sample_data.bat" :after_1st_indiv "1" "2" "SAMPLE_INDIV\TWO_ENCAPS"
+rem call "funcs_last_sample_data.bat" :after_1st_indiv "2" "3" "SAMPLE_INDIV\THREE_ENCAPS"
+rem call "funcs_last_sample_data.bat" :after_1st_indiv "3" "4" "SAMPLE_INDIV\FOUR_ENCAPS"
+
+rem Needs its own folder SAMPLE_NESTED\TWO_ENCAPS
+REM Beginning encap is nested, has concluding encaps as the following:
+rem * nested
+rem * indiv
+
+call "funcs_last_sample_data.bat" :after_1st_nested "1" "2" "SAMPLE_NESTED\TWO_NECAPS"
+REM call "funcs_last_sample_data.bat" :after_1st_indiv "2" "3" "SAMPLE_NESTED\THREE_ENCAPS"
+rem call "funcs_last_sample_data.bat" :after_1st_indiv "3" "4" "SAMPLE_NESTED\FOUR_ENCAPS"
 
 rem call "funcs_rom_keywords.bat" :exe_loop
 rem ------------------------- DONE ----------------------------------
