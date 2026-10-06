@@ -72,6 +72,7 @@ rem p, p
 :all_indiv
     setlocal
     set "dirs=%~1"
+    set "dest_root=%~2"
 
 
     set "char_num=1"
@@ -79,9 +80,9 @@ rem p, p
     set "func_encap="
 
     set "args=!brid_num!|!char_num!|!func_encap!"
-    call :make_indiv "!dirs!" "c" "!args!"
-    call :make_indiv "!dirs!" "s" "!args!"
-    call :make_indiv "!dirs!" "p" "!args!"
+    call :make_indiv "c" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_indiv "s" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_indiv "p" "!args!" "!dest_root!\STAGE_!char_num!"
     endlocal
 exit /B
 
@@ -89,6 +90,7 @@ exit /B
     setlocal
 
     set "dirs=%~1"
+    set "dest_root=%~2"
 
     
     set "char_num=1"
@@ -97,9 +99,10 @@ exit /B
 
     set "args=!brid_num!|!char_num!|!func_encap!"
 
-    call :make_nested "!dirs!" "c" "!args!"
-    call :make_nested "!dirs!" "s" "!args!"
-    call :make_nested "!dirs!" "p" "!args!"
+
+    call :make_nested "c" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_nested "s" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_nested "p" "!args!" "!dest_root!\STAGE_!char_num!"
     endlocal
 exit /b
 
@@ -142,92 +145,82 @@ exit /b
         set "func_encap=%%i"
     )
 
-rem echo ARGS  "!args!"
     
 
     set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
-    set "dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
-    rem echo SRC "!src_dir!"
-    rem echo DEST "!dest_dir!"
-    set /a q=0
+    set "indv_dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
+   
+   
+    set /a qty=0
     
     for %%i in ("!src_dir!\*") do (
         set "fpath=%%i"
-        rem echo FPATH "!fpath!"
-        REM PAUSE
         set file=
-        set /a q+=1
-        echo DEST_DIR "!dest_dir!" !q!
+        set /a qty+=1
 
         for /f "tokens=4 delims=\" %%j in ("!fpath!") do (
             set "file=%%j"
 
             rem Write this
-            rem ECHO READ FILE "!file!"
-            call :write "!dest_dir!" "!file!"
+            call :write "!indv_dest_dir!" "!file!"
 
             rem Write this
-            call :add_bridge "!file!" "!dest_dir!" "!enc_num!"
+            call :add_bridge "!file!" "!indv_dest_dir!" "!enc_num!"
            
 
             rem Write these
-            rem echo ALL INDIV
-            rem echo "DIRS" "!dirs!"
-            rem echo "args" "!args!"
-            call :add_indiv "!file!" "c" "" "!dirs!" "!args!"
-            call :add_indiv "!file!" "p" "" "!dirs!" "!args!"
-            call :add_indiv "!file!" "s" "" "!dirs!" "!args!"
+            call :add_indiv "!file!" "c" "" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "p" "" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "s" "" "!args!" "!indv_dest_dir!"
 
             set "b=BRIDGE !enc_num!"
             set "sb= !b!"
             set "bs=!b! "
             set "sbs= !b! "
 
-            call :add_indiv "!file!" "c" "!b!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "p" "!b!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "s" "!b!" "!dirs!"  "!args!"
+            call :add_indiv "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
 
 
-            call :add_indiv "!file!" "c" "!sb!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "p" "!sb!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "s" "!sb!" "!dirs!"  "!args!"
+            call :add_indiv "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
 
-            call :add_indiv "!file!" "c" "!bs!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "p" "!bs!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "s" "!bs!" "!dirs!"  "!args!"
+            call :add_indiv "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "s" "!bs!"  "!args!" "!indv_dest_dir!"
 
-            call :add_indiv "!file!" "c" "!sbs!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "p" "!sbs!" "!dirs!"  "!args!"
-            call :add_indiv "!file!" "s" "!sbs!" "!dirs!"  "!args!"
+            call :add_indiv "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
+            call :add_indiv "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
 
             
 
-            rem set /a enc_num_=!enc_num!-1
-            rem Need to change destination folder from \indiv\ to \nested\
-
+           
             rem Write these
-            ECHO INDIV, NESTED
-            call :add_nested "!file!" "c" "" "!dirs!" "!args!"
-            call :add_nested "!file!" "p" "" "!dirs!" "!args!"
-            call :add_nested "!file!" "s" "" "!dirs!" "!args!"
+            
+            call :add_nested "!file!" "c" "" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "p" "" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "s" "" "!args!" "!indv_dest_dir!"
 
 
-            call :add_nested "!file!" "c" "!b!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!b!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!b!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
 
 
-            call :add_nested "!file!" "c" "!sb!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!sb!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!sb!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
 
-            call :add_nested "!file!" "c" "!bs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!bs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!bs!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "s" "!bs!" "!args!" "!indv_dest_dir!"
 
-            call :add_nested "!file!" "c" "!sbs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!sbs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!sbs!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
+            call :add_nested "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
 
 
 
@@ -250,12 +243,6 @@ exit /b
     call :make_bridge "!brid_num!"
     for /f "tokens=1 delims=|" %%i in (bridge.txt) do (
         set "bridge=%%i"
-        rem echo "!file!!bridge!"
-        rem echo "!file!!bridge! "
-        rem echo "!file! !bridge!"
-        rem echo "!file! !bridge! "
-
-        REM echo ADD BRIDGE
         rem Write all
         call :write "!dir!" "!file!!bridge!"
         call :write "!dir!" "!file!!bridge! "
@@ -280,23 +267,9 @@ exit /b
     set "file=%~1"
     set "char=%~2"
     set "bridge=%~3"
-    set "dirs=%~4"
-    set "args=%~5"
-    
+    set "args=%~4"
+    set "dest_dir=%~5"
 
-
-    set smpl=
-    set indv=
-    set nest=
-    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-        set "smpl=%%i"
-    )
-    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        set "indv=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-        set "nest=%%i"
-    )
 
     
     set bri_num=
@@ -314,17 +287,13 @@ exit /b
     )
 
     
-    set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
-    set "dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
-
-
-    call :make_indiv "!dirs!" "!char!" "!args!"
+    set empty_dest_dir=
+    call :make_indiv "!char!" "!args!" "!empty_dest_dir!"
     for /f "tokens=1 delims=|" %%i in (indiv.txt) do (
         set "encap=%%i"
         set "file=!file!!bridge!!encap!"
 
         rem Write this
-        rem echo "!file!"
         call :write "!dest_dir!" "!file!"
 
     )
@@ -339,25 +308,14 @@ exit /b
 rem args=!char_num!|!brid_num!|!func_encap!
 :make_indiv
     setlocal
-    set "dirs=%~1"
-    set "char=%~2"
-    set "args=%~3"
+    rem set "dirs=%~1"
+    set "char=%~1"
+    
 
-    rem echo MAKE_INDIV_DIRS "!dirs!"
-    rem echo ARSGS "!args!"
-    set smpl=
-    set indv=
-    set nest=
-    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-        set "smpl=%%i"
-    )
-    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        set "indv=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-        set "nest=%%i"
-    )
-
+    rem 1st stage: dest_dir neq ""
+    rem nth stage, n > 1: dest_dir equ ""
+    set "args=%~2"
+    set "dest_dir=%~3"
 
     set char_num=
     set brid_num=
@@ -391,7 +349,7 @@ rem args=!char_num!|!brid_num!|!func_encap!
     )
 
     set "name=!enc_l!!cap_c!!char_num! +!enc_r!"
-    set "dest_dir=!smpl!\!indv!\STAGE_!char_num!"
+    
 
     if "!func_encap!" equ "*" (
         set "name=!name!|"
@@ -483,9 +441,9 @@ exit /b
             set file=
             set /a qty+=1
             echo DEST_DIR "!dest_dir!" !qty!
-        for /f "tokens=2 delims=\" %%i in ("!fpath!") do (
+        for /f "tokens=4 delims=\" %%i in ("!fpath!") do (
             set "file=%%i"
-            rem echo FILE IN DIRECTORY= "!file!"
+          
             call :write "!dest_dir!" "!file!"
 
 
@@ -494,9 +452,9 @@ exit /b
 
 
             rem Write these
-            call :add_nested "!file!" "c" "" "2" "!dir!"
-            call :add_nested "!file!" "p" "" "2" "!dir!"
-            call :add_nested "!file!" "s" "" "2" "!dir!"
+            call :add_nested "!file!" "c" "" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "p" "" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "s" "" "!args!" "!dest_dir!"
 
             set "b=BRIDGE !enc_num!"
             set "sb= !b!"
@@ -505,22 +463,22 @@ exit /b
 
 
             rem Write these
-            call :add_nested "!file!" "c" "!b!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!b!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!b!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!b!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "p" "!b!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "s" "!b!" "!args!" "!dest_dir!"
 
 
-            call :add_nested "!file!" "c" "!sb!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!sb!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!sb!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!sb!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "p" "!sb!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "s" "!sb!" "!args!" "!dest_dir!"
 
-            call :add_nested "!file!" "c" "!bs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!bs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!bs!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!bs!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "p" "!bs!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "s" "!bs!" "!args!" "!dest_dir!"
 
-            call :add_nested "!file!" "c" "!sbs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "p" "!sbs!" "!dirs!"  "!args!"
-            call :add_nested "!file!" "s" "!sbs!" "!dirs!"  "!args!"
+            call :add_nested "!file!" "c" "!sbs!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "p" "!sbs!" "!args!" "!dest_dir!"
+            call :add_nested "!file!" "s" "!sbs!" "!args!" "!dest_dir!"
 
 
 
@@ -528,27 +486,27 @@ exit /b
             rem echo ENC !enc_num!
 
         rem Write these
-        call :add_indiv "!file!" "c" "" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "p" "" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "s" "" "!dirs!"  "!args!"
+        call :add_indiv "!file!" "c" "" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "p" "" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "s" "" "!args!" "!dest_dir!"
 
 
-        call :add_indiv "!file!" "c" "!b!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "p" "!b!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "s" "!b!" "!dirs!"  "!args!"
+        call :add_indiv "!file!" "c" "!b!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "p" "!b!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "s" "!b!" "!args!" "!dest_dir!"
 
 
-        call :add_indiv "!file!" "c" "!sb!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "p" "!sb!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "s" "!sb!" "!dirs!"  "!args!"
+        call :add_indiv "!file!" "c" "!sb!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "p" "!sb!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "s" "!sb!" "!args!" "!dest_dir!"
 
-        call :add_indiv "!file!" "c" "!bs!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "p" "!bs!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "s" "!bs!" "!dirs!"  "!args!"
+        call :add_indiv "!file!" "c" "!bs!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "p" "!bs!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "s" "!bs!" "!args!" "!dest_dir!"
 
-        call :add_indiv "!file!" "c" "!sbs!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "p" "!sbs!" "!dirs!"  "!args!"
-        call :add_indiv "!file!" "s" "!sbs!" "!dirs!"  "!args!"
+        call :add_indiv "!file!" "c" "!sbs!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "p" "!sbs!" "!args!" "!dest_dir!"
+        call :add_indiv "!file!" "s" "!sbs!" "!args!" "!dest_dir!"
 
     )
 
@@ -561,23 +519,9 @@ exit /b
     set "file=%~1"
     set "char=%~2"
     set "bridge=%~3"
+    set "args=%~4"
+    set "dest_dir=%~5"
 
-    set "dirs=%~4"
-    set "args=%~5"
-
-
-    set smpl=
-    set indv=
-    set nest=
-    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-        set "smpl=%%i"
-    )
-    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        set "indv=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-        set "nest=%%i"
-    )
 
     
     set bri_num=
@@ -595,18 +539,14 @@ exit /b
     )
 
     
-    set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
-    set "dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
-   
+    
 
 
-    call :make_nested "!dirs!" "!char!" "!args!"
+    call :make_nested "!char!" "!args!"
     for /f "tokens=1 delims=|" %%i in (nested.txt) do (
         set "encap=%%i"
         set "file=!file!!bridge!!encap!"
         
-        rem Write this.
-        rem echo "!file!"
         call :write "!dest_dir!" "!file!"
 
 
@@ -616,22 +556,9 @@ exit /b
 
 :make_nested
     setlocal
-    set "dirs=%~1"
-    set "char=%~2"
-    set "args=%~3"
-
-    set smpl=
-    set indv=
-    set nest=
-    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-        set "smpl=%%i"
-    )
-    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        set "indv=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-        set "nest=%%i"
-    )
+    set "char=%~1"
+    set "args=%~2"
+    set "dest_dir=%~3"
 
 
     set char_num=
@@ -664,7 +591,6 @@ exit /b
     )
 
     set "name=!enc_l!!cap_c!!char_num!.0 + !enc_l!!cap_c!!char_num!.1 +!enc_r! !enc_l!!cap_c!!char_num!.2 +!enc_r! !cap_c!!char_num!.n +!enc_r!"
-    set "dest_dir=!smpl!\!nest!\STAGE_!char_num!"
 
     if "!func_encap!" EQU "*" (
         set "name=!name!|"
@@ -686,14 +612,12 @@ exit /b
     setlocal
     set "path=%~1"
     set "file=%~2"
-    rem echo PATH "!path!"
-    rem echo FILE "!file!"
-    rem echo "!brk!"
+   
     if not exist "!path!" (
         md "!path!"
     )
     echo write file path "!path!\!file!"
-     exit /b
+     rem exit /b
     echo !file! > "!path!\!file!"
     endlocal
 exit /b

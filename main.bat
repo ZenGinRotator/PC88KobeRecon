@@ -218,8 +218,8 @@ REM declared in each function
 set "stage=STAGE"
 
 rem need bridges before the first, single encap
-rem call "funcs_last_sample_data.bat" :all_indiv "!dirs!"
-rem call "funcs_last_sample_data.bat" :all_nested "!dirs!"
+
+
 
 rem Needs its own folder SAMPLE_INDIV\TWO_ENCAPS
 REM Beginning encap is indiv, has concluding encaps as the following:
@@ -229,7 +229,8 @@ rem args=!char_num!|!brid_num!|!func_encap!
 set "stg2_args=1|2|*"
 set "stg3_args=2|3|*"
 set "stg4_args=3|4|*"
-
+set "idest_root=!sampl!\!indv!"
+rem call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!idest_root!"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg2_args!"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg3_args!"
 rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg4_args!"
@@ -238,8 +239,10 @@ rem Needs its own folder SAMPLE_NESTED\TWO_ENCAPS
 REM Beginning encap is nested, has concluding encaps as the following:
 rem * nested
 rem * indiv
-
-rem call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg2_args!"
+set "ndest_root=!sampl!\!nest!"
+call "funcs_last_sample_data.bat" :all_nested "!dirs!" "!ndest_root!"
+echo -------------------------------------------------------
+call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg2_args!"
 rem call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg3_args!"
 rem call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg4_args!"
 
