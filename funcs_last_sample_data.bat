@@ -38,9 +38,34 @@ set "b4=B4"
 
 
 
-call %*
+rem output directories for sample: indiv & nested
+rem SAMPLE\*
+rem *INDV
+rem *NEST
+rem **NO_ENCAP - a bridge that can serve as a rom name (do this later)
+REM **STAGE_1
+REM     bridge & encap,
 
-goto :eof
+rem **STAGE_2
+rem     bridge & encap & bridge & encap
+
+
+rem **STAGE_3
+rem     bridge & encap & bridge & encap & bridge & encap
+
+rem **STAGE_4
+rem     bridge & encap, bridge & encap, bridge & encap, bridge & encap
+
+rem ARGUEMENTS FOR FUNCTION CALLS
+rem char: c, p, s
+rem char_num: 1, 2, 3, 4
+rem bridge_num: 0 (indicates space), 1, 2, 3,
+rem src_dir: 0 (none), 1, 2, 3
+rem dest_dir: 1, 2, 3, 4
+rem ** unsure of what arguements required for mixed (nested with indiv and vice-versa)
+
+
+rem need bridges before the first, single encap
 
 
 rem Permutations for last character data
@@ -69,10 +94,98 @@ rem c, c,
 rem s, s
 rem p, p
 
+
+
+call %*
+
+goto :eof
+
+
+:make_samples
+    setlocal
+    
+set "smp=SAMPLE"
+set "ndv=INDIV"
+set "nst=NESTED"
+set "stg=STAGE"
+set "dest_dirs=ALL|SUBSET"
+set "sub=SUBSET"
+set "all=ALL"
+
+set "dirs=!smp!|!ndv!|!nst!|!stg!|!sub!|!all!"
+
+REM SAMPLE\INDIV\
+REM SUB\STAGE_X, where X=1, 2, 3, 4
+REM ALL\STAGE_X, where X=1, 2, 3, 4
+
+REM SAMPLE\NESTED
+REM SUB\STAGE_X, X=1,2,3,4
+REM ALL\STAGE_X, X=1,2,3,4
+
+REM ALL
+REM SUB
+rem STAGE_1
+REM STAGE_2
+REM STAGE_3
+REM STAGE_4
+set "stg2_args=1|2|*"
+set "stg3_args=2|3|*"
+set "stg4_args=3|4|*"
+set "idest_root=!sampl!\!indv!"
+set "idest_dir=!sampl!\!indv!\!sub!"
+rem rename to all_encap
+call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!idest_dir!"
+set "src_dir=!sampl!\!indv!\STAGE_1"
+set "dest_dir=!sampl!\!indv!\STAGE_2"
+call "funcs_last_sample_data.bat" :after_1st_indiv "!stg2_args!" "!idest_root!" "!idest_dir!"
+exit /b
+
+
+
+REM call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg3_args!" "!dest_dirs!" "!idest_root!" "!idest_dir!"
+REM call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg4_args!" "!dest_dirs!" "!idest_root!" "!idest_dir!"
+
+
+
+REM set "ndest_root=!sampl!\!nest!"
+REM set "ndest_dir=!sampl!\!nest!\!sub!"
+ REM call "funcs_last_sample_data.bat" :all_nested "!dirs!" "!ndest_root!" "!dest_dirs!" "!ndest_dir!"
+REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg2_args!" "!dest_dirs!" "!ndest_dir!"
+ REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg3_args!" "!dest_dirs!" "!ndest_dir!"
+REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg4_args!" "!dest_dirs!" "!ndest_dir!"
+    endlocal
+exit /b
+
+rem change to all_encap
 :all_indiv
     setlocal
     set "dirs=%~1"
-    set "dest_root=%~2"
+
+    set smp=
+    set ndv=
+    set nst=
+    set stg=
+    set sbst=
+    set all=
+    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+        set "smp=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        set "ndv=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
+        set "nst=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!dirs!") do (
+        set "stg=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!dirs!") do (
+        set "sbst=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!dirs!") do (
+        set "all=%%i"
+    )
+
 
 
     set "char_num=1"
@@ -80,17 +193,50 @@ rem p, p
     set "func_encap="
 
     set "args=!brid_num!|!char_num!|!func_encap!"
-    call :make_indiv "c" "!args!" "!dest_root!\STAGE_!char_num!"
-    call :make_indiv "s" "!args!" "!dest_root!\STAGE_!char_num!"
-    call :make_indiv "p" "!args!" "!dest_root!\STAGE_!char_num!"
+
+    
+    rem need all version...
+    rem need subset version...
+    rem set "all_dest_root=!dest_root!\!all!\STAGE_!char_num!"
+    rem set "sub_dest_root=!dest_root!\!sub!\STAGE_!char_num!"
+    rem set "dest_root=!"
+    rem set "dest_root=!smp!\"
+
+
+    set "i_root=!smp!\!ndv!\!stg!_!char_num!"
+    set "scn=!stg!_!char_num!"
+
+
+    set "i_sbst_dir=!i_root!\!sbst!"
+    set "i_all_dir=!i_root!\!all!"
+    
+    set "n_root=!smp!\!nst!"
+    set "n_sbst_dir=!n_root!\!sbst!"
+    set "n_all_dir=!n_root!\!all!"
+    
+    set "dest_dirs=!i_sbst_dir!|!n_sbst_dir!|!i_all_dir!|!n_all_dir!"
+
+    
+    set "i_dest_all_dir=!smp!\!ndv!\!stg1"
+    set put_in_dir=
+    rem rename to make_encap
+    call :make_indiv "i" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_indiv "i" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_indiv "i" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+
+    call :make_indiv "n" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_indiv "n" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_indiv "n" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+
     endlocal
 exit /B
 
 :all_nested
     setlocal
 
-    set "dirs=%~1"
+    rem set "dirs=%~1"
     set "dest_root=%~2"
+    set "dest_dirs=%~3"
 
     
     set "char_num=1"
@@ -109,26 +255,29 @@ exit /b
 
 :after_1st_indiv
     setlocal
-    set "dirs=%~1"
-    set "args=%~2"
+    rem set "dirs=%~1"
+    set "args=%~1"
+
+    set "dest_root=%~2"
+    set "indv_dest_dir=%~3"
 
 
     rem These are referenced below but have to be changed here, or below
     set fpath=
     
 
-    set smpl=
-    set indv=
-    set nest=
-    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-        set "smpl=%%i"
-    )
-    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        set "indv=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-        set "nest=%%i"
-    )
+rem     set smpl=
+rem     set indv=
+   rem  set nest=
+    rem for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+       rem  set "smpl=%%i"
+    rem )
+    rem for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        rem set "indv=%%i"
+    rem )
+    rem for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
+     rem    set "nest=%%i"
+    rem )
 
 
     set bri_num=
@@ -147,8 +296,8 @@ exit /b
 
     
 
-    set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
-    set "indv_dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
+    rem set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
+    rem set "indv_dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
    
    
     set /a qty=0
@@ -169,6 +318,7 @@ exit /b
            
 
             rem Write these
+            rem Use c
             call :add_indiv "!file!" "c" "" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "p" "" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "s" "" "!args!" "!indv_dest_dir!"
@@ -178,19 +328,23 @@ exit /b
             set "bs=!b! "
             set "sbs= !b! "
 
+            rem Use p
             call :add_indiv "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
 
 
+            rem Use s
             call :add_indiv "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
 
+            rem Use c
             call :add_indiv "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "s" "!bs!"  "!args!" "!indv_dest_dir!"
 
+        
             call :add_indiv "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
             call :add_indiv "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
@@ -199,25 +353,28 @@ exit /b
 
            
             rem Write these
-            
+            rem Use p
             call :add_nested "!file!" "c" "" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "p" "" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "s" "" "!args!" "!indv_dest_dir!"
 
-
+            rem Use s
             call :add_nested "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
 
-
+            rem use c
             call :add_nested "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
 
+
+            rem use p
             call :add_nested "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "s" "!bs!" "!args!" "!indv_dest_dir!"
 
+            rem use s
             call :add_nested "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
             call :add_nested "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
@@ -306,16 +463,15 @@ exit /b
 exit /b
 
 rem args=!char_num!|!brid_num!|!func_encap!
+
+rem change to make_encap
 :make_indiv
     setlocal
-    rem set "dirs=%~1"
-    set "char=%~1"
-    
-
-    rem 1st stage: dest_dir neq ""
-    rem nth stage, n > 1: dest_dir equ ""
-    set "args=%~2"
-    set "dest_dir=%~3"
+    set "type=%~1"
+    set "char=%~2"
+    set "args=%~3"
+    set "dest_dirs=%~4"
+    set "echo_only=%~5"
 
     set char_num=
     set brid_num=
@@ -329,6 +485,7 @@ rem args=!char_num!|!brid_num!|!func_encap!
     for /f "tokens=3 delims=|" %%i in ("!args!") do (
         set "func_encap=%%i"
     )
+
 
     
 
@@ -349,24 +506,63 @@ rem args=!char_num!|!brid_num!|!func_encap!
     )
 
     set "name=!enc_l!!cap_c!!char_num! +!enc_r!"
+
+    if "!type!" equ "n" (
+        set "name=!enc_l!!cap_c!!char_num!.0 + !enc_l!!cap_c!!char_num!.1 +!enc_r! !enc_l!!cap_c!!char_num!.2 +!enc_r! !cap_c!!char_num!.n +!enc_r!"
+    )
+    
     
 
     if "!func_encap!" equ "*" (
         set "name=!name!|"
-        echo !name! > indiv.txt
+        echo !name! > encap.txt
         exit /b
     )
 
+    set i_sub_dir=
+    set n_sub_dir=
+    set i_all_dir=
+    set n_all_dir=
+    for /f "tokens=1 delims=|" %%i in ("!dest_dirs!") do (
+        set "i_sub_dir=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dest_dirs!") do (
+        set "n_sub_dir=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dest_dirs!") do (
+        set "i_all_dir=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!dest_dirs!") do (
+        set "n_all_dir=%%i"
+    )
 
+
+    if "!type!" equ "i" (
+        call :check_n_write "!i_sub_dir!" "!name!" "!echo_only!"
+        call :check_n_write "!i_all_dir!" "!name!" "!echo_only!"
+        exit /b
+    )
+
+    
+    call :check_n_write "!n_sub_dir!" "!name!" "!echo_only!"
+    call :check_n_write "!n_all_dir!" "!name!" "!echo_only!"
+
+    endlocal
+exit /b
+
+:check_n_write
+    setlocal
+    set "dest_dir=%~1"
+    set "name=%~2"
+    set "echo_only=%~3"
 
     if not exist "!dest_dir!" (
         md "!dest_dir!"
     )
-    echo !name! > "!dest_dir!\!name!"
 
+   
+    call :write "!dest_dir!" "!name!" "!echo_only!"
     call :prepend_bridge "!name!" "!brid_num!" "!dest_dir!"
-
-    
     endlocal
 exit /b
 
@@ -612,15 +808,68 @@ exit /b
     setlocal
     set "path=%~1"
     set "file=%~2"
+    set "echo_only=%~3"
    
     if not exist "!path!" (
         md "!path!"
     )
-    echo write file path "!path!\!file!"
-     rem exit /b
-    echo !file! > "!path!\!file!"
+    set "fpath=!path!\!file!"
+    echo write file path "!fpath!"
+    if "!echo_only!" neq "" (
+        exit /b
+    )
+    
+
+    if not exist "!fpath!" (
+        echo !file! > "!fpath!"
+    )
+    
     endlocal
 exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

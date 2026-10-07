@@ -184,71 +184,11 @@ rem call "funcs_first_char_sample_data.bat" :small_data
 rem call "funcs_last_char.bat" :exe
 
 
-rem output directories for sample: indiv & nested
-rem SAMPLE\*
-rem *INDV
-rem *NEST
-rem **NO_ENCAP - a bridge that can serve as a rom name (do this later)
-REM **STAGE_1
-REM     bridge & encap,
-
-rem **STAGE_2
-rem     bridge & encap & bridge & encap
-
-
-rem **STAGE_3
-rem     bridge & encap & bridge & encap & bridge & encap
-
-rem **STAGE_4
-rem     bridge & encap, bridge & encap, bridge & encap, bridge & encap
-
-rem ARGUEMENTS FOR FUNCTION CALLS
-rem char: c, p, s
-rem char_num: 1, 2, 3, 4
-rem bridge_num: 0 (indicates space), 1, 2, 3,
-rem src_dir: 0 (none), 1, 2, 3
-rem dest_dir: 1, 2, 3, 4
-rem ** unsure of what arguements required for mixed (nested with indiv and vice-versa)
-
-set "sampl=SAMPLE"
-set "indv=INDIV"
-set "nest=NESTED"
-set "dirs=!sampl!|!indv!|!nest!"
-REM declared in each function
-set "stage=STAGE"
-
-rem need bridges before the first, single encap
-
-
-
-rem Needs its own folder SAMPLE_INDIV\TWO_ENCAPS
-REM Beginning encap is indiv, has concluding encaps as the following:
-rem * indivs
-rem * nested
-rem args=!char_num!|!brid_num!|!func_encap!
-set "stg2_args=1|2|*"
-set "stg3_args=2|3|*"
-set "stg4_args=3|4|*"
-set "idest_root=!sampl!\!indv!"
-rem call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!idest_root!"
-rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg2_args!"
-rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg3_args!"
-rem call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg4_args!"
-
-rem Needs its own folder SAMPLE_NESTED\TWO_ENCAPS
-REM Beginning encap is nested, has concluding encaps as the following:
-rem * nested
-rem * indiv
-set "ndest_root=!sampl!\!nest!"
-call "funcs_last_sample_data.bat" :all_nested "!dirs!" "!ndest_root!"
-echo -------------------------------------------------------
-call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg2_args!"
-rem call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg3_args!"
-rem call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg4_args!"
 
 rem call "funcs_rom_keywords.bat" :exe_loop
-rem ------------------------- DONE ----------------------------------
-ECHO ---- DONE ----
+call "funcs_last_sample_data.bat" :make_samples
+
+ECHO --------------------------------- DONE ----
 
 PAUSE
 goto :eof
@@ -414,7 +354,7 @@ REM indiv pare one indiv pare two (these need to be on separate lines in txt fil
     setlocal
     set "ext=%~1"
     
-    rem call :indiv_encaps "(" ")" "1"
+    
     rem call :nested_encaps "(" ")" "1"
     rem call :encap_n_gap "I" "(" ")" ""
     rem call :encap_n_gap "I" "(" ")" " "
@@ -912,26 +852,6 @@ exit /b
     endlocal
 exit /b
 
-:indiv_encaps
-    setlocal
-    set "left_char=%~1"
-    set "right_char=%~2"
-    set "num=%~3"
-
-    set "type=P"
-    if "!left_char!" equ "[" (
-        set "type=S"
-    )
-    if "!left_char!" equ "{" (
-        set "type=C"
-    )
-
-    set "r=!left_char!!type!!num! +!right_char!"
-    rem echo "!r!"
-    set "r=!r!|"
-    echo !r! > "encap.txt"
-    endlocal
-exit /b
 
 
 rem (P1.0 + (P1.1 +) (P1.2 +) P1.N +)
