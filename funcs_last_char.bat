@@ -36,11 +36,17 @@ exit /b
     setlocal
     set "phrase=%~1"
 
+    echo ---------------- Phrase "!phrase!" ------------------
 
     rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
     rem     or to indicate the end of a bridge
     rem In both instances, we need to find the last character in the name/bridge
-    set "end_mark=*"
+    rem Using the end_mark will force the algorithm to yield the end_mark or a bridge
+    rem     appearing after the last encapsulating character (with the end_mark included)
+    rem     within the file name.
+
+    
+    set "end_mark=\"
     set "phrase=!phrase!!end_mark!"
     rem set "phrase=!phrase!"
     
@@ -68,7 +74,9 @@ exit /b
 
     set read_item=
     set last_char=
-    call :recurse_to_end "1" ")" "!phrase!" "" "!end_mark!"
+    set empty_old_item=
+
+    call :recurse_to_end "1" ")" "!phrase!" "!empty_old_item!" "!end_mark!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
     )
@@ -81,19 +89,17 @@ exit /b
 
 
     set "p_bridge=!read_item!"
-    if "!read_item!" equ "!end_mark!" (
-        
-        set "last_char=)"
-        call :verify_2 "!p_token!" "!last_char!" "!phrase!" "!end_mark!"
-
-        exit /b
+    set /a empty=0
+    if "!p_bridge!" equ "!phrase!" (
+        set /a empty+=1
     )
 
 
 
+rem item no. 48 has incorrect classification of last character because
+rem a bridge proceeds after the last encapsulator
 
-
-    call :recurse_to_end "1" "}" "!read_item!" "" "!end_mark!"
+    call :recurse_to_end "1" "}" "!read_item!" "!empty_old_item!" "!end_mark!"
 
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
@@ -106,17 +112,14 @@ exit /b
 
 
     set "c_bridge=!read_item!"
-    if "!read_item!" equ "!end_mark!" (
-        set "last_char=}"
-        call :verify_2 "!c_token!" "!last_char!" "!phrase!" "!end_mark!"
-        exit /b
-
+    if "!c_bridge!" equ "!phrase!" (
+        set /a empty+=1
     )
 
 
 
 
-    call :recurse_to_end "1" "]" "!read_item!" "" "!end_mark!"
+    call :recurse_to_end "1" "]" "!read_item!" "!empty_old_item!" "!end_mark!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
     )
@@ -129,91 +132,126 @@ exit /b
    
 
     set "s_bridge=!read_item!"
-    if "!read_item!" equ "!end_mark!" (
-        set "last_char=]"
-        call :verify_2 "!s_token!" "!last_char!" "!phrase!" "!end_mark!"
+    if "!s_bridge!" equ "!phrase!" (
+        set /a empty+=1
+    )
+
+    if "!empty!" equ "3" (
+        echo NONE 
         exit /b
-
     )
 
-    rem ------------- FINDING LAST CHARS IN FILE NAMES WHERE A BRIDGE APPEARS AFTER THE LAST CHARACTER ----
-    set /a same=0
-    set bride_with_mark=
-    set char_token=
 
-    rem if bridge_1 equ bridge_2
-    rem Both bridge_1 and bridge_2 contain last_char L,
-    rem     which is why they are equivalent.
-    if "!p_bridge!" equ "!c_bridge!" (
-        rem ECHO last is S
-        set "last_char=]"
-        set /a same+=1
-        set "bridge_with_mark=!s_bridge!"
-        set "char_token=!s_token!"
+
+
+
+    set "last_char=)"
+    set "last_bridge=!p_bridge!"
+    set "old_bridge=!c_bridge!"
+    set "last_token=!p_token!"
+    call :recurse_to_end "1" "}" "!p_bridge!" "!empty_old_item!" "!end_mark!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "c_bridge=%%i"
     )
 
-    if "!c_bridge!" equ "!s_bridge!" (
-        rem echo LAST IS P
-        set "last_char=)"
-        set /a same+=1
-        set "bridge_with_mark=!p_bridge!"
-        set "char_token=!p_token!"
-    )
-
-    IF "!p_bridge!" equ "!s_bridge!" (
-        rem echo LAST IS C
+    if "!c_bridge!" neq "!p_bridge!" (
         set "last_char=}"
-        set /a same+=1
-        set "bridge_with_mark=!c_bridge!"
-        set "char_token=!c_token!"
+        set "last_bridge=!old_bridge!"
+        set "last_token=!c_token!"
     )
 
-  
-
-    if "!same!" equ "3" (
-        ECHO has no last char
-        exit /b
+    set "old_bridge=!s_bridge!"
+    call :recurse_to_end "1" "]" "!last_bridge!" "!emtpy_old_item!" "!end_mark!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "s_bridge=%%i"
     )
-    echo LAST CHAR IS "!last_char!" with bridge_and_mark "!bridge_with_mark!" and Token "!char_token!"
 
-    call :verify_2 "!char_token!" "!last_char!" "!phrase!" "!bridge_with_mark!"
+    if "!s_bridge!" neq "!last_bridge!" (
+        set "last_char=]"
+        set "last_bridge=!s_bridge!"
+        set "last_token=!s_token!"
+    )
+
+
+    echo LAST char "!last_char!"
+    echo Last bridge "!last_bridge!"
+    echo LAST TOKEN "!last_token!"
+    CALL :verify_3 "!phrase!" "!last_char!" "!last_bridge!" "!last_token!" "!end_mark!"
+    
 
     endlocal
 exit /b
 
-:verify_2
-    setlocal
-    set "token=%~1"
-    set "last_char=%~2"
-    set "phrase=%~3"
-    set "end_mark=%~4"
 
-    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!last_char!" "!phrase!"
-    set test=
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "test=%%i"
-    )
-    if "!test!" equ "!end_mark!" (
-        echo PASSS LAST CHAR "!last_char!"
-    ) else ( ECHO FAIL LAST CHAR "!last_char!" )
-    endlocal
-exit /b
-
-
-:outcome
+:verify_3
     setlocal
     set "phrase=%~1"
-    set "type=%~2"
-    set "char=%~3"
-    set "status=%~4"
-    set "show=%~5"
+    set "last_char=%~2"
+    set "last_bridge=%~3"
+    set "last_token=%~4"
+    set "end_mark=%~5"
 
-    if "!show!" equ "" (
-        set phrase=
+
+    call :primary_and_optn_chars "!last_char!"
+
+    rem collects primary encapsulators and option 1 and 2 encapsulators
+    
+    rem Option chars
+    set o1_right=
+    set o2_right=
+
+   
+    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
+        set "o1_right=%%i"
     )
-    echo "!phrase!" "!type! CHAR" "!char!" -- "!status!"
+    
+    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
+        set "o2_right=%%i"
+    )
+
+
+    set o1_right_t=
+    set o2_right_t=
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_right!" "PAD!last_bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "o1_right_t=%%i"
+    )
+    
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_right!" "PAD!last_bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "o2_right_t=%%i"
+    )
+
+    set /a eqty=0
+
+    if "!o1_right_t!" neq "PAD!last_bridge!" (
+        set /a eqty+=1
+    )
+    if "!o2_right_t!" neq "PAD!last_bridge!" (
+        set /a eqty+=1
+    )
+
+    if "!eqty!" neq "0" (
+        echo LAST CHAR, FAIL, DIFF LAST CHAR
+        PAUSE
+        EXIT /B
+    )
+    ECHO LAST CHAR "!last_char!" --- PASS
+    echo O1 RIGHT "!o1_right!" 
+    ECHO O2 RIGHT "!o2_right!"
+    echo LAST BRIDGE     "!last_bridge!"
+    echo PAD LAST BRIDGE "PAD!last_bridge!"
+    echo O1_RIGHT_T      "!o1_right_t!"
+    echo 02_RIGHT_T      "!o2_right_t!"
+
+
     endlocal
 exit /b
+
+
+
+
 
 
 :primary_and_optn_chars

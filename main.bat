@@ -151,8 +151,6 @@ set vvv=
  rem call "funcs_rom_keywords.bat" :traverse "2" "(" ")" "x y z"
  rem pause
  rem goto :eof
-
-rem call "funcs_last_sample_data.bat" :trial 
 rem goto :eof
 
 set "isp_front_bar=|isphrase"
@@ -171,7 +169,7 @@ rem call :no_bridges
 rem call :neighb
 rem call :run_samples
 rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
-rem call "funcs_last_sample_data.bat" :last_char
+
 rem call "funcs_bridge_sample_data.bat" :hard_code
 
 rem call "funcs_bridge_sample_data.bat" :sample_file_names
@@ -186,7 +184,8 @@ rem call "funcs_last_char.bat" :exe
 
 
 rem call "funcs_rom_keywords.bat" :exe_loop
-call "funcs_last_sample_data.bat" :make_samples
+call "funcs_match_chars.bat" :do_match
+rem call "funcs_last_sample_data.bat" :make_samples
 
 ECHO --------------------------------- DONE ----
 

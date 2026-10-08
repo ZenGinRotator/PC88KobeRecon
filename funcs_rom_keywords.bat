@@ -106,7 +106,7 @@ rem     set "right_char=%~2"
     call "funcs_match_chars.bat" :start_n_end_matches "!name!"
     
     for /f "tokens=*" %%i in (chars.txt) do (
-        echo "%%i"
+        rem echo CHARS.TXT "%%i"
     )
     for /f "tokens=1 delims=|" %%i in (chars.txt) do (
         set "left_char=%%i"
@@ -213,10 +213,10 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "p_bridge=%%i"
     )
-  echo P ITEM I ---------"!p_item!" 
-  echo p bridge "!p_bridge!"
-    echo O item -- "!orig_item!"
-    echo o bridge "!o_bridge!"
+  rem echo P ITEM I ---------"!p_item!" 
+  rem echo p bridge "!p_bridge!"
+    rem echo O item -- "!orig_item!"
+    rem echo o bridge "!o_bridge!"
      
    
     

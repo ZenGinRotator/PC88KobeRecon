@@ -142,9 +142,9 @@ set echo_no_write=
 rem to produce only subset of all possible permutations, set var to "S"
 rem To produce all possible permutations and subsets of those permutations, set var to anything not equal to "S" (NOTE -- this is computationally & time expensive)
 set "subset_only=S"
-rem call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!subset_only!"
-rem call "funcs_last_sample_data.bat" :after_1st_stage "!dirs!" "!stg2_args!" "!echo_no_write!" "!subset_only!"
-call "funcs_last_sample_data.bat" :after_1st_stage "!dirs!" "!stg3_args!" "!echo_no_write!" "!subset_only!"
+rem call :all_indiv "!dirs!" "!subset_only!"
+rem call :after_1st_stage "!dirs!" "!stg2_args!" "!echo_no_write!" "!subset_only!"
+call :after_1st_stage "!dirs!" "!stg3_args!" "!echo_no_write!" "!subset_only!"
 
 endlocal
 exit /b
