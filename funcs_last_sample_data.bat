@@ -134,30 +134,26 @@ set "stg4_args=3|4|*"
 set "idest_root=!sampl!\!indv!"
 set "idest_dir=!sampl!\!indv!\!sub!"
 rem rename to all_encap
-call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!idest_dir!"
-call "funcs_last_sample_data.bat" :after_1st_stage "!dirs!" "!stg2_args!" ""
+
+rem to show output and write, set var not equal to ""
+rem to show output only from echo command, set to anything not equal to "" (but don't use "!" -- special character)
+set echo_no_write=
+
+rem to produce only subset of all possible permutations, set var to "S"
+rem To produce all possible permutations and subsets of those permutations, set var to anything not equal to "S" (NOTE -- this is computationally & time expensive)
+set "subset_only=S"
+call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!subset_only!"
+call "funcs_last_sample_data.bat" :after_1st_stage "!dirs!" "!stg2_args!" "!echo_no_write!" "!subset_only!"
+endlocal
 exit /b
 
 
-
-REM call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg3_args!" "!dest_dirs!" "!idest_root!" "!idest_dir!"
-REM call "funcs_last_sample_data.bat" :after_1st_indiv "!dirs!" "!stg4_args!" "!dest_dirs!" "!idest_root!" "!idest_dir!"
-
-
-
-REM set "ndest_root=!sampl!\!nest!"
-REM set "ndest_dir=!sampl!\!nest!\!sub!"
- REM call "funcs_last_sample_data.bat" :all_nested "!dirs!" "!ndest_root!" "!dest_dirs!" "!ndest_dir!"
-REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg2_args!" "!dest_dirs!" "!ndest_dir!"
- REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg3_args!" "!dest_dirs!" "!ndest_dir!"
-REM call "funcs_last_sample_data.bat" :after_1st_nested "!dirs!" "!stg4_args!" "!dest_dirs!" "!ndest_dir!"
-    endlocal
-exit /b
 
 rem change to all_encap
 :all_indiv
     setlocal
     set "dirs=%~1"
+    set "subset_only=%~2"
 
     set smp=
     set ndv=
@@ -208,13 +204,13 @@ rem change to all_encap
     
     set put_in_dir=
     rem rename to make_encap
-    call :make_encap "i" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_encap "i" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_encap "i" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "i" "c" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
+    call :make_encap "i" "s" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
+    call :make_encap "i" "p" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
 
-    call :make_encap "n" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_encap "n" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_encap "n" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "n" "c" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
+    call :make_encap "n" "s" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
+    call :make_encap "n" "p" "!args!" "!dest_dirs!" "!put_in_dir!" "!subset_only!"
 
     endlocal
 exit /B
@@ -226,14 +222,19 @@ exit /B
     set "dirs=%~1"
     set "stg_args=%~2"
     set "echo_only=%~3"
+    set "subset_only=%~4"
 
 
     
     call :read "i" "s" "!dirs!" "!stg_args!" "!echo_only!"
-    call :read "i" "a" "!dirs!" "!stg_args!" "!echo_only!"
-    call :read "n" "s" "!dirs!" "!stg_args!" "!echo_only!"
-    call :read "n" "a" "!dirs!" "!stg_args!" "!echo_only!"
+    if "!subset_only!" neq "S" (
+        call :read "i" "a" "!dirs!" "!stg_args!" "!echo_only!"
+    )
     
+    call :read "n" "s" "!dirs!" "!stg_args!" "!echo_only!"
+    if "!subset_only!" neq "S" (
+        call :read "n" "a" "!dirs!" "!stg_args!" "!echo_only!"
+    )
    
     exit /b
     
@@ -442,14 +443,14 @@ exit /b
     call :add_bridge_n_encap "!same!" "p" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
     call :add_bridge_n_encap "!same!" "s" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
     call :add_bridge_n_encap "!same!" "c" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
-    call :add_bridge_n_encap "!same!" "p" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    rem call :add_bridge_n_encap "!same!" "p" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
 
     echo ---- mixed ----
     call :add_bridge_n_encap "!mixed!" "p" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
     call :add_bridge_n_encap "!mixed!" "s" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
     call :add_bridge_n_encap "!mixed!" "c" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
     call :add_bridge_n_encap "!mixed!" "p" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
-    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    rem call :add_bridge_n_encap "!mixed!" "s" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
 
     endlocal
 exit /B
@@ -671,6 +672,7 @@ rem change to make_encap
     set "args=%~3"
     set "dest_dirs=%~4"
     set "echo_only=%~5"
+    set "subset_only=%~6"
 
     set char_num=
     set brid_num=
@@ -738,14 +740,17 @@ rem change to make_encap
 
     if "!type!" equ "i" (
         call :check_n_write "!i_sub_dir!" "!name!" "!echo_only!"
-        call :check_n_write "!i_all_dir!" "!name!" "!echo_only!"
+        if "!subset_only!" neq "S" (
+            call :check_n_write "!i_all_dir!" "!name!" "!echo_only!"
+        )
         exit /b
     )
 
     
     call :check_n_write "!n_sub_dir!" "!name!" "!echo_only!"
-    call :check_n_write "!n_all_dir!" "!name!" "!echo_only!"
-
+    if "!subset_only!" neq "S" (
+        call :check_n_write "!n_all_dir!" "!name!" "!echo_only!"
+    )
     endlocal
 exit /b
 
