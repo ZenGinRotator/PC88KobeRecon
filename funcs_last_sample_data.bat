@@ -135,9 +135,7 @@ set "idest_root=!sampl!\!indv!"
 set "idest_dir=!sampl!\!indv!\!sub!"
 rem rename to all_encap
 call "funcs_last_sample_data.bat" :all_indiv "!dirs!" "!idest_dir!"
-set "src_dir=!sampl!\!indv!\STAGE_1"
-set "dest_dir=!sampl!\!indv!\STAGE_2"
-call "funcs_last_sample_data.bat" :after_1st_indiv "!stg2_args!" "!idest_root!" "!idest_dir!"
+call "funcs_last_sample_data.bat" :after_1st_stage "!dirs!" "!stg2_args!" ""
 exit /b
 
 
@@ -195,216 +193,404 @@ rem change to all_encap
     set "args=!brid_num!|!char_num!|!func_encap!"
 
     
-    rem need all version...
-    rem need subset version...
-    rem set "all_dest_root=!dest_root!\!all!\STAGE_!char_num!"
-    rem set "sub_dest_root=!dest_root!\!sub!\STAGE_!char_num!"
-    rem set "dest_root=!"
-    rem set "dest_root=!smp!\"
 
 
     set "i_root=!smp!\!ndv!\!stg!_!char_num!"
-    set "scn=!stg!_!char_num!"
-
-
     set "i_sbst_dir=!i_root!\!sbst!"
     set "i_all_dir=!i_root!\!all!"
     
-    set "n_root=!smp!\!nst!"
+    set "n_root=!smp!\!nst!\!stg!_!char_num!"
     set "n_sbst_dir=!n_root!\!sbst!"
     set "n_all_dir=!n_root!\!all!"
     
     set "dest_dirs=!i_sbst_dir!|!n_sbst_dir!|!i_all_dir!|!n_all_dir!"
 
     
-    set "i_dest_all_dir=!smp!\!ndv!\!stg1"
     set put_in_dir=
     rem rename to make_encap
-    call :make_indiv "i" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_indiv "i" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_indiv "i" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "i" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "i" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "i" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
 
-    call :make_indiv "n" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_indiv "n" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
-    call :make_indiv "n" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "n" "c" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "n" "s" "!args!" "!dest_dirs!" "!put_in_dir!"
+    call :make_encap "n" "p" "!args!" "!dest_dirs!" "!put_in_dir!"
 
     endlocal
 exit /B
 
-:all_nested
-    setlocal
 
-    rem set "dirs=%~1"
-    set "dest_root=%~2"
-    set "dest_dirs=%~3"
+
+:after_1st_stage
+    setlocal
+    set "dirs=%~1"
+    set "stg_args=%~2"
+    set "echo_only=%~3"
+
 
     
-    set "char_num=1"
-    set "brid_num=1"
-    set "func_encap="
+    call :read "i" "s" "!dirs!" "!stg_args!" "!echo_only!"
+    call :read "i" "a" "!dirs!" "!stg_args!" "!echo_only!"
+    call :read "n" "s" "!dirs!" "!stg_args!" "!echo_only!"
+    call :read "n" "a" "!dirs!" "!stg_args!" "!echo_only!"
+    
+   
+    exit /b
+    
 
-    set "args=!brid_num!|!char_num!|!func_encap!"
-
-
-    call :make_nested "c" "!args!" "!dest_root!\STAGE_!char_num!"
-    call :make_nested "s" "!args!" "!dest_root!\STAGE_!char_num!"
-    call :make_nested "p" "!args!" "!dest_root!\STAGE_!char_num!"
     endlocal
 exit /b
 
-
-:after_1st_indiv
+:read
     setlocal
-    rem set "dirs=%~1"
-    set "args=%~1"
+    set "type=%~1"
+    set "sub_or_all=%~2"
+    set "dirs=%~3"
+    set "stg_args=%~4"
+    set "echo_only=%~5"
 
-    set "dest_root=%~2"
-    set "indv_dest_dir=%~3"
+   
+    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+        set "src=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        set "dest=%%i"        
+    )
 
-
-    rem These are referenced below but have to be changed here, or below
-    set fpath=
     
-
-rem     set smpl=
-rem     set indv=
-   rem  set nest=
-    rem for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
-       rem  set "smpl=%%i"
-    rem )
-    rem for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
-        rem set "indv=%%i"
-    rem )
-    rem for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
-     rem    set "nest=%%i"
-    rem )
+    set smp=
+    set ndv=
+    set nst=
+    set stg=
+    set sbst=
+    set all=
+    for /f "tokens=1 delims=|" %%i in ("!dirs!") do (
+        set "smp=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dirs!") do (
+        set "ndv=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dirs!") do (
+        set "nst=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!dirs!") do (
+        set "stg=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!dirs!") do (
+        set "sbst=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!dirs!") do (
+        set "all=%%i"
+    )
 
 
     set bri_num=
     set enc_num=
     set func_encap=
     
-    for /f "tokens=1 delims=|" %%i in ("!args!") do (
+    for /f "tokens=1 delims=|" %%i in ("!stg_args!") do (
         set "bri_num=%%i"
     )
-    for /f "tokens=2 delims=|" %%i in ("!args!") do (
+    for /f "tokens=2 delims=|" %%i in ("!stg_args!") do (
         set "enc_num=%%i"
     )
-    for /f "tokens=3 delims=|" %%i in ("!args!") do (
+    for /f "tokens=3 delims=|" %%i in ("!stg_args!") do (
         set "func_encap=%%i"
     )
 
+    REM I, S
+    set "i_ndv_sub_src=!smp!\!ndv!\!stg!_!bri_num!\!sbst!"
+    set "i_ndv_sub_dest=!smp!\!ndv!\!stg!_!enc_num!\!sbst!"
     
 
-    rem set "src_dir=!smpl!\!indv!\STAGE_!bri_num!"
-    rem set "indv_dest_dir=!smpl!\!indv!\STAGE_!enc_num!"
-   
-   
-    set /a qty=0
-    
-    for %%i in ("!src_dir!\*") do (
-        set "fpath=%%i"
-        set file=
-        set /a qty+=1
-
-        for /f "tokens=4 delims=\" %%j in ("!fpath!") do (
-            set "file=%%j"
-
-            rem Write this
-            call :write "!indv_dest_dir!" "!file!"
-
-            rem Write this
-            call :add_bridge "!file!" "!indv_dest_dir!" "!enc_num!"
-           
-
-            rem Write these
-            rem Use c
-            call :add_indiv "!file!" "c" "" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "p" "" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "s" "" "!args!" "!indv_dest_dir!"
-
-            set "b=BRIDGE !enc_num!"
-            set "sb= !b!"
-            set "bs=!b! "
-            set "sbs= !b! "
-
-            rem Use p
-            call :add_indiv "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
 
 
-            rem Use s
-            call :add_indiv "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
-
-            rem Use c
-            call :add_indiv "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "s" "!bs!"  "!args!" "!indv_dest_dir!"
-
-        
-            call :add_indiv "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
-            call :add_indiv "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
-
-            
-
-           
-            rem Write these
-            rem Use p
-            call :add_nested "!file!" "c" "" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "p" "" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "s" "" "!args!" "!indv_dest_dir!"
-
-            rem Use s
-            call :add_nested "!file!" "c" "!b!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "p" "!b!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "s" "!b!" "!args!" "!indv_dest_dir!"
-
-            rem use c
-            call :add_nested "!file!" "c" "!sb!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "p" "!sb!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "s" "!sb!" "!args!" "!indv_dest_dir!"
-
-
-            rem use p
-            call :add_nested "!file!" "c" "!bs!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "p" "!bs!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "s" "!bs!" "!args!" "!indv_dest_dir!"
-
-            rem use s
-            call :add_nested "!file!" "c" "!sbs!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "p" "!sbs!" "!args!" "!indv_dest_dir!"
-            call :add_nested "!file!" "s" "!sbs!" "!args!" "!indv_dest_dir!"
+    REM I, A
+    set "i_ndv_all_src=!smp!\!ndv!\!stg!_!bri_num!\!all!"
+    set "i_ndv_all_dest=!smp!\!ndv!\!stg!_!enc_num!\!all!"
 
 
 
 
+    REM N, S
+    set "n_nst_sub_src=!smp!\!nst!\!stg!_!bri_num!\!sbst!"
+    set "n_nst_sub_dest=!smp!\!nst!\!stg!_!enc_num!\!sbst!"
+
+    REM N, A
+    set "n_nst_all_src=!smp!\!nst!\!stg!_!bri_num!\!all!"
+    set "n_nst_all_dest=!smp!\!nst!\!stg!_!enc_num!\!all!"
+
+    set "src=!i_ndv_sub_src!"
+    set "dest=!i_ndv_sub_dest!"
+    set "same=i"
+    set "mixed=n"
+
+    if "!type!" equ "i" (
+        if "!sub_or_all!" equ "a" (
+            set "src=!i_ndv_all_src!"
+            set "dest=!i_ndv_all_dest!"
+        )
+    ) else (
+        set "same=n"
+        set "mixed=i"
+        set "src=!n_nst_sub_src!"
+        set "dest=!n_nst_sub_dest!"
+        if "!sub_or_all!" equ "a" (
+            set "src=!n_nst_all_src!"
+            set "dest=!n_nst_all_dest!"
         )
 
-
     )
+
+
+    echo "!brk!" READ...
+    echo TYPE "!type!"
+    ECHO SUB OR ALL "!sub_or_all!"
+    echo SRC "!src!"
+    echo DEST "!dest!"
+    echo ECHO ONLY "!echo_only!"
+    echo SAME "!same!"
+    echo MIXED "!mixed!"
+    
+    
+    set /a qty=0
+    for %%i in ("!src!\*") do (
+        set "fpath=%%i"
+        set file=
+        for /f "tokens=5 delims=\" %%j in ("!fpath!") do (
+            set "file=%%j"
+        )
+        set /a qty+=1
+        echo QTY "!qty!"
+      
+        set "bridge=BRIDGE"
+        set "sm=!same!|!mixed!"
+        set "fbe=!file!|!bridge!|!enc_num!"
+        set "sde=!stg_args!/!dest!/!echo_only!"
+
+        if "!sub_or_all!" equ "s" (    
+            call :do_sub "!sm!" "!fbe!" "!sde!"
+               
+        ) else (        
+            call :do_sub "!sm!" "!fbe!" "!sde!"
+        )
+    )
+
+
 
     endlocal
 exit /b
 
-:add_bridge
+
+
+
+:do_sub
+    setlocal
+    set "sm=%~1"
+    set "fbe=%~2"
+    set "sde=%~3"
+
+
+    set same=
+    set mixed=
+    for /f "tokens=1 delims=|" %%i in ("!sm!") do (
+        set "same=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!sm!") do (
+        set "mixed=%%i"
+    )
+
+    set file=
+    set bridge=
+    set enc_num=
+    for /f "tokens=1 delims=|" %%i in ("!fbe!") do (
+        set "file=%%i"       
+    )
+    for /f "tokens=2 delims=|" %%i in ("!fbe!") do (
+        set "bridge=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!fbe!") do (
+        set "enc_num=%%i"
+    )
+
+    set stg_args=
+    set dest=
+    set echo_only=
+
+    for /f "tokens=1 delims=/" %%i in ("!sde!") do (
+        set "stg_args=%%i"
+    )
+    for /f "tokens=2 delims=/" %%i in ("!sde!") do (
+        set "dest=%%i"
+    )
+    for /f "tokens=3 delims=/" %%i in ("!sde!") do (
+        set "echo_only=%%i"        
+    )
+
+
+    call :write "!dest!" "!file!" "!echo_only!"
+    call :add_only_bridge "!file!" "!dest!" "!enc_num!" "!echo_only!"
+
+
+    set "b=!bridge! !enc_num!"
+    set "sb= !b!"
+    set "bs=!b! "
+    set "sbs= !b! "
+
+    
+    call :add_bridge_n_encap "!same!" "c" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "c" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+
+    echo ---- mixed ----
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+
+    endlocal
+exit /B
+
+
+:do_all
+    setlocal
+    set "sm=%~1"
+    set "fbe=%~2"
+    set "sde=%~3"
+
+
+    set same=
+    set mixed=
+    for /f "tokens=1 delims=|" %%i in ("!sm!") do (
+        set "same=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!sm!") do (
+        set "mixed=%%i"
+    )
+
+    set file=
+    set bridge=
+    set enc_num=
+    for /f "tokens=1 delims=|" %%i in ("!fbe!") do (
+        set "file=%%i"       
+    )
+    for /f "tokens=2 delims=|" %%i in ("!fbe!") do (
+        set "bridge=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!fbe!") do (
+        set "enc_num=%%i"
+    )
+
+    set stg_args=
+    set dest=
+    set echo_only=
+
+    for /f "tokens=1 delims=/" %%i in ("!sde!") do (
+        set "stg_args=%%i"
+    )
+    for /f "tokens=2 delims=/" %%i in ("!sde!") do (
+        set "dest=%%i"
+    )
+    for /f "tokens=3 delims=/" %%i in ("!sde!") do (
+        set "echo_only=%%i"        
+    )
+
+    
+    call :write "!dest!" "!file!" "!echo_only!"
+    call :add_only_bridge "!file!" "!dest!" "!enc_num!" "!echo_only!"
+
+
+    set "b=!bridge! !enc_num!"
+    set "sb= !b!"
+    set "bs=!b! "
+    set "sbs= !b! "
+
+                   
+    call :write "!dest!" "!file!" "!echo_only!"
+    
+    call :add_only_bridge "!file!" "!dest!" "!enc_num!" "!echo_only!"
+
+    call :add_bridge_n_encap "!same!" "c" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+
+
+
+    call :add_bridge_n_encap "!same!" "c" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+
+
+    rem Use s
+    call :add_bridge_n_encap "!same!" "c" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+
+    rem Use c
+    call :add_bridge_n_encap "!same!" "c" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "!bs!"  "!stg_args!" "!dest!" "!echo_only!"
+
+            rem Use p
+    call :add_bridge_n_encap "!same!" "c" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "p" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!same!" "s" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+            
+            
+
+      
+    rem Use p
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "" "!stg_args!" "!dest!" "!echo_only!"
+
+    rem Use s
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!b!" "!stg_args!" "!dest!" "!echo_only!"
+
+    rem use c
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!sb!" "!stg_args!" "!dest!" "!echo_only!"
+
+
+    rem use p
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!bs!" "!stg_args!" "!dest!" "!echo_only!"
+
+    rem use s
+    call :add_bridge_n_encap "!mixed!" "c" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "p" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+    call :add_bridge_n_encap "!mixed!" "s" "!file!" "!sbs!" "!stg_args!" "!dest!" "!echo_only!"
+
+
+    endlocal
+exit /b
+
+:add_only_bridge
     setlocal
     set "file=%~1"
     set "dir=%~2"
     set "brid_num=%~3"
+    set "echo_only=%~4"
 
+    rem echo ADD BRIDGE, ECHO ONLY "!echo_only!"
+    rem ECHO ADD BRIDGE
     set bridge=
     call :make_bridge "!brid_num!"
     for /f "tokens=1 delims=|" %%i in (bridge.txt) do (
         set "bridge=%%i"
         rem Write all
-        call :write "!dir!" "!file!!bridge!"
-        call :write "!dir!" "!file!!bridge! "
-        call :write "!dir!" "!file! !bridge!"
-        call :write "!dir!" "!file! !bridge! "
+        call :write "!dir!" "!file!!bridge!" "!echo_only!"
+        call :write "!dir!" "!file!!bridge! " "!echo_only!"
+        call :write "!dir!" "!file! !bridge!" "!echo_only!"
+        call :write "!dir!" "!file! !bridge! " "!echo_only!"
 
     )
     endlocal
@@ -419,13 +605,16 @@ exit /b
 exit /b
 
 
-:add_indiv
+:add_bridge_n_encap
     setlocal
-    set "file=%~1"
+    set "type=%~1"
     set "char=%~2"
-    set "bridge=%~3"
-    set "args=%~4"
-    set "dest_dir=%~5"
+    set "file=%~3"
+    
+    set "bridge=%~4"
+    set "args=%~5"
+    set "dest_dir=%~6"
+    set "echo_only=%~7"
 
 
     
@@ -444,14 +633,24 @@ exit /b
     )
 
     
-    set empty_dest_dir=
-    call :make_indiv "!char!" "!args!" "!empty_dest_dir!"
-    for /f "tokens=1 delims=|" %%i in (indiv.txt) do (
+
+rem ECHO TYPE "!type!"
+rem echo "!char!"
+rem echo "!file!"
+rem echo "!bridge!"
+rem echo "!args!"
+rem echo "!dest_dir!"
+
+rem     set empty_dest_dir=
+    call :make_encap "!type!" "!char!" "!args!" "!dest_dir!" "!echo_only!"
+    for /f "tokens=1 delims=|" %%i in (encap.txt) do (
         set "encap=%%i"
+        rem ECHO ENCAP "!encap!"
+        rem pause
         set "file=!file!!bridge!!encap!"
 
         rem Write this
-        call :write "!dest_dir!" "!file!"
+        call :write "!dest_dir!" "!file!" "!echo_only!"
 
     )
     endlocal
@@ -465,7 +664,7 @@ exit /b
 rem args=!char_num!|!brid_num!|!func_encap!
 
 rem change to make_encap
-:make_indiv
+:make_encap
     setlocal
     set "type=%~1"
     set "char=%~2"
@@ -586,6 +785,104 @@ exit /b
     echo !sbn! > "!dir!\!sbn!"
     echo !bsn! > "!dir!\!bsn!"
     echo !sbsn! > "!dir!\!sbsn!"
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+
+
+
+:write
+    setlocal
+    set "path=%~1"
+    set "file=%~2"
+    set "echo_only=%~3"
+   
+    if not exist "!path!" (
+        md "!path!"
+    )
+    set "fpath=!path!\!file!"
+    echo "!echo_only!"  write file path "!fpath!"
+    if "!echo_only!" neq "" (
+        exit /b
+    )
+    
+
+    if not exist "!fpath!" (
+        echo !file! > "!fpath!"
+    )
+    
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:all_nested
+    setlocal
+
+    rem set "dirs=%~1"
+    set "dest_root=%~2"
+    set "dest_dirs=%~3"
+
+    
+    set "char_num=1"
+    set "brid_num=1"
+    set "func_encap="
+
+    set "args=!brid_num!|!char_num!|!func_encap!"
+
+
+    call :make_nested "c" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_nested "s" "!args!" "!dest_root!\STAGE_!char_num!"
+    call :make_nested "p" "!args!" "!dest_root!\STAGE_!char_num!"
     endlocal
 exit /b
 
@@ -803,74 +1100,6 @@ exit /b
     call :prepend_bridge "!name!" "!brid_num!" "!dest_dir!"
     endlocal
 exit /b
-
-:write
-    setlocal
-    set "path=%~1"
-    set "file=%~2"
-    set "echo_only=%~3"
-   
-    if not exist "!path!" (
-        md "!path!"
-    )
-    set "fpath=!path!\!file!"
-    echo write file path "!fpath!"
-    if "!echo_only!" neq "" (
-        exit /b
-    )
-    
-
-    if not exist "!fpath!" (
-        echo !file! > "!fpath!"
-    )
-    
-    endlocal
-exit /b
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 :one
