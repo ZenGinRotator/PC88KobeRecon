@@ -32,6 +32,111 @@ rem SAMPLE_FILE_NAMES_INDIV_START\*
     endlocal
 exit /b
 
+
+rem ------------------------ Procedure -------------------------
+rem Significant events of the algorithm:
+rem 1. Attempt to recursively delimit the text of a file name using a pre-selected character, and the if 
+rem     the portion of the file name is different than original text from the file name, 
+rem     then the previously selected delimiting character exists within the file name.
+
+rem 2. Designate an end-of-file-name character and append that character to the end of the 
+rem     file name, which forces the algorithm to retrieve the last portion of the file name
+rem     that appear after the end-of-file-name character, but possibly also includes portions
+rem      of the file name that appear after the incorrectly chosen end-of-file-name character.
+
+
+rem ---------------------- Algorithm -----------------------
+rem     1. Choose 1 of 3 possible delimiting characters and use that character to recurse across
+rem         the text of the file name to retrieve the portion of the file name that appears after the last
+rem         instance of the selected delimiting character.
+
+rem         a. If this portion of the file name is different than the original file name,
+rem             * then the delimiting character exists within the file name,
+
+rem         b. If this portion of the file name is the same as the original file name,
+rem             * then the delimiting character does not exist within the file name
+rem             * then increment a no encapsulator counter by 1
+
+rem     2. Choose the 2nd of 3 possible limiting characters and use that character to recurse
+rem         across the 1st end-portion of the file name, and retrieve the inner portion of that 
+rem         1st end-portion, the latter of which appears after the last instance of the 1st chosen
+rem         delimiting character within the file name,
+
+rem         a. If this portion of the file name is different than the 2nd end-portion of file name,
+rem             *then the 2nd delimiting character exists within the file name,
+
+rem         b. If this portion of the file name is the same as the original file name,
+rem             * then the delimiting character does not exist within the file name
+rem             * then increment a no encapsulator counter by 1
+
+rem     3. Choose the last of 3 possible limiting characters and use that character to recurse
+rem         across the 2nd end-portion of the file name, and retrieve the inner-inner portion
+rem         of the 1st end-portion, the latter of which appears after the last instance
+rem         of the 1st chosen delimiting character within the file name.
+
+rem         a. If this portion of the file name is different than the 3rd end-portion of file name,
+rem             * then the 3rd delimiting character exists within the file name.
+
+rem         b. If this portion of the file name is the same as the original file name,
+rem             * then the delimiting character does not exist within the file name
+rem             * then increment a no encapsulator counter by 1
+
+
+
+rem     4. If the no encapsulator counter = 3
+rem         * then the file name does not contain any of the 3 encapsulating characters
+rem         * exit the function
+rem     name is different than the file name, then that difference implies that the 
+rem     delimiting character exists within the file name.
+
+rem     5. The file name contains at least 1 of the 3 avaialble encapsulating characters, but
+rem         we do not know which one of these characters is the last encapsuulating character.
+
+rem     6. We have 3 portions of the end of file name, each of which corresponds
+rem         to one of the 3 encapsulating characters previously used to recurse to the end of
+rem         of the file name.
+
+rem     7. Pick one of the 3 encapsulating characters and its corresponding portion to use as
+rem         a starting point for determining which of the 3 characters is the last encapsulating
+rem         character.
+
+rem     8. Assume that your picked character is the last encapsulating character of the file name,
+rem         and assume that its portion might contain one of the remaining 2 encapsulating characters
+rem         from the file name.
+
+rem     9. Use the 2nd encapsulating character to recurse across this portion of the file name 
+rem         corresponding to the usage of the 1st character on  the file name.
+
+rem         a. If resulting portion of the 1st recursed-end portion of the file name is smaller than
+rem             than the 1st recursed end-portion of the file name
+rem             * This smaller portion becomes the "newest" portion to use for the next recursive step.
+rem             * then the 2nd character appears after the (assumed) 1st character in the file name
+rem                 and could be the last character in the file name
+
+rem         b. If this smaller portion  is the same as the 1st end portion of the file name,
+rem             * then the 2nd character is not the last character, and the 1st character is possibly 
+rem                 the last character in the file name
+
+
+rem     10. Use the last of the 3 encapsulating characters to recurse across the "smallest"
+rem         end portion of the file name 
+
+rem         a. If this portion of the "smallest" portion of the file name (3rd end-portion) is
+rem             smaller than the "smallest" end-portion of the file name,
+rem             * then the 3rd encapsulating character appears after the  2nd encapsulating
+rem                 characters within the file name (is the last character)
+
+rem         b. If this smaller of the 2nd end-portion of the file name is the same as the
+rem             "smallest" end-portion of the file name
+rem             * then the 3rd last character is not the last character of the file name and the
+rem                 the 1st or 2nd character is the last character of the file name
+
+
+
+
+
+
+
 :find_last_char
     setlocal
     set "phrase=%~1"
@@ -58,14 +163,7 @@ exit /b
     if exist token.txt ( del token.txt )
 
 
-    rem Assume ")" is the last character in the file name
 
-    rem These will be token values for identifying the last
-    rem     item within the file name when using
-    rem     parentheses, square and/or curly brackets.
-    set /a p_token=0
-    set /a c_token=0
-    set /a s_token=0
 
     rem These will be used to store bridges (non-encapsulated text) that 
     rem appear after the last character in the file name.
@@ -82,9 +180,6 @@ exit /b
         set "read_item=%%i"
     )
 
-    for /f "tokens=1 delims=|" %%i in (token.txt) do (
-        set /a p_token=%%i
-    )
 
     if exist token.txt ( del token.txt )
 
@@ -97,17 +192,13 @@ exit /b
 
 
 
-rem item no. 48 has incorrect classification of last character because
-rem a bridge proceeds after the last encapsulator
 
     call :recurse_to_end "1" "}" "!read_item!" "!empty_old_item!"
 
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "read_item=%%i"
     )
-    for /f "tokens=1 delims=|" %%i in (token.txt) do (
-        set /a c_token=%%i
-    )
+    
 
     if exist token.txt ( del token.txt )
 
@@ -125,9 +216,6 @@ rem a bridge proceeds after the last encapsulator
         set "read_item=%%i"
     )
 
-    for /f "tokens=1 delims=|" %%i in (token.txt) do (
-        set /a s_token=%%i
-    )
 
     if exist token.txt ( del token.txt )
    
@@ -139,18 +227,21 @@ rem a bridge proceeds after the last encapsulator
 
     if "!empty!" equ "3" (
         echo NONE 
-        echo "!last_char!"
+        echo !last_char!
+        rem return the empty last char
+        rem emtpy char = ECHO is off.
+        rem set "last_char=!last_char!|"
+        echo !last_char! > last_char.txt
         exit /b
     )
 
 
 
 
-
+    rem Assuming the last encapsulating character within the file name
     set "last_char=)"
     set "last_bridge=!p_bridge!"
     set "old_bridge=!c_bridge!"
-    set "last_token=!p_token!"
     call :recurse_to_end "1" "}" "!p_bridge!" "!empty_old_item!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "c_bridge=%%i"
@@ -159,7 +250,6 @@ rem a bridge proceeds after the last encapsulator
     if "!c_bridge!" neq "!p_bridge!" (
         set "last_char=}"
         set "last_bridge=!old_bridge!"
-        set "last_token=!c_token!"
     )
 
     set "old_bridge=!s_bridge!"
@@ -171,7 +261,6 @@ rem a bridge proceeds after the last encapsulator
     if "!s_bridge!" neq "!last_bridge!" (
         set "last_char=]"
         set "last_bridge=!s_bridge!"
-        set "last_token=!s_token!"
     )
 
 
@@ -234,7 +323,11 @@ exit /b
         if "!echo_verify!" neq "" (
             call :out_fail "!last_char!"
         )
+
+        rem return error
         PAUSE
+        set "last_char=-!last_char!|"
+        echo !last_char! > last_char.txt
         EXIT /B
     )
   
@@ -249,6 +342,11 @@ exit /b
     if "!echo_verify!" neq "" (
         call :out_pass "!ops!"
     )
+
+    set "last_char=!last_char!|"
+    echo !last_char! > last_char.txt
+
+    rem return the last char
     
     endlocal
 exit /b
