@@ -21,182 +21,151 @@ call %*
 
 goto :eof
 
-rem Work In Progress - might not need
+
 :find_first_char
     setlocal
     set "name=%~1"
 
-    set "padname=PAD!name!"
-    set "show=%~3"
-    rem echo "!brk!"
-    rem echo PADNAME "!padname!"
 
-    set c=
-    set p=
-    set s=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "(" "!padname!"
+    echo ------------------------------ "!name!" --------------------
+    set "pad_name=PAD!name!"
+
+    set first_char=
+    set p_bridge=
+    set c_bridge=
+    set s_bridge=
+    set "smallest_bridge= "
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "(" "!pad_name!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "p=%%i"
+        set "p_bridge=%%i"
     )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!padname!"
+
+    if "!p_bridge!" neq "!pad_name!" (
+        set "first_char=("
+        set "smallest_bridge=!p_bridge!"
+    ) 
+
+    rem set "p_bridge=PAD!p_bridge!"
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!p_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "c=%%i"
+        set "s_bridge=%%i"
     )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!padname!"
+
+    if "!s_bridge!" neq "!p_bridge!" (
+        set "first_char=["
+        set "smallest_bridge=!s_bridge!"
+    ) 
+
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!s_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "s=%%i"
+        set "c_bridge=%%i"
     )
 
-    set /a q=0
-    if "!p!" equ "!padname!" (
-        set /a q+=1
+    if "!c_bridge!" neq "!s_bridge!" (
+        set "first_char={"
+        set "smallest_bridge=!c_bridge!"
     )
-    if "!s!" equ "!padname!" (
-        set /a q+=1
-    )
-    if "!c!" equ "!padname!" (
-        set /a q+=1
-    )
+    echo FIND2 FIRST CHAR  "!first_char!"
 
-    if "!q!" equ "3" (
-        echo "!name!" NO ENCAPS AS FIRST CHAR
-        set "err=|"
-        echo !err! > "chars.txt"
-        rem call :read_c
-        exit /b
-    )
-
-    call :count_it "!p!" "(" "!show!"
-    call :count_it "!c!" "{" "!show!"
-    call :count_it "!s!" "[" "!show!"
+    call :verify_ "!first_char!" "!name!" "!smallest_bridge!"
     
-exit /b
-
-:read_c
-    setlocal
-    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-        echo READ "%%i"
-    )
+    
     endlocal
 exit /b
 
-:count_it
+:verify_
     setlocal
-    set "delim=%~1"
-    set "left_c=%~2"
-    set "show=%~3"
-    rem set "delim=PAD!delim!"
-    set del_p=
-    set del_c=
-    set del_s=
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "(" "!delim!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "del_p=%%i"
-    )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!delim!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "del_s=%%i"
-    )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!delim!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "del_c=%%i"
+    set "first_char=%~1"
+    set "phrase=%~2"
+    set "smallest_bridge=%~3"
+
+    set "right_char=)"
+    if "!first_char!" equ "{" (
+        set "right_char=}"
     )
 
-     set /a q=0
+    if "!first_char!" equ "[" (
+        set "right_char=]"
+    )
 
-    if "!del_p!" equ "!delim!" (
-        set /a q+=1
-    )
-    if "!del_c!" equ "!delim!" (
-        set /a q+=1
-    )
-    if "!del_s!" equ "!delim!" (
-        set /a q+=1
+    set o1_left_char=
+    set o2_left_char=
+    call "funcs_last_char.bat" :primary_and_optn_chars "!right_char!"
+    for /f "tokens=3 delims=|" %%i in (chars.txt) do (
+        set "o1_left_char=%%i"
     )
     
-
-    if "!q!" neq "3" (
-        exit /b
+    for /f "tokens=5 delims=|" %%i in (chars.txt) do (
+        set "o2_left_char=%%i"
     )
-    REM echo FIRST CHAR "!char!"
-    
-    call :verify_f "!padname!" "!left_c!" "!show!"
+    echo o1_left "!o1_left_char!"
+    echo o2_left "!o2_left_char!"
 
-    endlocal
-exit /b
+    set /a not_first=0
 
-:verify_f
-    setlocal
-    set "name=%~1"
-    set "first_c=%~2"
-    set "show=%~3"
-
-    rem Assume first_c=(
-    set "t1=["
-    set "t2={"
-
-    if "!first_c!" equ "{" (
-        set "t1=["
-        set "t2=("
-    )
-    if "!first_c!" equ "[" (
-        set "t1={"
-        set "t2=("
-    )
-    
-
-    set t_first=
-    set t_name1=
-    set t_name2=
-
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!first_c!" "!name!"
+    set o1_bridge=
+    set o2_bridge=
+    set "pad_name=PAD!phrase!"
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_left!" "!smallest_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "t_first=%%i"
+        set "o1_bridge=%%i"
     )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!t1!" "!t_first!"
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_left!" "!smallest_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "t_name1=%%i"
-    )
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!t2!" "!t_first!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "t_name2=%%i"
+        set "o2_bridge=%%i"
     )
 
-
-    set "e_status=FAIL"
-
-    if "!t_name1!" equ "!t_first!" (
-        set "e_status=PASSED"
+    echo "!o1_bridge!"
+    echo "!o2_bridge!"
+    echo "!smallest_bridge!"
+    REM exit /b 
+    set /a same_found_bridge=0
+    if "!o1_bridge!" neq "!smallest_bridge!" (
+        set /a same_found_bridge+=1
     )
-    if "!t_name2!" equ "!t_first!" (
-        set "e_status=PASSED"
+
+    if "!o2_bridge!" neq "!smallest_bridge!" (
+        set /a same_found_bridge+=1
     )
 
-    REM echo "!name!" FIRST CHAR "!first_c!" "!e_status!"
-    call "funcs_last_char.bat" :outcome "!name!" "FIRST" "!first_c!" "!e_status!: VERIFY_F" "!show!"
-    if "!e_status!" equ "FAIL" (
-REM         echo FIRST CHAR FAIL
-        call "funcs_last_char.bat" :outcome "!name!" "FIRST" "!first_c!" "!e_status!: VERIFY_F" "!show!"
+    if "!same_found_bridge!" neq "0" (
+        echo FALSE
         pause
         exit /b
     )
-    rem write to a file the last character
-    rem set "first_c=!first_c!|"
 
+    echo PASSED FIRST CHAR _V_
+    exit /b
 
-    set "first_as_r=)"
-
-    if "!first_c!" equ "{" (
-        set "first_as_r=}"
+    set "pad_name=PAD!phrase!"
+    set test_o1L=
+    set test_o2L=
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_left!" "!pad_name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test_o1L=%%i"
     )
 
-    if "!first_c!" equ "[" (
-        set "first_as_r=]"
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_left!" "!pad_name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test_o2L=%%i"
     )
 
-    set "chrs=!first_c!|!first_as_r!|"
-    echo !chrs! > "chars.txt"
-    rem call :read_c
-    
+
+    set has_first_o1=
+    set has_first_o2=
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!first_char!" "!test_o1L!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has_first_o1=%%i"
+    )
+
+    call "funcs_rom_keywords.bat" :delim_with_char "1" "!first_char!" "!test_o2L!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "has_first_o2=%%i"
+    )
+
+
+
     endlocal
 exit /b

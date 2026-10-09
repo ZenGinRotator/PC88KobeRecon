@@ -236,8 +236,6 @@ rem                 the 1st or 2nd character is the last character of the file n
     )
 
 
-
-
     rem Assuming the last encapsulating character within the file name
     set "last_char=)"
     set "last_bridge=!p_bridge!"
@@ -394,7 +392,7 @@ exit /b
         set "test_o2R=%%i"
     )
 
-
+rem ARGUMENTS: FIRST/LAST, LEFT/RIGHT
     echo LAST CHAR TEST: PASS (CORRECT LAST CHAR)
     echo LAST CHAR: "!last_char!"
     echo OPTION 1 RIGHT: "!o1_right_chr!"
@@ -402,7 +400,7 @@ exit /b
     echo LAST BRIDGE: "!bridge!"
     echo PAD LAST BRIDGE: "!pad_bridge!"
     echo TEST OPTION 1 RESULT: "!test_o1R!"
-    ECHO test OPTION 2 RESULT: "!test_o2R!"
+    ECHO TEST OPTION 2 RESULT: "!test_o2R!"
     endlocal
 exit /b
 
