@@ -263,14 +263,16 @@ rem                 the 1st or 2nd character is the last character of the file n
 
 
 
-    CALL :verify_3 "!phrase!" "!last_char!" "!last_bridge!" "!end_mark!" "!echo_verify!"
+    CALL :verify_last_bridge "!phrase!" "!last_char!" "!last_bridge!" "!end_mark!" "!echo_verify!"
     
 
     endlocal
 exit /b
 
+rem Compare the bridge from the found last character, with the bridges 
+rem     found with the optional characters
 
-:verify_3
+:verify_last_bridge
     setlocal
     set "phrase=%~1"
     set "last_char=%~2"
@@ -292,34 +294,50 @@ exit /b
         set "o2_right=%%i"
     )
     rem Collecting tests for option characters
-    set test_o1_r=
-    set test_o2_r=
+    set o1_bridge=
+    set o2_bridge=
     set "pad_last_brdg=PAD!last_bridge!"
 
 
     call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_right!" "!pad_last_brdg!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "test_o1_r=%%i"
+        set "o1_bridge=%%i"
     )
     
 
     call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_right!" "!pad_last_brdg!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "test_o2_r=%%i"
+        set "o2_bridge=%%i"
     )
 
+    
+    
+    rem primary bridge vs. each optional bridge
     set /a eqty=0
 
-    if "!test_o1_r!" neq "!pad_last_brdg!" (
+    if "!o1_bridge!" neq "!pad_last_brdg!" (
         set /a eqty+=1
     )
-    if "!test_o2_r!" neq "!pad_last_brdg!" (
+    if "!o2_bridge!" neq "!pad_last_brdg!" (
         set /a eqty+=1
     )
 
+
+
+
+
+
+    set "los=!last_char!|!o1_right!|!o2_right!"
+    set "lasts=!last_bridge!|!pad_last_brdg!"
+    set "o_bridges=!o1_bridge!|!o2_bridge!"
+
+    set "ops=!los!|!lasts!|!o_bridges!"
+
+    set "last_chr_func=L"
     if "!eqty!" neq "0" (
+        set fail=
         if "!echo_verify!" neq "" (
-            call :out_fail "!last_char!"
+            call :out "!ops!" "!last_chr_func!" "!fail!"
         )
 
         rem return error
@@ -330,15 +348,10 @@ exit /b
     )
   
 
-    set "los=!last_char!|!o1_right!|!o2_right!"
-    set "lasts=!last_bridge!|!pad_last_brdg!"
-    set "tests=!test_o1_r!|!test_o2_r!"
-
-    set "ops=!los!|!lasts!|!tests!"
    
-
+    set "pass=p"
     if "!echo_verify!" neq "" (
-        call :out_pass "!ops!"
+        call :out "!ops!" "!last_chr_func!" "!pass!"
     )
 
     set "last_char=!last_char!|"
@@ -349,27 +362,22 @@ exit /b
     endlocal
 exit /b
 
-:out_fail
-    setlocal
-    set "last=%~1"
 
-    echo LAST CHAR TEST: FAIL 
-    echo "!last!": WRONG LAST CHAR
-
-    endlocal
-exit /b
-
-:out_pass
+:out
     setlocal
     set "ops=%~1"
+    set "char_type=%~2"
+    set "pass_type=%~3"
+   
 
     set last_char=
     set o1_right_chr=
     set o2_right_chr=
     set bridge=%~4
     set pad_bridge=
-    set test_o1R=
-    set test_o2R=
+    rem set test_o1R=
+    set o1_bridge=
+    set o2_bridge=
     for /f "tokens=1 delims=|" %%i in ("!ops!") do (
         set "last_char=%%i"
     )
@@ -386,21 +394,59 @@ exit /b
         set "pad_bridge=%%i"
     )
     for /f "tokens=6 delims=|" %%i in ("!ops!") do (
-        set "test_o1R=%%i"
+        set "o1_bridge=%%i"
     )
     for /f "tokens=7 delims=|" %%i in ("!ops!") do (
-        set "test_o2R=%%i"
+        set "o2_bridge=%%i"
     )
 
-rem ARGUMENTS: FIRST/LAST, LEFT/RIGHT
-    echo LAST CHAR TEST: PASS (CORRECT LAST CHAR)
-    echo LAST CHAR: "!last_char!"
-    echo OPTION 1 RIGHT: "!o1_right_chr!"
-    echo OPTION 2 RIGHT: "!o2_right_chr!"
-    echo LAST BRIDGE: "!bridge!"
-    echo PAD LAST BRIDGE: "!pad_bridge!"
-    echo TEST OPTION 1 RESULT: "!test_o1R!"
-    ECHO TEST OPTION 2 RESULT: "!test_o2R!"
+    set "char_label=LAST"
+    set "directn_type=RIGHT"
+
+    if "!char_type!" neq "L" (
+        set "char_label=FIRST"
+        set "directn_type=LEFT"
+    )
+
+    set "is_fail=FAIL"
+    set "is_incorr=WRONG"
+    if "!pass_type!" equ "p" (
+        set "is_fail=PASS"
+        set "is_incorr=CORRECT"
+    )
+
+    rem ARGUMENTS: FIRST/LAST, LEFT/RIGHT
+    rem arguements: PASS/FAIL, CORRECT/INCORRECT
+    set "char_prompt=!char_label! CHAR TEST: !is_fail! (!is_incorr! !char_label! CHAR)"
+    echo "!char_prompt!"
+    
+    
+    set "char_type_prompt=!char_label! CHAR: !last_char!"
+    echo "!char_type_prompt!"
+
+
+    set "o1=OPTION 1 !directn_type!: !o1_right_chr!"
+    echo "!o1!"
+
+
+    set "o2=OPTION 2 !directn_type!: !o2_right_chr!"
+    echo "!o2!"
+
+
+    set "lst_b=!char_label! BRIDGE: !bridge!"
+    echo "!lst_b!"
+
+    set "lst_pb=PAD !char_label! BRIDGE: !pad_bridge!"
+    echo "!lst_pb!"
+
+
+    set "o1_b=OPTION 1 BRIDGE: !o1_bridge!"
+    echo "!o1_b!"
+    
+    set "o2_b=OPTION 2 BRIDGE: !o2_bridge!"
+    echo "!o2_b!"
+
+
     endlocal
 exit /b
 
