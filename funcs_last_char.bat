@@ -143,8 +143,10 @@ rem                 the 1st or 2nd character is the last character of the file n
     set "echo_verify=%~2"
      
     
-
-    echo ---------------- Phrase "!phrase!" ------------------
+    if "!echo_verify!" neq "" (
+        echo ---------------- Phrase "!phrase!" ------------------
+    )
+    
 
     rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
     rem     or to indicate the end of a bridge

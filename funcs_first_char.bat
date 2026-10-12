@@ -26,9 +26,13 @@ goto :eof
     setlocal
     set "name=%~1"
     set "echo_verify=%~2"
+    rem echo EV "!echo_verify!"
+    rem pause
 
-
-    echo ------------------------------ "!name!" --------------------
+    if "!echo_verify!" neq "" (
+        echo ------------------------------ "!name!" --------------------
+    )
+    
     set "pad_name=PAD!name!"
 
     set first_char=
@@ -148,13 +152,18 @@ rem     found with the optional characters
             set fail=
 
             call "funcs_last_char.bat" :out "!ops!" !first_chr_func!" "!fail!" 
+            
         )
-
+        set "first_char=!first_char!|"
+        echo !first_char! > first_char.txt
         pause
         exit /b
     )
     set "pass=p"
-    call "funcs_last_char.bat" :out "!ops!" "!first_chr_func!" "!pass!"
-
+    if "!echo_verify!" neq "" (
+        call "funcs_last_char.bat" :out "!ops!" "!first_chr_func!" "!pass!"
+    )
+    set "first_char=!first_char!|"
+    echo !first_char! > first_char.txt
     endlocal
 exit /b
