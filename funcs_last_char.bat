@@ -162,9 +162,7 @@ rem                 the 1st or 2nd character is the last character of the file n
     
     rem Delete file from previous run of the algorithm
     if exist old_item.txt ( del old_item.txt )
-    if exist token.txt ( del token.txt )
-
-
+    
 
 
     rem These will be used to store bridges (non-encapsulated text) that 
@@ -185,22 +183,11 @@ rem                 the 1st or 2nd character is the last character of the file n
     )
 
 
-    if exist token.txt ( del token.txt )
-
-
-    rem set "p_bridge=!read_item!"
-    set /a empty=0
-    if "!p_bridge!" equ "!phrase!" (
-        set /a empty+=1
-    )
-
     if "!p_bridge!" neq "!phrase!" (
         set "last_char=)"
         set "bridge=!p_bridge!"
     )
 
-
-    rem echo p bridge "!p_bridge!"
 
     call :recurse_to_end "1" "}" "!p_bridge!" "!empty_old_item!"
 
@@ -209,19 +196,10 @@ rem                 the 1st or 2nd character is the last character of the file n
     )
     
 
-    if exist token.txt ( del token.txt )
-
-
-    rem set "c_bridge=!read_item!"
-    if "!c_bridge!" equ "!phrase!" (
-        set /a empty+=1
-    )
-
     if "!c_bridge!" neq "!p_bridge!" (
         set "last_char=}"
         set "bridge=!c_bridge!"
     )
-rem echo c bridge "!c_bridge!"
 
 
 
@@ -229,71 +207,14 @@ rem echo c bridge "!c_bridge!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "s_bridge=%%i"
     )
-rem echo s bridge "!s_bridge!"
 
-    if exist token.txt ( del token.txt )
    
-
-    rem set "s_bridge=!read_item!"
-    if "!s_bridge!" equ "!phrase!" (
-        set /a empty+=1
-    )
-
     if "!s_bridge!" neq "!c_bridge!" (
         set "last_char=]"
         set "bridge=!s_bridge!"
     )
 
-    rem echo Last char "!last_char!" "!phrase!"
     CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!end_mark!" "!echo_verify!"
-    exit /b
-
-
-
-
-
-
-
-    if "!empty!" equ "3" (
-        echo NONE 
-        echo !last_char!
-        rem return the empty last char
-        rem emtpy char = ECHO is off.
-        rem set "last_char=!last_char!|"
-        echo !last_char! > last_char.txt
-        rem exit /b
-    )
-
-
-    rem Assuming the last encapsulating character within the file name
-    set "last_char=)"
-    set "last_bridge=!p_bridge!"
-    set "old_bridge=!c_bridge!"
-    call :recurse_to_end "1" "}" "!p_bridge!" "!empty_old_item!"
-    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
-        set "c_bridge=%%i"
-    )
-
-    if "!c_bridge!" neq "!p_bridge!" (
-        set "last_char=}"
-        set "last_bridge=!old_bridge!"
-    )
-
-    set "old_bridge=!s_bridge!"
-    call :recurse_to_end "1" "]" "!last_bridge!" "!emtpy_old_item!"
-    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
-        set "s_bridge=%%i"
-    )
-
-    if "!s_bridge!" neq "!last_bridge!" (
-        set "last_char=]"
-        set "last_bridge=!s_bridge!"
-    )
-
-
-
-    CALL :verify_last_bridge "!phrase!" "!last_char!" "!last_bridge!" "!end_mark!" "!echo_verify!"
-    
 
     endlocal
 exit /b
@@ -316,6 +237,11 @@ rem     found with the optional characters
     set o2_right=
 
     call :primary_and_optn_chars "!last_char!"
+
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "last_char=%%i"
+    )
+
     for /f "tokens=4 delims=|" %%i in (chars.txt) do (
         set "o1_right=%%i"
     )
