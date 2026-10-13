@@ -372,34 +372,64 @@ exit /b
     set "pass_type=%~3"
    
 
-    set last_char=
-    set o1_right_chr=
-    set o2_right_chr=
+    set prime_char=
+    set o1_chr=
+    set o2_chr=
     set bridge=%~4
     set pad_bridge=
     rem set test_o1R=
     set o1_bridge=
     set o2_bridge=
     for /f "tokens=1 delims=|" %%i in ("!ops!") do (
-        set "last_char=%%i"
+        set "prime_char=%%i"
+        if "!prime_char!" equ "@" (
+            set prime_char=
+        )
     )
     for /f "tokens=2 delims=|" %%i in ("!ops!") do (
-        set "o1_right_chr=%%i"
+        set "o1_chr=%%i"
+        if "!o1_chr!" equ "@" (
+            set o1_chr=
+        )
+
+
+
+
     )
     for /f "tokens=3 delims=|" %%i in ("!ops!") do (
-        set "o2_right_chr=%%i"
+        set "o2_chr=%%i"
+        if "!o2_chr!" equ "@" (
+            set o2_chr=
+        )
+
     )
     for /f "tokens=4 delims=|" %%i in ("!ops!") do (
         set "bridge=%%i"
+        if "!bridge!" equ " " (
+            set bridge=
+        )
+
     )
     for /f "tokens=5 delims=|" %%i in ("!ops!") do (
         set "pad_bridge=%%i"
+        if "!pad_bridge!" equ " " (
+            set pad_bridge=
+        )
+
     )
     for /f "tokens=6 delims=|" %%i in ("!ops!") do (
         set "o1_bridge=%%i"
+        if "!o1_bridge!" equ " " (
+            set o1_bridge=
+        )
+
     )
     for /f "tokens=7 delims=|" %%i in ("!ops!") do (
         set "o2_bridge=%%i"
+        if "!o2_bridge!" equ " " (
+            set o2_bridge=
+        )
+
     )
 
     set "char_label=LAST"
@@ -423,29 +453,29 @@ exit /b
     echo "!char_prompt!"
     
     
-    set "char_type_prompt=!char_label! CHAR: !last_char!"
+    set "char_type_prompt=   !char_label! CHAR:" "!prime_char!"
     echo "!char_type_prompt!"
 
 
-    set "o1=OPTION 1 !directn_type!: !o1_right_chr!"
+    set "o1=OPTION 1 !directn_type!:" "!o1_chr!"
     echo "!o1!"
 
 
-    set "o2=OPTION 2 !directn_type!: !o2_right_chr!"
+    set "o2=OPTION 2 !directn_type!:" "!o2_chr!"
     echo "!o2!"
 
 
-    set "lst_b=!char_label! BRIDGE: !bridge!"
+    set "lst_b=    !char_label! BRIDGE:" "!bridge!"
     echo "!lst_b!"
 
-    set "lst_pb=PAD !char_label! BRIDGE: !pad_bridge!"
+    set "lst_pb=PAD !char_label! BRIDGE:" "!pad_bridge!"
     echo "!lst_pb!"
 
 
-    set "o1_b=OPTION 1 BRIDGE: !o1_bridge!"
+    set "o1_b= OPTION 1 BRIDGE:" "!o1_bridge!"
     echo "!o1_b!"
     
-    set "o2_b=OPTION 2 BRIDGE: !o2_bridge!"
+    set "o2_b= OPTION 2 BRIDGE:" "!o2_bridge!"
     echo "!o2_b!"
 
 
@@ -459,15 +489,26 @@ exit /b
     set "right_char=%~1"
 
     set left_char=
-    if "!right_char!" equ ")" (
-        set "left_char=("
+
+    if "!left_char!" equ "" (
+        set "left_char=@"
+        set "right_char=@"
+        set "optn_one_left=@"
+        set "optn_one_right=@"
+        set "optn_two_left=@"
+        set "optn_two_right=@"
     )
 
-    set "optn_one_left={"
-    set "optn_one_right=}"
+    if "!right_char!" equ ")" (
+        set "left_char=("
+    
+        set "optn_one_left={"
+        set "optn_one_right=}"
 
-    set "optn_two_left=["
-    set "optn_two_right=]"
+        set "optn_two_left=["
+        set "optn_two_right=]"
+
+    )
 
     if "!right_char!" equ "}" (
         set "left_char={"

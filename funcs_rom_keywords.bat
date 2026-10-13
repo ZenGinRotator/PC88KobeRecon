@@ -176,137 +176,68 @@ exit /b
     set "optn_one_right=%~6"
     set "optn_two_left=%~7"
     set "optn_two_right=%~8"
-     echo === "!optn_one_right!"
-    echo --- "!optn_two_right!"
+     REM echo === 01 right "!optn_one_right!"
+    REM echo --- 02 right "!optn_two_right!"
+    ECHO "!brk!"
 
-    set orig_item=
+    set item=
     call :delim_with_char "!token!" "!right_char!" "!name!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "orig_item=%%i"
-    )
-
-    set p_item=
-    call :delim_with_char "!token!" "!right_char!" "PAD!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "p_item=%%i"
+        set "item=%%i"
     )
     
-    REM echo called ROG2 "!left_char!" "!right_char!" "!optn_one_left!"  "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    
 
-    if "!p_item!" equ " " (
+    if "!item!" equ " " (
         exit /b
     )
 
-
+    set "pad_item=PAD!item!"
     
-    
-    set o_bridge=
-    call :delim_with_char "1" "!left_char!" "!orig_item!"
+
+    set pad_bridge=
+    call :delim_with_char "1" "!left_char!" "!pad_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "o_bridge=%%i"
+        set "pad_bridge=%%i"
     )
 
 
-    set p_bridge=
-    call :delim_with_char "1" "!left_char!" "PAD!name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "p_bridge=%%i"
-    )
-  rem echo P ITEM I ---------"!p_item!" 
-  rem echo p bridge "!p_bridge!"
-    rem echo O item -- "!orig_item!"
-    rem echo o bridge "!o_bridge!"
-     
-   
-    
-    rem echo BRIDGE FROM ITEM "!bridge!"
-
-    
-    set has1=
-    set has2=
-    call :delim_with_char "1" "!optn_one_right!" "!o_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "has1=%%i"
-        
-    )
-    if "!has1!" neq "!o_bridge!" (
-        rem echo HAS 1
-        rem PAUSE
-        REM echo calling DOIR has 1
-        rem call :DOIR "1" "!optn_one_left!" "!optn_one_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-        rem echo d1
-        rem call :doir_ "1" "!optn_one_left!" "!optn_one_right!" "!o_bridge!"
-    )
-    call :delim_with_char "1" "!optn_two_right!" "!o_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "has2=%%i"
-        rem echo HAS 2 "%%i"
-    )
-    if "!has2!" neq "!o_bridge!" (
-        rem ECHO Has 2 
-        rem pause
-        REM echo calling DOIR has 2
-        rem call :DOIR "1" "!optn_two_left!" "!optn_two_right!" "!bridge!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-        rem echo d2
-        rem call :doir_ "1" "!optn_two_left!" "!optn_two_right!" "!o_bridge!"
-    )
-
-  
-REM 
-    set no_o1=
-    set no_o2=
-    set /a no_o=0
-    
-    call :delim_with_char "1" "!optn_one_right!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "no_o1=%%i"
-    )
-
-    call :delim_with_char "1" "!optn_two_right!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "no_o2=%%i"
-    )
-
-    if "!no_o1!" equ "!item!" (
-        set /a no_o+=1
-    )
-
-    if "!no_o2!" equ "!item!" (
-        set /a no_o+=1
-    )
-
-
-    rem if item does not have primary left_char , block item to DOIL
-    set has_lp=
+    set orig_bridge=
     call :delim_with_char "1" "!left_char!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "has_lp=%%i"
+        set "orig_bridge=%%i"
     )
-    rem if "!has_lp!" neq "!item!" (
-        rem echo calling DOIL
-    rem call :DOIL "1" "!left_char!" "!right_char!" "!item!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
-    rem )
+
+    if "!left_char!!orig_bridge!" equ "!item!" (
+        set orig_bridge=
+    )
+  
+rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
+
+    set "bridge=!pad_bridge!"
+
+    if "!pad_bridge!" neq "PAD " (
+        set "bridge=!orig_bridge!"
+    )
+
+    if "!pad_bridge!" neq "PAD" (
+        set "bridge=!orig_bridge!"
+    )
+    ECHO test BRIDGE "!bridge!"
+
+    set no_show=
+    set "do_show=\"
+    rem call "funcs_first_char.bat" :find_first_char "!bridge!" "!do_show!"
+   
 
 
 
-    rem Item can contain primary left
-    rem if "!bridge!" neq "!item!" (
-    rem call :DOIL "1" "!left_char!" "!item!"
-    rem )
-    rem Item can contain optn1_right
+    rem Loook for options 1 & 2 within bridge from pad name
+    set has01=
+    set has02=
 
-    rem Item can contain optn2_right
-    
-    rem call :process
-    
 
-    set "primes=!left_char!|!right_char!"
-    set "optn1s=!optn_one_left!|!optn_one_right!"
-    set "optn2s=!optn_two_left!|!optn_two_right!"
 
-    set "delim_chars=!primes!|!optn1s!|!optn2s!"
-    
+
     
     set status=
     set /a ttoken=!token!
@@ -324,7 +255,23 @@ REM
     endlocal
 exit /b
 
+:output
+    setlocal
+    set "item=%~1"
+    set "pad_item=%~2"
+    set "pad_bridge=%~3"
+    set "orig_bridge=%~4"
 
+    
+   
+
+
+    echo     ITEM: "!item!"
+    echo PAD ITEM: "!pad_item!"
+    echo PAD BRIDGE: "!pad_bridge!"
+    echo ORIG BRIDGE: "!orig_bridge!"
+    endlocal
+exit /b
 
 
 :DOIR

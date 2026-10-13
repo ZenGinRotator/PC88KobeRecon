@@ -45,12 +45,12 @@ goto :eof
         set "p_bridge=%%i"
     )
 
+
     if "!p_bridge!" neq "!pad_name!" (
         set "first_char=("
         set "smallest_bridge=!p_bridge!"
-    ) 
+    )
 
-    rem set "p_bridge=PAD!p_bridge!"
     call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!p_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "s_bridge=%%i"
@@ -59,7 +59,7 @@ goto :eof
     if "!s_bridge!" neq "!p_bridge!" (
         set "first_char=["
         set "smallest_bridge=!s_bridge!"
-    ) 
+    )
 
 
     call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!s_bridge!"
@@ -71,7 +71,7 @@ goto :eof
         set "first_char={"
         set "smallest_bridge=!c_bridge!"
     )
-    
+   
 
     call :verify_smallest_bridge "!first_char!" "!name!" "!smallest_bridge!" "!echo_verify!"
     
@@ -89,7 +89,11 @@ rem     found with the optional characters
     set "smallest_bridge=%~3"
     set "echo_verify=%~4"
 
-    set "right_char=)"
+
+    set right_char=
+    if "!left_char!" equ "(" (
+        set "right_char=)"
+    )
     if "!first_char!" equ "{" (
         set "right_char=}"
     )
@@ -101,6 +105,15 @@ rem     found with the optional characters
     set o1_left_char=
     set o2_left_char=
     call "funcs_last_char.bat" :primary_and_optn_chars "!right_char!"
+    for /f "tokens=1 delims=|" %%i in (chars.txt) do (
+        set "first_char=%%i"
+    )
+
+    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
+        set "right_char=%%i"
+    )
+
+
     for /f "tokens=3 delims=|" %%i in (chars.txt) do (
         set "o1_left_char=%%i"
     )
@@ -140,8 +153,9 @@ rem     found with the optional characters
     set "pad_bridge=PAD!smallest_bridge!"
 
     set "los=!first_char!|!o1_left_char!|!o2_left_char!"
+
     set "firsts=!smallest_bridge!|!smallest_bridge!"
-    set "o_bridges= !o1_bridge!| !o2_bridge!"
+    set "o_bridges=!o1_bridge!|!o2_bridge!"
 
     set "ops=!los!|!firsts!|!o_bridges!"
 

@@ -184,7 +184,10 @@ rem call "funcs_last_char.bat" :exe
 
 
 rem call "funcs_rom_keywords.bat" :exe_loop
-call "funcs_match_chars.bat" :do_match
+set "src1=SAMPLE\INDIV\STAGE_1\SUBSET\"
+set "src2=SAMPLE\INDIV\STAGE_3\SUBSET\"
+set "src3=SAMPLES_0_TO_3_ENCAPS\"
+call "funcs_match_chars.bat" :do_match "!src3!"
 rem call "funcs_last_sample_data.bat" :make_samples
 
 ECHO --------------------------------- DONE ----
