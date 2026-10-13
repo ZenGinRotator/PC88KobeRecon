@@ -103,7 +103,7 @@ rem     set "right_char=%~2"
     rem echo first_R "!first_r!"
     
     rem this function calls find_last_char, which populates chars.txt wit primary and option 1 & 2 chars
-    call "funcs_match_chars.bat" :start_n_end_matches "!name!"
+    call "funcs_match_chars.bat" :start_n_end_matches "!name!" ""
     
     for /f "tokens=*" %%i in (chars.txt) do (
         rem echo CHARS.TXT "%%i"
@@ -222,7 +222,7 @@ rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
     if "!pad_bridge!" neq "PAD" (
         set "bridge=!orig_bridge!"
     )
-    ECHO test BRIDGE "!bridge!"
+    rem ECHO test BRIDGE "!bridge!"
 
     set no_show=
     set "do_show=\"

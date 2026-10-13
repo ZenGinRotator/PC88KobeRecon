@@ -91,7 +91,7 @@ rem     found with the optional characters
 
 
     set right_char=
-    if "!left_char!" equ "(" (
+    if "!first_char!" equ "(" (
         set "right_char=)"
     )
     if "!first_char!" equ "{" (
@@ -153,6 +153,7 @@ rem     found with the optional characters
     set "pad_bridge=PAD!smallest_bridge!"
 
     set "los=!first_char!|!o1_left_char!|!o2_left_char!"
+    rem set los "!los!"
 
     set "firsts=!smallest_bridge!|!smallest_bridge!"
     set "o_bridges=!o1_bridge!|!o2_bridge!"
