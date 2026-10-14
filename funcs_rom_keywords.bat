@@ -396,7 +396,12 @@ exit /b
     call :DOIL "1" "!left!" "!right!" "!bitem!" "!optn1_left!" "!optn1_right!" "!optn2_left!" "!optn2_right!"
     set /a token+=1
     
-    call :DOIR "!token!" "!left!" "!right!" "!item!" "!optn1_left!" "!optn1_right!" "!optn2_left!" "!optn2_right!"
+
+    set "primes=!left!|!right!"
+    set "o1s=!optn1_left!|!optn1_right!"
+    set "o2s=!optn2_left!|!optn2_right!"
+    set "dois=!token!|!primes!|!item!|!o1s!|!o2s!"
+    call :DOIR "!dois!"
     endlocal
 exit /b
 
