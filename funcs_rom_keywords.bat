@@ -211,6 +211,8 @@ exit /b
         set "optn_two_right=%%i"
     )
 
+    rem echo RECS "!recs!"
+
 
 
 
@@ -294,7 +296,8 @@ call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
         set "o2s=!optn_two_left!|!optn_two_right!"
         rem echo 02S "!o2s!"
         set "dois=1|!primes!|!bridge!|!o1s!|!o2s!"
-rem         echo DOIS "!dois!"
+         echo DOIS "!dois!"
+        
         call :DOIR "!dois!"
 
     )
@@ -324,7 +327,7 @@ rem         echo DOIS "!dois!"
     
     set "primes=!left_char!|!right_char!"
     set "o1s=!optn_one_left!|!optn_one_right!"
-    set "o2s=!optn_two_lef!|!optn_two_right!"
+    set "o2s=!optn_two_left!|!optn_two_right!"
     set "recs=!ttoken!|!primes!|!name!|!o1s!|!o2s!"
 
 
@@ -633,6 +636,7 @@ rem echo padded "!padded!"
 
     
     rem might extend this condition for use when required to include a space between nested, encapsulated words
+    rem add a preceeding space to the found encapsulated words
     if "!pad!" equ "PAD " (
         set "use= !padded!"
     )
