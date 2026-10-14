@@ -132,8 +132,12 @@ rem     set "right_char=%~2"
         set "optn_two_right=%%i"
     )
 
-    
-    call :recurse_on_group2 "1" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+    set "token=1"
+    set "primes=!left_char!|!right_char!"
+    set "o1s=!optn_one_left!|!optn_one_right!"
+    set "o2s=!optn_two_lef!|!optn_two_right!"
+    set "recs=!token!|!primes!|!name!|!o1s!|!o2s!"
+    call :recurse_on_group2 "!recs!"
 
     rem call :print_bridge
     rem call :print_labels
@@ -168,17 +172,48 @@ exit /b
 
 :recurse_on_group2
     setlocal
-    set "token=%~1"
-    set "left_char=%~2"
-    set "right_char=%~3"
-    set "name=%~4"
-    set "optn_one_left=%~5"
-    set "optn_one_right=%~6"
-    set "optn_two_left=%~7"
-    set "optn_two_right=%~8"
-     REM echo === 01 right "!optn_one_right!"
-    REM echo --- 02 right "!optn_two_right!"
+    set "recs=%~1"
+
+
+    set token=
+    set left_char=
+    set right_char=
+    set name=
+    set optn_one_left=
+    set optn_one_right=
+    set optn_two_left=
+    set optn_two_right=
     ECHO "!brk!"
+
+    for /f "tokens=1 delims=|" %%i in ("!recs!") do (
+        set "token=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!recs!") do (
+        set "left_char=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!recs!") do (
+        set "right_char=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!recs!") do (
+        set "name=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!recs!") do (
+        set "optn_one_left=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!recs!") do (
+        set "optn_one_right=%%i"        
+    )
+    for /f "tokens=7 delims=|" %%i in ("!recs!") do (
+        set "optn_two_left=%%i"
+    )
+    for /f "tokens=8 delims=|" %%i in ("!recs!") do (
+        set "optn_two_right=%%i"
+    )
+
+
+
+
+
 
     set item=
     call :delim_with_char "!token!" "!right_char!" "!name!"
@@ -211,7 +246,7 @@ exit /b
         set orig_bridge=
     )
   
-rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
+call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
 
     set "bridge=!pad_bridge!"
 
@@ -222,7 +257,35 @@ rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
     if "!pad_bridge!" neq "PAD" (
         set "bridge=!orig_bridge!"
     )
-    rem ECHO test BRIDGE "!bridge!"
+
+
+    set last_char=
+    call "funcs_last_char.bat" :find_last_char "!bridge!" ""
+    for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
+        rem echo LAST CHAR "%%i"
+        set "last_char=%%i"
+        if "!last_char!" equ "@" (
+            set last_char=
+        )
+            
+    )
+    rem echo LAST CHAR "!last_char!"
+    if "!last_char!" neq "" (
+        echo RECURSE ON BRIDGE "!bridge!" with last char "!last_char!" using DOIR
+            set token=
+    set left_char=
+    set right_char=
+    set name=
+    set optn_one_left=
+    set optn_one_right=
+    set optn_two_left=
+    set optn_two_right=
+        set "primes=!left_char!|!right_char!"
+        set "o1s=!optn_one_left!|!optn_one_right!"
+        set "o2s=!optn_two_left!|!optn_two_right!"
+        set "dois=!ttoken!|!primes!|!bridge!|!o1s!|!o2s!
+
+    )
 
     set no_show=
     set "do_show=\"
@@ -246,11 +309,14 @@ rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
 
     set /a ttoken+=1
 
-    set "primaries=!left_char!|!right_char!"
-    set "optn_ones=!optn_one_left!|!optn_one_right!"
-    set "optn_twos=!optn_two_left!|!optn_two_right!"
+    
+    set "primes=!left_char!|!right_char!"
+    set "o1s=!optn_one_left!|!optn_one_right!"
+    set "o2s=!optn_two_lef!|!optn_two_right!"
+    set "recs=!ttoken!|!primes!|!name!|!o1s!|!o2s!"
 
-    call :recurse_on_group2 "!ttoken!" "!left_char!" "!right_char!" "!name!" "!optn_one_left!" "!optn_one_right!" "!optn_two_left!" "!optn_two_right!"
+
+    call :recurse_on_group2 "!recs!"
 
     endlocal
 exit /b
@@ -267,7 +333,7 @@ exit /b
 
 
     echo     ITEM: "!item!"
-    echo PAD ITEM: "!pad_item!"
+    echo PAD ITEM: "!pad_item!" use with DOIL, tok=2
     echo PAD BRIDGE: "!pad_bridge!"
     echo ORIG BRIDGE: "!orig_bridge!"
     endlocal
@@ -276,14 +342,40 @@ exit /b
 
 :DOIR
     setlocal
-    set "token=%~1"
-    set "left=%~2"
-    set "right=%~3"
-    set "item=%~4"
-    set "optn1_left=%~5"
-    set "optn1_right=%~6"
-    set "optn2_left=%~7"
-    set "optn2_right=%~8"
+    set "dois=%~1"
+
+    set token=
+    set left=
+    set right=
+    set item=
+    set optn1_left=
+    set optn1_right=
+    set optn2_left=
+    set optn2_right=
+    for /f "tokens=1 delims=|" %%i in ("!dois!") do (
+        set "token=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!dois!") do (
+        set "left=%%i"        
+    )
+    for /f "tokens=3 delims=|" %%i in ("!dois!") do (
+        set "right=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!dois!") do (
+        set "item=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!dois!") do (
+        set "optn1_left=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!dois!") do (
+        set "optn1_right=%%i"
+    )
+    for /f "tokens=7 delims=|" %%i in ("!dois!") do (
+        set "optn2_left=%%i"
+    )
+    for /f "tokens=8 delims=|" %%i in ("!dois!") do (
+        set "optn2_right=%%i"
+    )
 
     echo called DOIR "!token!" "!left!" "!right!" "!item!" "!optn1_left!"  "!optn1_right!" "!optn2_left!" "!optn2_right!"
 
