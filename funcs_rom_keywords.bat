@@ -175,6 +175,7 @@ exit /b
     if exist "last_item.txt" ( del "last_item.txt" )
     if exist "chars.txt" ( del "chars.txt" )
     if exist "token.txt" ( del "token.txt" )
+    if exist nested.txt ( del nested.txt )
     endlocal
 exit /b
 
@@ -731,6 +732,8 @@ exit /b
 
 
 
+
+
     set pad=
     call :delim_with_char "1" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -769,15 +772,36 @@ exit /b
          rem echo LAST CAR "!last_char!" doil 1
          if "!last_char!" equ "" (
             
+            
+            REM TEST FOR nested label
+            set "nest_status=INDIV"
+            set /a temp=!ttoken!+1
+            call :delim_with_char "!temp!" "!left!" "!item!"
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                if "%%i" neq " " (
+                    rem set "nest_status=NESTED"
+                    echo #### NEXT  "%%i" ##### "!left!" "!item!"
+                    echo "" > nested.txt
+                )
+            )
+
 
             rem if item === bitem, then the item/bitem is last of nested label
             rem if item == bitem, then item/bitem is an ending bridge
 
-            echo "!brk!" use "!use!"
+            if exist nested.txt (
+                set "nest_status=NESTED"
+            )
+
+            echo "!brk!" use "!use!" ---- "!nest_status!"
             echo ITEM "!item!"
             echo BITEM "!bitem!"
             echo PAD "!pad!"
             echo PADDED "!padded!"
+
+            if "!item!" equ "!bitem!" (
+                if exist nested.txt ( del nested.txt )
+            )
 
             rem need to determine if this is an encapsulated label or a bridge
             call :construct "!left!!use!!right!"
@@ -943,7 +967,32 @@ exit /b
 rem currently use can save a space " "
     if "!use!" neq " " (
         if "!hide!" equ "0" (
-                    echo "!brk!" use "!use!"
+
+            set "nest_status=INDIV"
+            if "!ttoken!" equ "2" (
+            REM TEST FOR nested label
+            
+            set /a temp=!ttoken!+1
+            call :delim_with_char "!temp!" "!left!" "!item!"
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                if "%%i" neq " " (
+                    rem set "nest_status=NESTED"
+                    echo #### NEXT  "%%i" ##### "!left!" "!item!"
+                    echo "" > nested.txt
+                )
+            )
+            )
+
+
+            rem if item === bitem, then the item/bitem is last of nested label
+            rem if item == bitem, then item/bitem is an ending bridge
+
+            if exist nested.txt (
+                set "nest_status=NESTED"
+            )
+
+
+            echo "!brk!" use "!use!" ===== "!nest_status!"
             echo ITEM "!item!"
             echo BITEM "!bitem!"
             echo PAD "!pad!"
