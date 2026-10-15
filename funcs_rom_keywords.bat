@@ -138,7 +138,17 @@ rem     set "right_char=%~2"
     set "o1s=!optn_one_left!|!optn_one_right!"
     set "o2s=!optn_two_left!|!optn_two_right!"
     set "recs=!token!|!primes!|!name!|!o1s!|!o2s!"
+
+    if exist construct.txt ( del construct.txt )
+
     call :recurse_on_group2 "!recs!"
+    if exist construct.txt (
+    for /f "tokens=*" %%i in (construct.txt) do (
+        echo made "%%i"
+    )
+    )
+
+    echo name "!name!"
 
     rem call :print_bridge
     rem call :print_labels
@@ -740,6 +750,7 @@ exit /b
     
     rem might extend this condition for use when required to include a space between nested, encapsulated words
     rem add a preceeding space to the found encapsulated words
+    rem padded is the encapsulated set of labels
     if "!pad!" equ "PAD " (
         set "use= !padded!" 
     )
@@ -757,7 +768,19 @@ exit /b
     
          rem echo LAST CAR "!last_char!" doil 1
          if "!last_char!" equ "" (
-            echo use "!use!"
+            
+
+            rem if item === bitem, then the item/bitem is last of nested label
+            rem if item == bitem, then item/bitem is an ending bridge
+
+            echo "!brk!" use "!use!"
+            echo ITEM "!item!"
+            echo BITEM "!bitem!"
+            echo PAD "!pad!"
+            echo PADDED "!padded!"
+
+            rem need to determine if this is an encapsulated label or a bridge
+            call :construct "!left!!use!!right!"
             rem  DOIL1 "!left!" token "!ttoken!"
          )
         if "!last_char!" neq "" (
@@ -920,7 +943,14 @@ exit /b
 rem currently use can save a space " "
     if "!use!" neq " " (
         if "!hide!" equ "0" (
-        echo use "!use!"
+                    echo "!brk!" use "!use!"
+            echo ITEM "!item!"
+            echo BITEM "!bitem!"
+            echo PAD "!pad!"
+            echo PADDED "!padded!"
+
+            rem need to determine if this is an encapsulated label or a bridge
+            call :construct "!left!!use!!right!"
         )
         rem echo ITEM "!item!"
     )
@@ -942,6 +972,28 @@ rem currently use can save a space " "
     endlocal
 exit /b
 
+
+:construct
+    setlocal
+    set "item=%~1"
+    rem file could exist
+
+    if not exist construct.txt (
+
+        echo !item! > construct.txt
+        exit /b
+    )
+
+    set old=
+    for /f "tokens=*" %%i in (construct.txt) do (
+        set "old=!old!%%i"
+    )
+
+    set "old=!old! !item!"
+    echo !old! > construct.txt
+    rem file could not exist
+    endlocal
+exit /b
 
 
 
