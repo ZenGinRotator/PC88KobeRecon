@@ -249,7 +249,7 @@ exit /b
         set orig_bridge=
     )
   
-call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
+rem call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
 
     set "bridge=!pad_bridge!"
 
@@ -275,8 +275,9 @@ call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
             
     )
     rem echo LAST CHAR "!last_char!"
+    
     if "!last_char!" neq "" (
-        echo RECURSE ON BRIDGE "!bridge!" with last char "!last_char!" using DOIR
+        rem echo RECURSE ON BRIDGE "!bridge!" with last char "!last_char!" using DOIR
 
 
 
@@ -288,15 +289,12 @@ call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
             set "o_right=!optn_two_right!"
             set "o_left=!optn_two_left!"
         )
-       rem  echo O_RIGHT "!o_right!"
-   rem      echo O_left "!o_left!"
-        rem Use o_right to find correct o_left
         set "primes=!o_left!|!o_right!"
         set "o1s=!optn_one_left!|!optn_one_right!"
         set "o2s=!optn_two_left!|!optn_two_right!"
         rem echo 02S "!o2s!"
         set "dois=1|!primes!|!bridge!|!o1s!|!o2s!"
-         rem echo DOIS "!dois!"
+         rem  echo DOIS "!dois!"
         
         call :DOIR "!dois!"
 
@@ -305,7 +303,14 @@ call :output "!item!" "!pad_item!" "!pad_bridge!" "!orig_bridge!"
     set no_show=
     set "do_show=\"
     rem call "funcs_first_char.bat" :find_first_char "!bridge!" "!do_show!"
-   
+    
+   rem DOIL2 ON ITEM WITH LEFT CHAR
+    set "primes=!left_char!|!right_char!"
+    set "o1s=!optn_one_left!|!optn_one_right!"
+    set "o2s=!optn_two_left!|!optn_two_right!"
+    set "doils=1|!primes!|!item!|!o1s!|!o2s!"
+    rem echo "!doils!"
+    call :DOIL2 "!doils!"
 
 
 
@@ -876,16 +881,48 @@ exit /b
 
     set "use=!bitem!" 
 
-    
     rem might extend this condition for use when required to include a space between nested, encapsulated words
     rem add a preceeding space to the found encapsulated words
     if "!pad!" equ "PAD " (
+        
         set "use= !padded!"
+        
     )
+
+ rem exclude strings  containing either option 1 left or option 2 right
+    set haso1=
+    set haso2=
+    set /a hide=0
+    
+    call :delim_with_char "1" "!optn1_right!" "!use!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "haso1=%%i"
+    )
+        if "!haso1!" neq "!use!" (
+            set /a hide+=1
+        )
+
+    
+    call :delim_with_char "1" "!optn2_right!" "!use!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "haso2=%%i"
+    )
+        if "!haso2!" neq "!use!" (
+            set /a hide+=1
+        )
+
+    
+    
+
+
+
 
 rem currently use can save a space " "
     if "!use!" neq " " (
-        echo use "!use!" 
+        if "!hide!" equ "0" (
+        echo use "!use!"
+        )
+        rem echo ITEM "!item!"
     )
 
     if "!bitem!" equ " " (
