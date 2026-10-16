@@ -176,10 +176,18 @@ rem                 the 1st or 2nd character is the last character of the file n
     set last_char=
     set empty_old_item=
 
+    set p_token=
+    set c_token=
+    set s_token=
+
     rem set "last_char=)"
     call :recurse_to_end "1" ")" "!phrase!" "!empty_old_item!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "p_bridge=%%i"
+    )
+
+    for /f "tokens=*" %%i in (token.txt) do (
+        set "p_token=%%i"
     )
 
 
@@ -195,6 +203,10 @@ rem                 the 1st or 2nd character is the last character of the file n
         set "c_bridge=%%i"
     )
     
+    for /f "tokens=*" %%i in (token.txt) do (
+        set "c_token=%%i"
+    )
+    
 
     if "!c_bridge!" neq "!p_bridge!" (
         set "last_char=}"
@@ -208,11 +220,18 @@ rem                 the 1st or 2nd character is the last character of the file n
         set "s_bridge=%%i"
     )
 
+    for /f "tokens=*" %%i in (token.txt) do (
+        set "s_token=%%i"
+    )
+
+
    
     if "!s_bridge!" neq "!c_bridge!" (
         set "last_char=]"
         set "bridge=!s_bridge!"
     )
+
+    
 
     CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!end_mark!" "!echo_verify!"
 
@@ -235,6 +254,8 @@ rem     found with the optional characters
     rem Collecting option chars
     set o1_right=
     set o2_right=
+
+    REM echo VERIFY "LAST BRIDGE" "!last_bridge!"
 
     call :primary_and_optn_chars "!last_char!"
 
@@ -517,6 +538,7 @@ rem echo ITEM "!item!" TOKEN "!token!"
         rem pause
         set /a temp=!token!-1
         echo !temp! > "token.txt"
+        rem echo TOKEN "!temp!" RIGHT "!right_c!"
         exit /b
     )
      

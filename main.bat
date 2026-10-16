@@ -188,7 +188,11 @@ set "src1=SAMPLE\INDIV\STAGE_1\SUBSET\"
 set "src2=SAMPLE\INDIV\STAGE_3\SUBSET\"
 set "src3=SAMPLES_0_TO_3_ENCAPS\"
 set "src4=SAMPLES_2_MIDDLE_BRIDGE"
-call "funcs_match_chars.bat" :do_match "!src4!"
+SET "src5=SAMPLES_BRIDGE_NO_BRIDGE"
+set "src6=SAMPLE_1_ENCAP"
+set "src7=SAMPLE_SAME_2_ENCAP_SAME_LETTER"
+set "src8=SAMPLE_DIFF_2_ENCAP_SAME_LETTER"
+call "funcs_match_chars.bat" :do_match "!src8!"
 rem call "funcs_last_sample_data.bat" :make_samples
 
 ECHO --------------------------------- DONE ----
