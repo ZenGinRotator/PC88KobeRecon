@@ -286,7 +286,7 @@ rem echo "ITEM" "!item!"
     for /f "tokens=*" %%i in (token.txt) do (
         REM echo TOKEN.TXT "%%i"
     )
-    
+    ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
     if "!last_char!" neq "" (
 
         rem primes must contain one of the two option characters
@@ -312,11 +312,16 @@ rem echo "ITEM" "!item!"
             rem echo Last enc tokn = !last_encap_token!
         )
 
+
+        rem Errror last_encap_token = 0
+
+
+        echo "LET" "!last_encap_token!"
         rem shorten the bridge with the last encap token
-        call :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
-        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        rem call :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
+        rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             rem echo last encap "%%i"
-        )
+        rem )
         
         set "dois=1|!primes!|!orig_bridge!|!o1s!|!o2s!"
          rem  echo DOIS "!dois!"
@@ -393,66 +398,136 @@ exit /b
     set "left=%~1"
     set "item=%~2"
     set "from_item=%~3"
+
+    rem encap structures within file names
+    rem "bridge(label)"
+    rem "(label)"
+    rem "....bridge(label)bridge(label)....."
+    rem "....(label)(label)..."
+    rem "....bridge(label)(label)...."
+    rem "...(label)(label)bridge...."
+
+    rem "....bridge(label (label) (label) label)..."
+    rem "....bridge(label (label) (label) label)bridge(label (label) (label) label)..."
+    rem "....bridge(label (label) (label) label)(label (label) (label) label)..."
+    rem "....(label (label) (label) label)(label (label) (label) label)bridge..."
+
+    rem change item -> to -> padded item
+
+    rem item                            padded item
+    rem -----                           -------------
+
+
+    rem "bridge"                          "PADbridge"
+    rem     1                                   1
+
+    rem "bridge(label"                    "PADbridge(label"
+    rem     1   2                           1           2
     
-
+    rem "bridge(label (label"             "PADbridge(label (label"
+    rem     1   2       3                   1       2       3
     
-    set orig_bridge=
-    call :delim_with_char "1" "!left!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "orig_bridge=%%i"
-    )
+    rem " label"                           "PAD label"
+    rem     1                               1
+
+    rem ""                          "PAD"
+    rem 1                            1
+    
+    rem " "                         "PAD "
+    rem 1                           1
+    
+    rem "(label"                    "PAD(label"
+    rem     1                       1       2
+    
+    rem "(label (label"             "PAD(label (label"
+    rem     1   2                   1       2       3
 
 
-    set pad=
+
+    rem variables representative of text previously collected using token values
+    set first=
+    set sec=
+    set third=
     call :delim_with_char "1" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "pad=%%i"
+        set "first=%%i"
     )
 
-
-
-
-    REM IDENTIFY 2 and 3 intra items
-    set sec=
+    
     call :delim_with_char "2" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "sec=%%i"
     )
 
-    set third=
+    
     call :delim_with_char "3" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "third=%%i"
     )
+rem echo FROM iTEM "!from_item!"
+rem echo ITEM "!item!"
 
-    rem echo * "!from_item!" "!orig_bridge!" "!item!" "!sec!" "!third!"
+    REM echo "!first!", "!sec!", "!third!"
+    rem echo PAD ITME "PAD!item!"
 
-    if "!from_item!" equ "!orig_bridge!" (
+    set nest_status=
+
+    rem applies to bridge B, last nested label L, 
+    rem B (label (label) (label) L) B
+    rem B (label) B
+    if "!from_item!" equ "!item!" (
         set "nest_status=BRIDGE"
+        if exist nested.txt (
+            del nested.txt
+            set "nest_status=NESTED"
+        )
+        set "nest_status=!nest_status!|"
+        echo !nest_status! > type.txt
+        exit /b
 
-        rem change this condition to nested.txt exist
-        rem if "!from_item!" equ "!item!" (
+    )
+
+
+    rem Applies to bridge B, as in
+    rem B(label) -- indiv encapsulator
+    rem B1(label (label)|B2(label)| label), -- nested encapsulator
+    rem B1="bridge", " "<space>, ""<no space>,
+    rem B2=" "<space>
+    if "PAD!from_item!" equ "!first!" (
+        set "nest_status=BRIDGE"
         if exist nested.txt (
             set "nest_status=NESTED"
-            del nested.txt
         )
-        
+        set "nest_status=!nest_status!|"
+        echo !nest_status! > type.txt
+        exit /b
+
     )
 
-
-
-    if "!from_item!" equ "!third!" (
-        set nest_status="NESTED"
-        echo "" > nested.txt
-    )
-
+    rem applies to label L
+    rem "PAD(L)""
+    rem "PADbridge(L)"
+    rem PAD(L (x) (x) x)
+    rem PADbridge(L (x) (x) x)
     if "!from_item!" equ "!sec!" (
         set "nest_status=INDIV"
-        if "!third!" neq " " (
-             set "nest_status=NESTED"
-             echo "" > nested.txt
+        if exist nested.txt (
+            set "nest_status=NESTED"
         )
     )
+
+
+    rem Applies to label L:
+    rem PAD(L (x) (L) x)
+    rem PADbridge(x (L) (x) x)
+    rem PAD(x) -- non-existent L
+    
+    if "!third!" neq " " (
+        set "nest_status=NESTED"
+        ECHO "" > nested.txt
+
+    )
+
 
     set "nest_status=!nest_status!|"
     echo !nest_status! > type.txt
@@ -935,7 +1010,7 @@ rem currently works on start and end encaps
 
     rem ECHO * doil 2 *
     set "doils2=%~1"
-
+    
     set ttoken=
     set left=
     set right=
@@ -986,6 +1061,26 @@ rem currently works on start and end encaps
     )
 
 
+    
+    rem "bridge"                          "PADbridge"
+    
+    rem "bridge(label"                    "PADbridge(label"
+    
+    rem "bridge(label (label"             "PADbridge(label (label"
+    
+    rem " label"                           "PAD label"
+    
+    rem ""                          "PAD"
+    
+    rem " "                         "PAD "
+    
+    rem "(label"                    "PAD(label"
+    
+    rem "(label (label"             "PAD(label (label"
+    
+    rem use a temp token value to determine the future string
+    rem to be extracted from item
+    
     SET /A temp=!ttoken!+1
     set next=
     call :delim_with_char "!temp!" "!left!" "!item!"
@@ -1003,8 +1098,9 @@ rem currently works on start and end encaps
 
     set status=
     if exist type.txt ( del type.txt )
-    
+
     call :text_type "!left!" "!item!" "!from_item!"
+
     for /f "tokens=1 delims=|" %%i in (type.txt) do (
         set "status=%%i"
     )
@@ -1013,7 +1109,7 @@ rem currently works on start and end encaps
 
 
 
-        if "!next!" equ " " (
+    if "!next!" equ " " (
         exit /b
     )
 
@@ -1025,7 +1121,7 @@ rem currently works on start and end encaps
     set haso1=
     set haso2=
     set /a hide=0
-    
+
     call :delim_with_char "1" "!optn1_right!" "!use!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "haso1=%%i"
@@ -1042,10 +1138,6 @@ rem currently works on start and end encaps
         if "!haso2!" neq "!use!" (
             set /a hide+=1
         )
-
-    
-    rem extract the tail bridge from use
-    REM ECHO UNHIDDEN USE "!use!"
 
     
 
