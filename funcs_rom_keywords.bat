@@ -335,8 +335,10 @@ rem echo "ITEM" "!item!"
     set "o1s=!optn_one_left!|!optn_one_right!"
     set "o2s=!optn_two_left!|!optn_two_right!"
     set "doils=1|!primes!|!item!|!o1s!|!o2s!"
-    rem echo "!doils!"
-    rem if exist nested.txt ( del nested.txt )
+    
+    
+
+    REM This function can correctly identify bridges, indivs, or nested labels
      call :DOIL2 "!doils!"
 
 
@@ -461,7 +463,7 @@ exit /b
 :DOIR_BRIDGE
     setlocal
     set "dois=%~1"
-ECHO doir bridge *
+rem ECHO doir bridge *
     set token=
     set left=
     set right=
@@ -510,7 +512,8 @@ ECHO doir bridge *
     set "o1s=!optn1_left!|!optn1_right!"
     set "o2s=!optn2_left!|!optn2_right!"
     set "doils=1|!primes!|!delimed_right!|!o1s!|!o2s!"
-    call :DOIL_BRIDGE "!doils!"
+    rem call :DOIL_BRIDGE "!doils!"
+    rem call :DOIL2 "!doils!"
     set /a token+=1
     
 
@@ -973,6 +976,8 @@ rem currently works on start and end encaps
         set "optn2_right=%%i"
     )
    
+    rem echo "ITEM " "!item!"
+    
    
     set from_item=
     call :delim_with_char "!ttoken!" "!left!" "!item!"
@@ -980,11 +985,16 @@ rem currently works on start and end encaps
         set "from_item=%%i"
     )
 
-    
 
-    if "!from_item!" equ " " ( exit /b )
-    rem Assume a bridge exists before encapsulated label
-    rem     like, " bridge before an { encapsulated label...."
+    SET /A temp=!ttoken!+1
+    set next=
+    call :delim_with_char "!temp!" "!left!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "next=%%i"
+    )
+
+
+
 
 
 
@@ -998,7 +1008,18 @@ rem currently works on start and end encaps
     for /f "tokens=1 delims=|" %%i in (type.txt) do (
         set "status=%%i"
     )
-    echo  "!from_item!" "!status!"
+
+    echo ---- "!from_item!" "!status!"
+
+
+
+        if "!next!" equ " " (
+        exit /b
+    )
+
+
+
+    
 
  rem exclude strings  containing either option 1 left or option 2 right
     set haso1=
