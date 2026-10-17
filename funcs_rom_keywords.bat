@@ -286,7 +286,7 @@ rem echo "ITEM" "!item!"
     for /f "tokens=*" %%i in (token.txt) do (
         REM echo TOKEN.TXT "%%i"
     )
-    ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
+    rem ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
     if "!last_char!" neq "" (
 
         rem primes must contain one of the two option characters
@@ -313,10 +313,14 @@ rem echo "ITEM" "!item!"
         )
 
 
-        rem Errror last_encap_token = 0
-
-
+        rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Errror last_encap_token = 0 !!!!!!!!!!!!!!!!!!!!
         echo "LET" "!last_encap_token!"
+
+
+
+
+
+
         rem shorten the bridge with the last encap token
         rem call :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
         rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -396,8 +400,9 @@ exit /b
 :text_type
     setlocal
     set "left=%~1"
-    set "item=%~2"
-    set "from_item=%~3"
+    set "right=%~2"
+    set "item=%~3"
+    set "from_item=%~4"
 
     rem encap structures within file names
     rem "bridge(label)"
@@ -464,13 +469,14 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "third=%%i"
     )
-rem echo FROM iTEM "!from_item!"
-rem echo ITEM "!item!"
 
-    REM echo "!first!", "!sec!", "!third!"
-    rem echo PAD ITME "PAD!item!"
 
+REM echo THIRD "!third!"
+    REM save whether string is bridge, nested, or indiv encapsulator
     set nest_status=
+
+    rem endmark=\ open, token=1 -> (label, token > 1 -> label)
+    rem endmark=/ closed (label)
 
     rem applies to bridge B, last nested label L, 
     rem B (label (label) (label) L) B
@@ -480,6 +486,9 @@ rem echo ITEM "!item!"
         if exist nested.txt (
             del nested.txt
             set "nest_status=NESTED"
+
+            rem echo ENCAPED FORMAT: "label)"
+            call :encap_struct "2" "!left!|!right!" "!from_item!"
         )
         set "nest_status=!nest_status!|"
         echo !nest_status! > type.txt
@@ -488,8 +497,10 @@ rem echo ITEM "!item!"
     )
 
 
-    rem Applies to bridge B, as in
+    rem Applies to bridge B, as in:
     rem B(label) -- indiv encapsulator
+
+    rem Apples to bridges B1 and B2, as in:
     rem B1(label (label)|B2(label)| label), -- nested encapsulator
     rem B1="bridge", " "<space>, ""<no space>,
     rem B2=" "<space>
@@ -510,23 +521,33 @@ rem echo ITEM "!item!"
     rem PAD(L (x) (x) x)
     rem PADbridge(L (x) (x) x)
     if "!from_item!" equ "!sec!" (
+        set "format=(indiv)"
+        set "format=3"
         set "nest_status=INDIV"
         if exist nested.txt (
             set "nest_status=NESTED"
+            rem set "format=(NESTED)"
+            set "format=3"
         )
     )
 
 
     rem Applies to label L:
-    rem PAD(L (x) (L) x)
+    rem PAD(x (L) (x) x)
     rem PADbridge(x (L) (x) x)
-    rem PAD(x) -- non-existent L
+    rem PAD(x), which has non-existent L
     
     if "!third!" neq " " (
         set "nest_status=NESTED"
         ECHO "" > nested.txt
-
+        rem if "!from_item!" equ "!sec!" ( set "format=(NESTED + ")
+        if "!from_item!" equ "!sec!" ( set "format=1" )
+        rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
+        if "!from_item!" equ "!third!" ( set "format=3" )
+       rem  echo "(nested)"
     )
+    rem echo "!format!"
+    call :encap_struct "!format!" "!left!|!right!" "!from_item!"
 
 
     set "nest_status=!nest_status!|"
@@ -1099,12 +1120,15 @@ rem currently works on start and end encaps
     set status=
     if exist type.txt ( del type.txt )
 
-    call :text_type "!left!" "!item!" "!from_item!"
+    call :text_type "!left!" "!right!" "!item!" "!from_item!"
 
     for /f "tokens=1 delims=|" %%i in (type.txt) do (
         set "status=%%i"
     )
 
+
+    rem from item: string only
+    rem status: NESTED, INDIV, or BRIDGE
     echo ---- "!from_item!" "!status!"
 
 
@@ -1201,6 +1225,43 @@ rem currently use can save a space " "
     endlocal
 exit /b
 
+rem determine if encasulators are open-started, open-ended, or closed
+rem open-ended: "(label 1 label2 label N..." -> 1
+rem open-started: "label N-2, label N-1, label N)" -> 2
+rem closed: "(label 1, label 2, .... labelN)" -> 3
+:encap_struct
+    setlocal
+    set "type=%~1"
+    set "encap_set=%~2"
+    set "labels=%~3"
+
+    rem store ecapsulators: (), {}, or []
+    set left=
+    set right=
+    for /f "tokens=1 delims=|" %%i in ("!encap_set!") do (
+        set "left=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!encap_set!") do (
+        set "right=%%i"
+    )
+
+    rem open-ended
+    set "use=!left!!labels!"
+
+
+    rem open-started
+    if "!type!" equ "2" (
+        set "use=!labels!!right!"
+    )
+
+    rem closed
+    if "!type!" equ "3" (
+        set "use=!left!!labels!!right!"
+    )
+
+    echo "!use!"
+    endlocal
+exit /b
 
 :construct
     setlocal

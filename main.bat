@@ -193,7 +193,8 @@ set "src6=SAMPLE_1_ENCAP"
 set "src7=SAMPLE_SAME_2_ENCAP_SAME_LETTER"
 set "src8=SAMPLE_DIFF_2_ENCAP_SAME_LETTER"
 set "src9=SAMPLE_1_ENCAP_1_DIFF_LETTER_BRIDGE"
-call "funcs_match_chars.bat" :do_match "!src9!"
+SET "src10=SAMPLE_DIFF_LENGTH_NESTED"
+call "funcs_match_chars.bat" :do_match "!src10!"
 rem call "funcs_last_sample_data.bat" :make_samples
 
 ECHO --------------------------------- DONE ----
