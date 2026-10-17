@@ -257,7 +257,7 @@ rem     found with the optional characters
 
     REM echo VERIFY "LAST BRIDGE" "!last_bridge!"
 
-    call :primary_and_optn_chars "!last_char!"
+    call ".\funcs\utils.bat" :primary_and_optn_chars "!last_char!"
 
     for /f "tokens=2 delims=|" %%i in (chars.txt) do (
         set "last_char=%%i"
@@ -279,13 +279,13 @@ rem     found with the optional characters
     set "pad_last_brdg=PAD!last_bridge!"
 
 
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_right!" "!pad_last_brdg!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!o1_right!" "!pad_last_brdg!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "o1_bridge=%%i"
     )
     
 
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_right!" "!pad_last_brdg!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!o2_right!" "!pad_last_brdg!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "o2_bridge=%%i"
     )
@@ -462,59 +462,6 @@ exit /b
 
 
 
-:primary_and_optn_chars
-    setlocal
-    set "right_char=%~1"
-
-    set left_char=
-
-    if "!right_char!" equ "" (
-        set "left_char=@"
-        set "right_char=@"
-        set "optn_one_left=@"
-        set "optn_one_right=@"
-        set "optn_two_left=@"
-        set "optn_two_right=@"
-    )
-
-    if "!right_char!" equ ")" (
-        set "left_char=("
-    
-        set "optn_one_left={"
-        set "optn_one_right=}"
-
-        set "optn_two_left=["
-        set "optn_two_right=]"
-
-    )
-
-    if "!right_char!" equ "}" (
-        set "left_char={"
-        set "optn_one_left=["
-        set "optn_one_right=]"
-        set "optn_two_left=("
-        set "optn_two_right=)"
-    )
-    if "!right_char!" equ "]" (
-        set "left_char=["
-        set "optn_one_left=("
-        set "optn_one_right=)"
-        set "optn_two_left={"
-        set "optn_two_right=}"
-    )
-
-    set "prime=!left_char!|!right_char!"
-    set "optn1=!optn_one_left!|!optn_one_right!"
-    set "optn2=!optn_two_left!|!optn_two_right!"
-
-    set "chars=!prime!|!optn1!|!optn2!|"
-    echo !chars! > "chars.txt"
-    
-
-    endlocal
-exit /b
-
-
 
 :recurse_to_end
     setlocal
@@ -524,7 +471,7 @@ exit /b
     set "old_item=%~4"
 
     set item=
-    call "funcs_rom_keywords.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
+    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "item=%%i"
     )

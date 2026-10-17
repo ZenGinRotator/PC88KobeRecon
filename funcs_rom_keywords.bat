@@ -230,7 +230,7 @@ exit /b
 
 
     set item=
-    call :delim_with_char "!token!" "!right_char!" "!name!"
+    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right_char!" "!name!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "item=%%i"
     )
@@ -244,7 +244,7 @@ exit /b
     rem Assume a text bridge preceeds the label
     rem     as in Bridge |last char| label
     set orig_bridge=
-    call :delim_with_char "1" "!left_char!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left_char!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         rem possibly is encapsulated label
         set "orig_bridge=%%i"
@@ -252,7 +252,7 @@ exit /b
 
 
     set label=
-    call :delim_with_char "2" "!left_char!" "!item_item!"
+    call ".\funcs\utils.bat" :delim_with_char "2" "!left_char!" "!item_item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "label=%%i"
     )
@@ -322,7 +322,7 @@ rem echo "ITEM" "!item!"
 
 
         rem shorten the bridge with the last encap token
-        rem call :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
+        rem call ".\funcs\utils.bat" :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
         rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             rem echo last encap "%%i"
         rem )
@@ -453,19 +453,19 @@ exit /b
     set first=
     set sec=
     set third=
-    call :delim_with_char "1" "!left!" "PAD!item!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "first=%%i"
     )
 
     
-    call :delim_with_char "2" "!left!" "PAD!item!"
+    call ".\funcs\utils.bat" :delim_with_char "2" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "sec=%%i"
     )
 
     
-    call :delim_with_char "3" "!left!" "PAD!item!"
+    call ".\funcs\utils.bat" :delim_with_char "3" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "third=%%i"
     )
@@ -594,7 +594,7 @@ rem ECHO doir bridge *
     )
 
     set delimed_right=
-    call :delim_with_char "!token!" "!right!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "delimed_right=%%i"
     )
@@ -659,7 +659,7 @@ exit /b
     )
 
     set delimed_right=
-    call :delim_with_char "!token!" "!right!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "delimed_right=%%i"
     )
@@ -692,7 +692,7 @@ rem old code
     setlocal
 
 
-    call :delim_with_char "2" "\" "!bitem!"
+    call ".\funcs\utils.bat" :delim_with_char "2" "\" "!bitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "filled=%%i"
     )
@@ -733,7 +733,7 @@ rem old code
     if !ttoken! equ 2 (
         set "status=INDIV LABEL"
         set /a temp=!ttoken!+1
-        call :delim_with_char "!temp!" "!left!" "!pb_item!"
+        call ".\funcs\utils.bat" :delim_with_char "!temp!" "!left!" "!pb_item!"
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "st=%%i"
         ) 
@@ -768,12 +768,12 @@ rem    set /a eq_=0
     rem remove any strings containing the optn chars from output
     set has_o1=
     set has_o2=
-    call :delim_with_char "1" "!optn1_right!" "!bitem!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn1_right!" "!bitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has_o1=%%i"
         
     )
-    call :delim_with_char "1" "!optn2_right!" "!bitem!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn2_right!" "!bitem!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "has_o2=%%i"
 
@@ -831,7 +831,7 @@ rem pause
     if "!ttoken!" equ "2" (
         set /a temp_t=!ttoken!+1
         set test_s=
-        call :delim_with_char "!temp_t!" "!left!" "!pb_item!"
+        call ".\funcs\utils.bat" :delim_with_char "!temp_t!" "!left!" "!pb_item!"
         for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
             set "test_s=%%i"
         )
@@ -905,7 +905,7 @@ ECHO * doil bridge *
 
 
     set bitem=
-    call :delim_with_char "!ttoken!" "!left!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "!ttoken!" "!left!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "bitem=%%i"
     )
@@ -915,13 +915,13 @@ ECHO * doil bridge *
 
 
     set pad=
-    call :delim_with_char "1" "!left!" "PAD!item!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "pad=%%i"
     )
 
     set padded=
-    call :delim_with_char "2" "!left!" "PAD!item!"
+    call ".\funcs\utils.bat" :delim_with_char "2" "!left!" "PAD!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "padded=%%i"
     )
@@ -956,7 +956,7 @@ ECHO * doil bridge *
             REM TEST FOR nested label
             set "nest_status=INDIV"
             set /a temp=!ttoken!+1
-            call :delim_with_char "!temp!" "!left!" "!item!"
+            call ".\funcs\utils.bat" :delim_with_char "!temp!" "!left!" "!item!"
             for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
                 if "%%i" neq " " (
                     rem set "nest_status=NESTED"
@@ -1076,7 +1076,7 @@ rem currently works on start and end encaps
     
    
     set from_item=
-    call :delim_with_char "!ttoken!" "!left!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "!ttoken!" "!left!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "from_item=%%i"
     )
@@ -1104,7 +1104,7 @@ rem currently works on start and end encaps
     
     SET /A temp=!ttoken!+1
     set next=
-    call :delim_with_char "!temp!" "!left!" "!item!"
+    call ".\funcs\utils.bat" :delim_with_char "!temp!" "!left!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "next=%%i"
     )
@@ -1146,7 +1146,7 @@ rem currently works on start and end encaps
     set haso2=
     set /a hide=0
 
-    call :delim_with_char "1" "!optn1_right!" "!use!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn1_right!" "!use!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "haso1=%%i"
     )
@@ -1155,7 +1155,7 @@ rem currently works on start and end encaps
         )
 
     
-    call :delim_with_char "1" "!optn2_right!" "!use!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn2_right!" "!use!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "haso2=%%i"
     )
@@ -1177,7 +1177,7 @@ rem currently use can save a space " "
             REM TEST FOR nested label
             
             set /a temp=!ttoken!+1
-            call :delim_with_char "!temp!" "!left!" "!item!"
+            call ".\funcs\utils.bat" :delim_with_char "!temp!" "!left!" "!item!"
             for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
                 if "%%i" neq " " (
                     rem set "nest_status=NESTED"
@@ -1400,7 +1400,7 @@ exit /b
     set /a n=0
     set "r=FAIL"
 
-    call :delim_with_char "1" "!primary_char!" "!name!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!primary_char!" "!name!"
     set test=
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "test=%%i"
@@ -1960,6 +1960,15 @@ rem echo DELIM NAME "!name!" "%~2" "%~3"
 
 
 exit /b
+
+
+
+
+
+
+
+
+
 
 
 

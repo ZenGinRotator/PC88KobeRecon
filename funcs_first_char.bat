@@ -40,7 +40,7 @@ goto :eof
     set c_bridge=
     set s_bridge=
     set "smallest_bridge= "
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "(" "!pad_name!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "(" "!pad_name!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "p_bridge=%%i"
     )
@@ -51,7 +51,7 @@ goto :eof
         set "smallest_bridge=!p_bridge!"
     )
 
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "[" "!p_bridge!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "[" "!p_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "s_bridge=%%i"
     )
@@ -62,7 +62,7 @@ goto :eof
     )
 
 
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "{" "!s_bridge!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "{" "!s_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "c_bridge=%%i"
     )
@@ -104,7 +104,7 @@ rem     found with the optional characters
 
     set o1_left_char=
     set o2_left_char=
-    call "funcs_last_char.bat" :primary_and_optn_chars "!right_char!"
+    call ".\funcs\utils.bat" :primary_and_optn_chars "!right_char!"
     for /f "tokens=1 delims=|" %%i in (chars.txt) do (
         set "first_char=%%i"
     )
@@ -127,12 +127,12 @@ rem     found with the optional characters
     set o1_bridge=
     set o2_bridge=
     set "pad_name=PAD!phrase!"
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o1_left!" "!smallest_bridge!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!o1_left!" "!smallest_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "o1_bridge=%%i"
     )
 
-    call "funcs_rom_keywords.bat" :delim_with_char "1" "!o2_left!" "!smallest_bridge!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!o2_left!" "!smallest_bridge!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "o2_bridge=%%i" 
     )
