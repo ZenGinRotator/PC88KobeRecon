@@ -1287,22 +1287,6 @@ exit /b
 
 
 
-:delim_with_char
-    setlocal
-    rem %~1: token
-    rem %~2: delim char 
-    rem (eg. [, (, {, ], ), or })
-    set "phrase=%~3"
-     rem echo ---- DELIMITING "%~3"---- with "%~1" and "%~2"
-    set d=
-    for /f "tokens=%~1 delims=%~2" %%i in ("!phrase!") do (
-        set "d=%%i"
-    )
-
-    set "d=!d!|"
-    echo !d! > "%delimtxt%"
-    endlocal
-exit /b
 
 
 
