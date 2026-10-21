@@ -273,6 +273,8 @@ rem echo "ITEM" "!item!"
     rem must match last char with one of the option cars
     rem Both option chars are not empty but need to test
     set last_char=
+
+    rem **** need to add parameter to show results for last char output
     call "funcs_last_char.bat" :find_last_char "!orig_bridge!" ""
     for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
         rem echo LAST CHAR "%%i"

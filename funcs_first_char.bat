@@ -34,6 +34,7 @@ goto :eof
     )
     
     set "pad_name=PAD!name!"
+    rem echo padname "!pad_name!"
 
     set first_char=
     set p_bridge=
@@ -71,6 +72,18 @@ goto :eof
         set "first_char={"
         set "smallest_bridge=!c_bridge!"
     )
+    rem echo p bridge "!p_bridge!"
+    rem echo s bridge "!s_bridge!"
+    rem echo c bridge "!c_bridge!"
+    rem echo sm bridge "!smallest_bridge!"
+    if "!c_bridge!" equ "PAD" (
+        set "smallest_bridge=PAD"
+    )
+
+    if "!c_bridge!" equ "PAD " (
+        set "smallest_bridge=PAD "
+    )
+
    
 
     call :verify_smallest_bridge "!first_char!" "!name!" "!smallest_bridge!" "!echo_verify!"
@@ -79,7 +92,7 @@ goto :eof
     endlocal
 exit /b
 
-
+rem -- This might be a shared function for verifying the found first & last chars -- 
 rem Compare the bridge from the found first character, with the bridges 
 rem     found with the optional characters
 :verify_smallest_bridge
@@ -122,35 +135,29 @@ rem     found with the optional characters
         set "o2_left_char=%%i"
     )
 
-    set /a not_first=0
-
+    rem ECHO first char smallest bridge "!smallest_bridge!"
+    call ".\funcs\utils.bat" :optns_in_last_char_bridge "!smallest_bridge!" "!o1_left!" "!o2_left!"
+    
+    set /a not_reduced=0
     set o1_bridge=
     set o2_bridge=
-    set "pad_name=PAD!phrase!"
-    call ".\funcs\utils.bat" :delim_with_char "1" "!o1_left!" "!smallest_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=1 delims=|" %%i in (reduced_bridge.txt) do (
+        set /a not_reduced=%%i
+    )
+    for /f "tokens=2 delims=|" %%i in (reduced_bridge.txt) do (
         set "o1_bridge=%%i"
     )
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "!o2_left!" "!smallest_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "o2_bridge=%%i" 
+    for /f "tokens=3 delims=|" %%i in (reduced_bridge.txt) do (
+        set "o2_bridge=%%i"
     )
+rem echo after call "!o1_bridge!" "!o2_bridge!"
+rem echo bridge "!smallest_bridge!"
+rem echo "!o1_bridge!"
+rem echo "!o2_bridge!"
 
 
-    rem primary bridge vs. each optional bridge
-    set /a same_found_bridge=0
-    if "!o1_bridge!" neq "!smallest_bridge!" (
-        set /a same_found_bridge+=1
-    )
+  
 
-    if "!o2_bridge!" neq "!smallest_bridge!" (
-        set /a same_found_bridge+=1
-    )
-
-
-    
-    set "pad_bridge=PAD!smallest_bridge!"
 
     set "los=!first_char!|!o1_left_char!|!o2_left_char!"
     rem set los "!los!"
@@ -159,10 +166,14 @@ rem     found with the optional characters
     set "o_bridges=!o1_bridge!|!o2_bridge!"
 
     set "ops=!los!|!firsts!|!o_bridges!"
+    rem echo LAST CHAR OPSecho FIRST CHAR OPS
+    rem echo "!los!"
+    rem echo "!firsts!"
+    rem echo "!o_bridges!"
 
-
+    echo "!not_reduced!"
     set first_chr_func=
-    if "!same_found_bridge!" neq "0" (
+    if "!not_reduced!" neq "0" (
         if "!echo_verify!" neq "" (
             set fail=
 
@@ -171,6 +182,7 @@ rem     found with the optional characters
         )
         set "first_char=!first_char!|"
         echo !first_char! > first_char.txt
+        echo FIRST CHAR PAUSE
         pause
         exit /b
     )

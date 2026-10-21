@@ -232,15 +232,33 @@ rem                 the 1st or 2nd character is the last character of the file n
     )
 
     
+    
+    if "!c_bridge!" equ "!end_mark!" (
+        set "bridge=!end_mark!"
+    )
+
+    if "!c_bridge!" equ " !end_mark!" (
+        set "bridge= !end_mark!"
+    )
+
+    rem echo brdige "!bridge!"
+    rem echo "!p_bridge!"
+    rem echo "!c_bridge!"
+    rem echo "!s_bridge!"
+
+
+    
 
     CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!end_mark!" "!echo_verify!"
 
     endlocal
 exit /b
 
+
+
+rem -- This might be a shared function for verifying the found first & last chars -- 
 rem Compare the bridge from the found last character, with the bridges 
 rem     found with the optional characters
-
 :verify_last_bridge
     setlocal
     
@@ -270,57 +288,50 @@ rem     found with the optional characters
     for /f "tokens=6 delims=|" %%i in (chars.txt) do (
         set "o2_right=%%i"
     )
-    rem Collecting tests for option characters
+  
+    set "pad_last_bridge=PAD!last_bridge!"
+ 
 
-    rem echo ooo "!o1_right!"
-    rem echo ooo "!o2_right!"
+
+    call ".\funcs\utils.bat" :optns_in_last_char_bridge "!pad_last_bridge!" "!o1_right!" "!o2_right!"
+    set /a not_reduced=0
     set o1_bridge=
     set o2_bridge=
-    set "pad_last_brdg=PAD!last_bridge!"
 
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "!o1_right!" "!pad_last_brdg!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=1 delims=|" %%i in (reduced_bridge.txt) do (
+        set /a not_reduced=%%i
+    )
+    for /f "tokens=2 delims=|" %%i in (reduced_bridge.txt) do (
         set "o1_bridge=%%i"
     )
-    
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "!o2_right!" "!pad_last_brdg!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=3 delims=|" %%i in (reduced_bridge.txt) do (
         set "o2_bridge=%%i"
     )
 
     
-    
-    rem primary bridge vs. each optional bridge
-    set /a eqty=0
-
-    if "!o1_bridge!" neq "!pad_last_brdg!" (
-        set /a eqty+=1
-    )
-    if "!o2_bridge!" neq "!pad_last_brdg!" (
-        set /a eqty+=1
-    )
-
-
-
 
 
 
     set "los=!last_char!|!o1_right!|!o2_right!"
-    set "lasts=!last_bridge!|!pad_last_brdg!"
+    set "lasts=!last_bridge!|!pad_last_bridge!"
     set "o_bridges=!o1_bridge!|!o2_bridge!"
 
     set "ops=!los!|!lasts!|!o_bridges!"
+    rem echo LAST CHAR OPS
+    rem echo "!los!"
+    rem echo "!lasts!"
+    rem echo "!o_bridges!"
+
 
     set "last_chr_func=L"
-    if "!eqty!" neq "0" (
+    if "!not_reduced!" neq "0" (
         set fail=
         if "!echo_verify!" neq "" (
             call :out "!ops!" "!last_chr_func!" "!fail!"
         )
 
         rem return error
+        echo LAST CHAR PAUSE
         PAUSE
         set "last_char=-!last_char!|"
         echo !last_char! > last_char.txt
