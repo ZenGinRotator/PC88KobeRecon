@@ -70,37 +70,29 @@ rem Need to find music in name title that is non-encapsulated
 exit /b
 
 
+:rom_n_labels
+    setlocal
+    set "name=%~1"
+    call :start_kywds "!name!"
+    call :print_txt "B"
+    call :print_txt "I"
+    call :print_txt "N"
+
+    call ".\funcs\delete.bat" :del_txts
+    endlocal
+exit /b
+
 :start_kywds
     setlocal
-    rem set "token=%~1"
-    rem set "left_char=%~1"
-rem     set "right_char=%~2"
+   
     set "name=%~1"
- rem    set "optn_one_left=%~4"
-   rem  set "optn_one_right=%~5"
-   rem  set "optn_two_left=%~6"
-   rem  set "optn_two_right=%~7"
-
+ 
     echo "!brk!"
     echo ----- "!name!" -----
-    call :del_txts
+    call call ".\funcs\delete.bat" :del_txts:del_txts
     
    
     
-    rem new version of finding last character in name
-    rem echo need to find the first char
-    rem call "funcs_first_char.bat" :find "!name!"
-    set first_l=
-    set first_r=
-    rem for /f "tokens=1 delims=|" %%i in (chars.txt) do (
-    rem     set "first_l=%%i"
-    rem )
-
-    rem for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-    rem     set "first_r=%%i"
-    rem )
-    rem echo first_l "!first_l!"
-    rem echo first_R "!first_r!"
     
     rem this function calls find_last_char, which populates chars.txt wit primary and option 1 & 2 chars
     call "funcs_match_chars.bat" :start_n_end_matches "!name!" ""
@@ -156,31 +148,6 @@ rem     set "right_char=%~2"
     
     endlocal
 exit /b
-
-
-
-:del_txts
-    setlocal
-    if exist labels.txt ( del labels.txt)
-    if exist nested.txt ( del nested.txt )
-    if exist %delimtxt% ( del %delimtxt% )
-    if exist %brgtxt% ( del %brgtxt% )
-    if exist "is_nested.txt" ( del "is_nested.txt" )
-    if exist "is_primary_nested.txt" ( del "is_primary_nested.txt" )
-    if exist "is_secondary_nested.txt" ( del "is_secondary_nested.txt" )
-    if exist "bridge.txt" ( del "bridge.txt" )
-    if exist "has_square.txt" ( del "has_square.txt" )
-    if exist "has_curl.txt" ( del "has_curl.txt" )
-    if exist "has_paren.txt" ( del "has_paren.txt" )
-    if exist "last_item.txt" ( del "last_item.txt" )
-    if exist "chars.txt" ( del "chars.txt" )
-    if exist "token.txt" ( del "token.txt" )
-    if exist nested.txt ( del nested.txt )
-    if exist indivs.txt ( del indivs.txt )
-    if exist bridges.txt ( del bridges.txt )
-    endlocal
-exit /b
-
 
 
 
@@ -1177,7 +1144,7 @@ rem currently works on start and end encaps
         set "format=%%i"
     )
 
-    rem the encap format for construct item
+    rem the encap format for sorting labels
     rem 0: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
     rem 1: open-ended: (label ... : (always add item to next line)
     rem 2: open-started: ...label) : (always add item to same line)
@@ -1210,23 +1177,23 @@ rem currently works on start and end encaps
     rem change to alphabetic identifier
     rem file==1, means use bridges.txt to save the bridge
     set "file=1"
-    set "construct_item=!from_item!"
+    set "sort_item=!from_item!"
     if "!status!" equ "INDIV" (
         SET "file=2"
-        set "construct_item=!struct_item!"
+        set "sort_item=!struct_item!"
     )
 
     if "!status!" equ "NESTED" (
         set "file=3"
-        set "construct_item=!struct_item!"
+        set "sort_item=!struct_item!"
         if "!from_item!" equ " " (
-            set "construct_item=!from_item!"
+            set "sort_item=!from_item!"
         )
     )
 
-    echo CONSTRUCT ITEM "!construct_item!" "!status!"
+    echo SORT ITEM "!sort_item!" "!status!"
 
-     call :sort_label "!construct_item!" "!file!" "!format!"
+     call :sort_label "!sort_item!" "!file!" "!format!"
 
 
 
@@ -1422,7 +1389,6 @@ rem Use this function to save bridges, indivs, or nested labels
     if "!format!" equ "0" (
         if exist is_nested.txt (
             set /a same_line+=1
-            echo ++
         )
     )
 
@@ -1466,14 +1432,14 @@ exit /b
     
     set file=bridges.txt
     set "title=-- BRIDGES --"
-    if "!type!" equ "2" (
+    if "!type!" equ "I" (
         set file=indivs.txt
         SET "title=-- INDIVS --"
     )
 
 
     rem use format argument
-    if "!type!" equ "3" (
+    if "!type!" equ "N" (
         set file=nested.txt
         set "title=-- NESTED --"
     )
