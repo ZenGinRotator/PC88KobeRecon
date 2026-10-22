@@ -42,5 +42,9 @@ goto :eof
     if exist reduced_bridge.txt ( del reduced_bridge.txt )
     if exist first_char.txt ( del first_char.txt )
     if exist last_char.txt ( del last_char.txt )
+    if exist construct.txt ( del construct.txt )
+    if exist type.txt ( del type.txt )
+    if exist struct.txt ( del struct.txt )
+    if exist format.txt ( del format.txt )
     endlocal
 exit /b
