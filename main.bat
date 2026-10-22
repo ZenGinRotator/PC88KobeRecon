@@ -168,7 +168,7 @@ rem call :all_bridges
 rem call :no_bridges
 rem call :neighb
 rem call :run_samples
-rem call "funcs_last_char" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
+rem call ".\funcs\encaps\last" :find_last_char "" "ROM[s][s]{c}{c}(p)(p).d88"
 
 rem call "funcs_bridge_sample_data.bat" :hard_code
 

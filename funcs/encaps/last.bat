@@ -25,7 +25,6 @@ rem SAMPLE_FILE_NAMES_INDIV_START\*
         echo !q!
         for /f "tokens=2 delims=\" %%j in ("%%i") do (
             echo "%%j"
-            rem call "funcs_first_char.bat" :find_first_char "%%j" ""
             call :find_last_char "%%j" "\"
         )
     )

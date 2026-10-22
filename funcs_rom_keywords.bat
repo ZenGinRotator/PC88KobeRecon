@@ -245,7 +245,7 @@ rem echo "ITEM" "!item!"
     set last_char=
 
     rem **** need to add parameter to show results for last char output
-    call "funcs_last_char.bat" :find_last_char "!orig_bridge!" ""
+    call ".\funcs\encaps\last.bat" :find_last_char "!orig_bridge!" ""
     for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
         rem echo LAST CHAR "%%i"
         set "last_char=%%i"
@@ -309,7 +309,7 @@ rem echo "ITEM" "!item!"
 
     set no_show=
     set "do_show=\"
-    rem call "funcs_first_char.bat" :find_first_char "!bridge!" "!do_show!"
+    rem call "funcs\encaps\first.bat" :find_first_char "!bridge!" "!do_show!"
     
    
     set "primes=!left_char!|!right_char!"
@@ -948,7 +948,7 @@ ECHO * doil bridge *
 
     if "!use!" neq " " (
         set last_char=
-        call "funcs_last_char.bat" :find_last_char "!use!"
+        call ".\funcs\encaps\last.bat" :find_last_char "!use!"
         for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
             set "last_char=%%i"
             if "!last_char!" equ "@" (

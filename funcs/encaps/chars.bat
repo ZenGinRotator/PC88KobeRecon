@@ -17,7 +17,7 @@ goto :eof
 
     set no_output=
     set "show_output=\"
-    call "funcs_first_char.bat" :find_first_char "!name!" "!show_out!"
+    call "funcs\encaps\first.bat" :find_first_char "!name!" "!show_out!"
     for /f "tokens=1 delims=|" %%i in (first_char.txt) do (
         set "left=%%i"
         if "!left!" equ "@" (
@@ -25,7 +25,7 @@ goto :eof
         )
     )
 
-    call "funcs_last_char.bat" :find_last_char "!name!" "!show_out!"
+    call ".\funcs\encaps\last.bat" :find_last_char "!name!" "!show_out!"
     
     for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
         set "right=%%i"
