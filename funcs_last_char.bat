@@ -275,7 +275,7 @@ rem     found with the optional characters
 
     REM echo VERIFY "LAST BRIDGE" "!last_bridge!"
 
-    call ".\funcs\utils.bat" :primary_and_optn_chars "!last_char!"
+    call ".\funcs\chars.bat" :primary_and_optn_chars "!last_char!"
 
     for /f "tokens=2 delims=|" %%i in (chars.txt) do (
         set "last_char=%%i"
@@ -293,7 +293,7 @@ rem     found with the optional characters
  
 
 
-    call ".\funcs\utils.bat" :optns_in_last_char_bridge "!pad_last_bridge!" "!o1_right!" "!o2_right!"
+    call ".\funcs\chars.bat" :optns_in_last_char_bridge "!pad_last_bridge!" "!o1_right!" "!o2_right!"
     set /a not_reduced=0
     set o1_bridge=
     set o2_bridge=

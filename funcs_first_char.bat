@@ -117,7 +117,7 @@ rem     found with the optional characters
 
     set o1_left_char=
     set o2_left_char=
-    call ".\funcs\utils.bat" :primary_and_optn_chars "!right_char!"
+    call ".\funcs\chars.bat" :primary_and_optn_chars "!right_char!"
     for /f "tokens=1 delims=|" %%i in (chars.txt) do (
         set "first_char=%%i"
     )
@@ -136,7 +136,7 @@ rem     found with the optional characters
     )
 
     rem ECHO first char smallest bridge "!smallest_bridge!"
-    call ".\funcs\utils.bat" :optns_in_last_char_bridge "!smallest_bridge!" "!o1_left!" "!o2_left!"
+    call ".\funcs\chars.bat" :optns_in_last_char_bridge "!smallest_bridge!" "!o1_left!" "!o2_left!"
     
     set /a not_reduced=0
     set o1_bridge=
