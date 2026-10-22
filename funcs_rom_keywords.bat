@@ -73,6 +73,7 @@ exit /b
 :rom_n_labels
     setlocal
     set "name=%~1"
+    call call ".\funcs\delete.bat" :del_txts
     call :start_kywds "!name!"
     call :print_txt "B"
     call :print_txt "I"
@@ -89,13 +90,13 @@ exit /b
  
     echo "!brk!"
     echo ----- "!name!" -----
-    call call ".\funcs\delete.bat" :del_txts:del_txts
+    
     
    
     
     
     rem this function calls find_last_char, which populates chars.txt wit primary and option 1 & 2 chars
-    call "funcs_match_chars.bat" :start_n_end_matches "!name!" ""
+    call ".\funcs\chars.bat" :start_n_ends "!name!" ""
     
     for /f "tokens=*" %%i in (chars.txt) do (
         echo CHARS.TXT "%%i"

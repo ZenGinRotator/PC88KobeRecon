@@ -22,7 +22,6 @@ goto :eof
 
 :del_txts
     setlocal
-    echo call delete
     if exist labels.txt ( del labels.txt)
     if exist nested.txt ( del nested.txt )
     if exist %delimtxt% ( del %delimtxt% )
@@ -41,6 +40,7 @@ goto :eof
     if exist indivs.txt ( del indivs.txt )
     if exist bridges.txt ( del bridges.txt )
     if exist reduced_bridge.txt ( del reduced_bridge.txt )
-    echo end delete
+    if exist first_char.txt ( del first_char.txt )
+    if exist last_char.txt ( del last_char.txt )
     endlocal
 exit /b
