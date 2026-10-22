@@ -487,20 +487,26 @@ exit /b
     rem B (label) B
     if "!from_item!" equ "!item!" (
         set "nest_status=BRIDGE"
-        set "bridge=1"
+        set "bridge=0"
         set "file=!bridge!"
+        set "format=!bridge!"
         if exist is_nested.txt (
             del is_nested.txt
             set "nest_status=NESTED"
 
             rem echo ENCAPED FORMAT: "label)"
             set "open_started=2"
+            set "format=!open_started!"
             set "nested=3"
             set "file=!nested!"
             call :encap_struct "!open_started!" "!left!|!right!" "!from_item!"
         )
         set "nest_status=!nest_status!|"
         echo !nest_status! > type.txt
+            if exist format.txt ( del format.txt )
+    set "format=!format!|"
+    echo !format! > format.txt
+
         exit /b
 
     )
@@ -515,18 +521,23 @@ exit /b
     rem B2=" "<space>
     if "PAD!from_item!" equ "!first!" (
         set "nest_status=BRIDGE"
-        set "bridge=1"
+        set "bridge=0"
         set "file=!bridge!"
+        set "format=!bridge!"
         if exist is_nested.txt (
             set "nest_status=NESTED"
-            set "nested=3"
+            set "nested=0"
             set "file=!nested!"
-           
+            set "format=!nested!"
         
         )
         
         set "nest_status=!nest_status!|"
         echo !nest_status! > type.txt
+            if exist format.txt ( del format.txt )
+    set "format=!format!|"
+    echo !format! > format.txt
+
         exit /b
 
     )
@@ -540,14 +551,14 @@ exit /b
         set "format=(indiv)"
         set "format=3"
         set "nest_status=INDIV"
-        set "indiv=2"
-        set "file=!indiv!"
+        rem set "indiv=2"
+        rem set "file=!indiv!"
         if exist is_nested.txt (
             set "nest_status=NESTED"
             rem set "format=(NESTED)"
             set "format=3"
-            set "nested=3"
-            set "file=!nested!"
+            rem set "nested=3"
+            rem set "file=!nested!"
         )
     )
 
@@ -564,16 +575,22 @@ exit /b
         if "!from_item!" equ "!sec!" ( set "format=1" )
         rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
         if "!from_item!" equ "!third!" ( set "format=3" )
-        set "nested=3"
-        set "file=!nested!"
+        rem set "nested=3"
+        rem set "file=!nested!"
        rem  echo "(nested)"
     )
+
+
+
     rem echo "!format!"
      call :encap_struct "!format!" "!left!|!right!" "!from_item!"
 
 
     set "nest_status=!nest_status!|"
     echo !nest_status! > type.txt
+    if exist format.txt ( del format.txt )
+    set "format=!format!|"
+    echo !format! > format.txt
     endlocal
 exit /b
 
@@ -1155,6 +1172,29 @@ rem currently works on start and end encaps
 
     )
 
+    set format=
+    for /f "tokens=1 delims=|" %%i in (format.txt) do (
+        set "format=%%i"
+    )
+
+    rem the encap format for construct item
+    rem 0: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
+    rem 1: open-ended: (label ... : (always add item to next line)
+    rem 2: open-started: ...label) : (always add item to same line)
+    rem 3: closed: (...label...) : (nested: same-line, indiv: new-line)
+    rem Use format to determine when to:
+    rem * add nested label to current or new line,
+    rem * if format=2, then new line
+    rem * else same line
+
+    echo FORMAT "!format!"
+
+    set "exist=N"
+    if exist is_nested.txt (
+        set "exist=Y"
+    )
+    echo is_nested: "!exist!"
+
 
     rem for /f "tokens=1"
 
@@ -1166,6 +1206,8 @@ rem currently works on start and end encaps
     REM or BRIDGE, <none>
     rem echo --- DOIL2 ---- "!from_item!" "!status!"
 
+
+    rem change to alphabetic identifier
     rem file==1, means use bridges.txt to save the bridge
     set "file=1"
     set "construct_item=!from_item!"
@@ -1184,7 +1226,7 @@ rem currently works on start and end encaps
 
     echo CONSTRUCT ITEM "!construct_item!" "!status!"
 
-     rem call :sort_label "!construct_item!" "!file!"
+     call :sort_label "!construct_item!" "!file!" "!format!"
 
 
 
@@ -1303,16 +1345,19 @@ rem closed: "(label 1, label 2, .... labelN)" -> 3
         set "right=%%i"
     )
 
-    rem open-ended
+
+    rem bridge only, format=0
+
+    rem open-ended, format=1
     set "use=!left!!labels!"
 
 
-    rem open-started
+    rem open-started, format=2
     if "!type!" equ "2" (
         set "use=!labels!!right!"
     )
 
-    rem closed
+    rem closed, format=3
     if "!type!" equ "3" (
         set "use=!left!!labels!!right!"
     )
@@ -1331,19 +1376,23 @@ rem Use this function to save bridges, indivs, or nested labels
     setlocal
     set "item=%~1"
     set "type=%~2"
+    set "format=%~3"
 
-    rem save line-by-line
+
+
+
+    rem Need to exclude  bridges that need future recursion using DOIR# & DOIL#
+    rem I might have an existing function that can be used to identify bridges matching these characteristics.
     set file=bridges.txt
 
 
-    rem save line-by-line
+   
     if "!type!" equ "2" (
         set file=indivs.txt
     )
 
 
-    rem save along same line until we find open-started,
-    rem then save line-by-line
+    rem use format argument
     if "!type!" equ "3" (
         set file=nested.txt
     )
@@ -1361,30 +1410,89 @@ rem Use this function to save bridges, indivs, or nested labels
         exit /b
     )
 
+    rem make diffline and sameline version
     set old=
-    for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!%%i"
+    set "separator=!brk!"
+
+
+
+
+    set /a same_line=0
+
+    if "!format!" equ "0" (
+        if exist is_nested.txt (
+            set /a same_line+=1
+            echo ++
+        )
     )
 
-    set "old=!old!!item!|"
-    rem echo NEW ITEM "!item!"
-     echo OLD "!old!"
-    rem pause
-    rem set "old=!old!|"
+    if "!format!" equ "2" (
+        set /a same_line+=1
+    )
+
+    if "!format!" equ "3" (
+        if exist is_nested.txt (
+            set /a same_line+=1
+        )
+    )
+    if "!same_line!" neq "0" (
+        set "separator="
+    )
+
+    echo SAME-LINE "!same_line!"
+    echo SEPARATOR "!separator!"
+
+
+
+
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
+        set "old=!old!!separator!%%i"
+    )
+
+    
+    set "old=!old!!separator!!item!|"
+    
+    
+    
     echo !old! > "!file!"
-    rem file could not exist
     endlocal
 exit /b
 
-:diff_line
+:print_txt
     setlocal
+    set "item=%~1"
+    set "type=%~1"
+
+    
+    set file=bridges.txt
+    set "title=-- BRIDGES --"
+    if "!type!" equ "2" (
+        set file=indivs.txt
+        SET "title=-- INDIVS --"
+    )
+
+
+    rem use format argument
+    if "!type!" equ "3" (
+        set file=nested.txt
+        set "title=-- NESTED --"
+    )
+
+    set old=
+    if not exist !file! ( exit /b )
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
+        set "old=!old!!brk!%%i"
+    )
+
+    echo "!brk!!title!"
+    echo "!old!"
+
+
     endlocal
 exit /B
 
-:same_line
-    setlocal
-    endlocal
-exit /b
+
+
 
 
 
