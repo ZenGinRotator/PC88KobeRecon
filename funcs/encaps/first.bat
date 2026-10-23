@@ -177,7 +177,7 @@ rem echo "!o2_bridge!"
         if "!echo_verify!" neq "" (
             set fail=
 
-            call "funcs_last_char.bat" :out "!ops!" !first_chr_func!" "!fail!" 
+            call ".\funcs\encaps\first.bat" :out "!ops!" !first_chr_func!" "!fail!" 
             
         )
         set "first_char=!first_char!|"
@@ -188,7 +188,7 @@ rem echo "!o2_bridge!"
     )
     set "pass=p"
     if "!echo_verify!" neq "" (
-        call "funcs_last_char.bat" :out "!ops!" "!first_chr_func!" "!pass!"
+        call ".\funcs\encaps\first.bat" :out "!ops!" "!first_chr_func!" "!pass!"
     )
     set "first_char=!first_char!|"
     echo !first_char! > first_char.txt

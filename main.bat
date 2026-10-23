@@ -186,15 +186,15 @@ rem call "funcs_last_char.bat" :exe
 rem call "funcs_rom_keywords.bat" :exe_loop
 set "src1=SAMPLE\INDIV\STAGE_1\SUBSET\"
 set "src2=SAMPLE\INDIV\STAGE_3\SUBSET\"
-set "src3=SAMPLES_0_TO_3_ENCAPS\"
-set "src4=SAMPLES_2_MIDDLE_BRIDGE"
-SET "src5=SAMPLES_BRIDGE_NO_BRIDGE"
-set "src6=SAMPLE_1_ENCAP"
-set "src7=SAMPLE_SAME_2_ENCAP_SAME_LETTER"
-set "src8=SAMPLE_DIFF_2_ENCAP_SAME_LETTER"
-set "src9=SAMPLE_1_ENCAP_1_DIFF_LETTER_BRIDGE"
-SET "src10=SAMPLE_DIFF_LENGTH_NESTED"
-call "funcs_match_chars.bat" :do_match "!src10!"
+set "src3=SAMPLES_SELECTED\0_TO_3_ENCAPS\"
+set "src4=SAMPLES_SELECTED\2_MIDDLE_BRIDGE"
+SET "src5=SAMPLES_SELECTED\BRIDGE_NO_BRIDGE"
+set "src6=SAMPLE_SELECTED\1_ENCAP"
+set "src7=SAMPLE_SELECTED\SAME_2_ENCAP_SAME_LETTER"
+set "src8=SAMPLE_SELECTED\DIFF_2_ENCAP_SAME_LETTER"
+set "src9=SAMPLE_SELECTED\1_ENCAP_1_DIFF_LETTER_BRIDGE"
+SET "src10=SAMPLE_SELECTED\DIFF_LENGTH_NESTED"
+call "funcs_match_chars.bat" :do_match "!src3!"
 rem call "funcs_last_sample_data.bat" :make_samples
 rem ECHO HI 
 rem call ".\funcs\utils.bat" :print

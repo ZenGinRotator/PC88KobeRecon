@@ -5,6 +5,15 @@ call %*
 goto :eof
 
 
+
+rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+rem This function needs revisions to account for situations
+rem     where the BRIDGE is actually a ROM name.
+
+rem How do we implement this and have it working correctly,
+rem     despite our test data not having a ROM descriptor
+rem     within the file name.
+rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 rem Use this function to save bridges, indivs, or nested labels
 :sort_label
     setlocal
@@ -12,7 +21,18 @@ rem Use this function to save bridges, indivs, or nested labels
     set "type=%~2"
     set "format=%~3"
 
-   
+
+    rem Block an item=" " in situations such as:
+    rem Two neighboring closed labels, that are both indiv labels: (label 1)<space>(label 2)
+    rem     and item=" " is a bridge, because we don't want 
+    rem     to write item (" ") to bridges.txt file
+
+
+    if "!item!" equ " " (
+        if "!type!" equ "BRIDGE" (
+            exit /b
+        )
+    )
 
     rem Need to exclude  bridges that need future recursion using DOIR# & DOIL#
     rem I might have an existing function that can be used to identify bridges matching these characteristics.

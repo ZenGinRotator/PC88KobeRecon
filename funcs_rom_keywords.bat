@@ -136,7 +136,7 @@ exit /b
 
     call :recurse_on_group2 "!recs!"
    
-    
+    rem comparing the constructed file name with the file name
     set construct=
     if exist construct.txt (
         for /f "tokens=1 delims=|" %%i in (construct.txt) do (
@@ -266,7 +266,7 @@ rem echo "ITEM" "!item!"
         )
             
     )
-    rem echo LAST CHAR "!last_char!"
+    echo LAST CHAR "!last_char!"
     rem for /f "tokens=*" %%i in (token.txt) do (
         REM echo TOKEN.TXT "%%i"
     rem )
@@ -288,7 +288,7 @@ rem echo "ITEM" "!item!"
         
         rem extract contents before last char using saved token from recursive function
         rem recurse_to_end returns the 1 token before the end
-        call "funcs_last_char.bat" :recurse_to_end "1" "!last_char!" "!orig_bridge!"
+        call ".\funcs\encaps\last.bat" :recurse_to_end "1" "!last_char!" "!orig_bridge!"
         for /f "tokens=*" %%i in (token.txt) do (
             rem echo recursed token = "%%i"
             SET "last_encap_token=%%i"
@@ -298,7 +298,7 @@ rem echo "ITEM" "!item!"
 
 
         rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Errror last_encap_token = 0 !!!!!!!!!!!!!!!!!!!!
-        echo "LET" "!last_encap_token!"
+        rem echo "LET" "!last_encap_token!"
 
 
 
@@ -315,7 +315,7 @@ rem echo "ITEM" "!item!"
          rem  echo DOIS "!dois!"
         
 
-        rem call :DOIR_BRIDGE "!dois!"
+        call :DOIR_BRIDGE "!dois!"
 
     )
 
@@ -931,11 +931,15 @@ rem ----------------------------------------
     set old=
     if not exist !file! ( exit /b )
     for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!!brk!%%i"
+        set "old=!old!  %%i!brk!"
     )
 
-    echo "!brk!!title!"
+    echo "!brk!"
+    echo ______________
+    echo "!title!"
+    rem echo ______________
     echo "!old!"
+     echo -------------
 
 
     endlocal

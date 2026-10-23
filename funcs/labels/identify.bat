@@ -27,6 +27,8 @@ goto :eof
 
     call :text_type "!left!" "!right!" "!item!" "!from_item!"
 
+
+    rem type.txt contains BRIDGE, INDIV, OR NESTED
     for /f "tokens=1 delims=|" %%i in (type.txt) do (
         set "status=%%i"
     )    
@@ -94,14 +96,14 @@ goto :eof
     call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
 
     rem reconstruct file name here
-    call :write "!sort_item!"
+    call :reconstruct "!sort_item!"
 
     endlocal
 exit /b
 
 
 rem move this function to different file
-:write
+:reconstruct
     setlocal
 
     set "item=%~1"
