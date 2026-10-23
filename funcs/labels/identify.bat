@@ -72,19 +72,12 @@ goto :eof
 
 
     rem change to alphabetic identifier
-    rem file==BRDGTXT, means use bridges.txt to save the bridge
-    set "file=1"
-    SET "file=BRDGTXT"
     set "sort_item=!from_item!"
     if "!status!" equ "INDIV" (
-        SET "file=2"
-        set "file=INDVTXT"
         set "sort_item=!encap_item!"
     )
 
     if "!status!" equ "NESTED" (
-        set "file=3"
-        set "file=NSTDTXT"
         set "sort_item=!encap_item!"
         if "!from_item!" equ " " (
             set "sort_item=!from_item!"
@@ -194,7 +187,6 @@ rem echo "!from_item!"
         set "nest_status=BRIDGE"
         set "bridge=0"
         set "bridge=BRDG"
-        set "file=!bridge!"
         set "format=!bridge!"
         if exist is_nested.txt (
             del is_nested.txt
@@ -205,7 +197,6 @@ rem echo "!from_item!"
             set "open_started=OPN_STRTD"
             set "format=!open_started!"
             set "nested=3"
-            set "file=!nested!"
             call :encap_struct "!open_started!" "!left!|!right!" "!from_item!"
         )
         set "nest_status=!nest_status!|"
@@ -228,15 +219,11 @@ rem echo "!from_item!"
     rem B2=" "<space>
     if "PAD!from_item!" equ "!first!" (
         set "nest_status=BRIDGE"
-        set "bridge=0"
         set "bridge=BRDG"
-        set "file=!bridge!"
         set "format=!bridge!"
         if exist is_nested.txt (
             set "nest_status=NESTED"
-            set "nested=0"
             set "nested=BRDG"
-            set "file=!nested!"
             set "format=!nested!"
         
         )
@@ -257,19 +244,13 @@ rem echo "!from_item!"
     rem PAD(L (x) (x) x)
     rem PADbridge(L (x) (x) x)
     if "!from_item!" equ "!sec!" (
-        set "format=(indiv)"
-        set "format=3"
+        rem set "format=(indiv)"
         set "format=CLSD"
         set "nest_status=INDIV"
-        rem set "indiv=2"
-        rem set "file=!indiv!"
         if exist is_nested.txt (
             set "nest_status=NESTED"
             rem set "format=(NESTED)"
-            set "format=3"
             set "format=CLSD"
-            rem set "nested=3"
-            rem set "file=!nested!"
         )
     )
 
@@ -284,17 +265,12 @@ rem echo "!from_item!"
         ECHO "" > is_nested.txt
         rem if "!from_item!" equ "!sec!" ( set "format=(NESTED + ")
         if "!from_item!" equ "!sec!" (
-            set "format=1"
             set "format=OPN_ENDD"
         )
         rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
         if "!from_item!" equ "!third!" (
-            set "format=3"
             set "format=CLSD"
         )
-        rem set "nested=3"
-        rem set "file=!nested!"
-       rem  echo "(nested)"
     )
 
 
