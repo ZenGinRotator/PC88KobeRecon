@@ -35,7 +35,6 @@ goto :eof
     if exist "has_paren.txt" ( del "has_paren.txt" )
     if exist "last_item.txt" ( del "last_item.txt" )
     if exist "chars.txt" ( del "chars.txt" )
-    if exist "token.txt" ( del "token.txt" )
     if exist nested.txt ( del nested.txt )
     if exist indivs.txt ( del indivs.txt )
     if exist bridges.txt ( del bridges.txt )
@@ -46,5 +45,6 @@ goto :eof
     if exist type.txt ( del type.txt )
     if exist struct.txt ( del struct.txt )
     if exist format.txt ( del format.txt )
+    if exist token.txt ( del token.txt )
     endlocal
 exit /b

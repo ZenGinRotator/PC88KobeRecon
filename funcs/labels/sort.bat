@@ -52,17 +52,20 @@ rem Use this function to save bridges, indivs, or nested labels
 
     set /a same_line=0
 
-    if "!format!" equ "0" (
+    rem if "!format!" equ "0" (
+    if "!format!" equ "BRDG" (
         if exist is_nested.txt (
             set /a same_line+=1
         )
     )
 
-    if "!format!" equ "2" (
+    rem if "!format!" equ "2" (
+    if "!format!" equ "OPN_STRTD" (
         set /a same_line+=1
     )
 
-    if "!format!" equ "3" (
+    REM if "!format!" equ "3" (
+    if "!format!" equ "CLSD" (
         if exist is_nested.txt (
             set /a same_line+=1
         )

@@ -42,10 +42,10 @@ goto :eof
     )
 
     rem the encap format for sorting labels
-    rem 0: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
-    rem 1: open-ended: (label ... : (always add item to next line)
-    rem 2: open-started: ...label) : (always add item to same line)
-    rem 3: closed: (...label...) : (nested: same-line, indiv: new-line)
+    rem 0 - BRDG: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
+    rem 1 - OPN_ENDD: open-ended: (label ... : (always add item to next line)
+    rem 2 - OPN_STRTD: open-started: ...label) : (always add item to same line)
+    rem 3 - CLSD: closed: (...label...) : (nested: same-line, indiv: new-line)
     rem Use format to determine when to:
     rem * add nested label to current or new line,
     rem * if format=2, then new line
@@ -94,8 +94,6 @@ goto :eof
 
     endlocal
 exit /b
-
-
 
 
 
@@ -192,6 +190,7 @@ rem echo "!from_item!"
     if "!from_item!" equ "!item!" (
         set "nest_status=BRIDGE"
         set "bridge=0"
+        set "bridge=BRDG"
         set "file=!bridge!"
         set "format=!bridge!"
         if exist is_nested.txt (
@@ -200,6 +199,7 @@ rem echo "!from_item!"
 
             rem echo ENCAPED FORMAT: "label)"
             set "open_started=2"
+            set "open_started=OPN_STRTD"
             set "format=!open_started!"
             set "nested=3"
             set "file=!nested!"
@@ -226,11 +226,13 @@ rem echo "!from_item!"
     if "PAD!from_item!" equ "!first!" (
         set "nest_status=BRIDGE"
         set "bridge=0"
+        set "bridge=BRDG"
         set "file=!bridge!"
         set "format=!bridge!"
         if exist is_nested.txt (
             set "nest_status=NESTED"
             set "nested=0"
+            set "nested=BRDG"
             set "file=!nested!"
             set "format=!nested!"
         
@@ -254,6 +256,7 @@ rem echo "!from_item!"
     if "!from_item!" equ "!sec!" (
         set "format=(indiv)"
         set "format=3"
+        set "format=CLSD"
         set "nest_status=INDIV"
         rem set "indiv=2"
         rem set "file=!indiv!"
@@ -261,6 +264,7 @@ rem echo "!from_item!"
             set "nest_status=NESTED"
             rem set "format=(NESTED)"
             set "format=3"
+            set "format=CLSD"
             rem set "nested=3"
             rem set "file=!nested!"
         )
@@ -276,9 +280,15 @@ rem echo "!from_item!"
         set "nest_status=NESTED"
         ECHO "" > is_nested.txt
         rem if "!from_item!" equ "!sec!" ( set "format=(NESTED + ")
-        if "!from_item!" equ "!sec!" ( set "format=1" )
+        if "!from_item!" equ "!sec!" (
+            set "format=1"
+            set "format=OPN_ENDD"
+        )
         rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
-        if "!from_item!" equ "!third!" ( set "format=3" )
+        if "!from_item!" equ "!third!" (
+            set "format=3"
+            set "format=CLSD"
+        )
         rem set "nested=3"
         rem set "file=!nested!"
        rem  echo "(nested)"
@@ -341,12 +351,14 @@ rem ECHO CALLL ENCAP_STRUCT
 
 
     rem open-started, format=2
-    if "!type!" equ "2" (
+    REM if "!type!" equ "2" (
+    if "!type!" equ "OPN_STRTD" (
         set "use=!labels!!right!"
     )
 
     rem closed, format=3
-    if "!type!" equ "3" (
+    REM if "!type!" equ "3" (
+    if "!type!" equ "CLSD" (
         set "use=!left!!labels!!right!"
     )
 

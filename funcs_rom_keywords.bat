@@ -161,7 +161,6 @@ exit /b
     set optn_one_right=
     set optn_two_left=
     set optn_two_right=
-    ECHO "!brk!"
 
     for /f "tokens=1 delims=|" %%i in ("!recs!") do (
         set "token=%%i"
@@ -218,12 +217,13 @@ exit /b
 
 
     set label=
-    call ".\funcs\utils.bat" :delim_with_char "2" "!left_char!" "!item_item!"
+    call ".\funcs\utils.bat" :delim_with_char "2" "!left_char!" "!item!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "label=%%i"
     )
 
-
+    rem Item does not have a preceeding bridge
+    rem Example item: "{label"
     if "!left_char!!orig_bridge!" equ "!item!" (
         set "label=!orig_bridge!"
         set orig_bridge=
@@ -251,9 +251,9 @@ rem echo "ITEM" "!item!"
             
     )
     rem echo LAST CHAR "!last_char!"
-    for /f "tokens=*" %%i in (token.txt) do (
+    rem for /f "tokens=*" %%i in (token.txt) do (
         REM echo TOKEN.TXT "%%i"
-    )
+    rem )
     rem ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
     if "!last_char!" neq "" (
 
