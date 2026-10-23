@@ -72,16 +72,19 @@ goto :eof
 
 
     rem change to alphabetic identifier
-    rem file==1, means use bridges.txt to save the bridge
+    rem file==BRDGTXT, means use bridges.txt to save the bridge
     set "file=1"
+    SET "file=BRDGTXT"
     set "sort_item=!from_item!"
     if "!status!" equ "INDIV" (
         SET "file=2"
+        set "file=INDVTXT"
         set "sort_item=!encap_item!"
     )
 
     if "!status!" equ "NESTED" (
         set "file=3"
+        set "file=NSTDTXT"
         set "sort_item=!encap_item!"
         if "!from_item!" equ " " (
             set "sort_item=!from_item!"
@@ -90,7 +93,7 @@ goto :eof
 
     rem echo SORT ITEM "!sort_item!" "!status!"
     
-    call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!file!" "!format!"
+    call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
 
     endlocal
 exit /b

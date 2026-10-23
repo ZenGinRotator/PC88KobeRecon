@@ -20,13 +20,15 @@ rem Use this function to save bridges, indivs, or nested labels
 
 
    
-    if "!type!" equ "2" (
+    REM if "!type!" equ "2" (
+    if "!type!" equ "INDIV" (
         set file=indivs.txt
     )
 
 
     rem use format argument
-    if "!type!" equ "3" (
+    rem if "!type!" equ "3" (
+    if "!type!" equ "NESTED" (
         set file=nested.txt
     )
 
