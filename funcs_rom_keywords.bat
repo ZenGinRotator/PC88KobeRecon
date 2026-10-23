@@ -132,14 +132,30 @@ exit /b
     set "o2s=!optn_two_left!|!optn_two_right!"
     set "recs=!token!|!primes!|!name!|!o1s!|!o2s!"
 
-    if exist construct.txt ( del construct.txt )
+    rem if exist construct.txt ( del construct.txt )
 
     call :recurse_on_group2 "!recs!"
+   
+    
+    set construct=
     if exist construct.txt (
-    for /f "tokens=*" %%i in (construct.txt) do (
-        rem echo made "%%i"
+        for /f "tokens=1 delims=|" %%i in (construct.txt) do (
+            set "construct=%%i"
+        )
     )
+
+    set "adjust=!name!"
+    if "!name!" equ " " (
+        set "construct= "
     )
+
+    if "!construct!" neq "!name!" (
+        echo ERROR: constructed name vs input name
+        echo "!construct!" "!name!"
+        pause
+        exit /b
+    )
+
 
    
     
@@ -152,7 +168,6 @@ exit /b
     setlocal
     set "recs=%~1"
 
-
     set token=
     set left_char=
     set right_char=
@@ -161,6 +176,7 @@ exit /b
     set optn_one_right=
     set optn_two_left=
     set optn_two_right=
+    
 
     for /f "tokens=1 delims=|" %%i in ("!recs!") do (
         set "token=%%i"

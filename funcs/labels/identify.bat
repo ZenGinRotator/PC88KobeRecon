@@ -1,4 +1,8 @@
 setlocal EnableDelayedExpansion
+set brk=^
+
+
+
 
 call %*
 
@@ -10,6 +14,7 @@ goto :eof
     set "right=%~2"
     set "item=%~3"
     set "from_item=%~4"
+
     rem echo CALL ID_LABEL
 
     set status=
@@ -88,6 +93,37 @@ goto :eof
     
     call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
 
+    rem reconstruct file name here
+    call :write "!sort_item!"
+
+    endlocal
+exit /b
+
+
+rem move this function to different file
+:write
+    setlocal
+
+    set "item=%~1"
+   
+
+    if not exist construct.txt (
+        set "item=!item!|"
+        echo !item! > construct.txt
+        exit /b
+    )
+
+    set old=
+    for /f "tokens=1 delims=|" %%i in (construct.txt) do (
+        set "old=!old!%%i"
+    )
+
+    set "saved=!old!!item!"
+    set "old=!old!!item!|"
+    
+    echo !old! > construct.txt
+
+ 
     endlocal
 exit /b
 

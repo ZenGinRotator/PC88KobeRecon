@@ -31,6 +31,7 @@ goto :eof
     rem PAUSE
         rem ECHO * doil 2 *
     set "doils2=%~1"
+
     
     set ttoken=
     set left=
