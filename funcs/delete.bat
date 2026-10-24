@@ -46,5 +46,6 @@ goto :eof
     if exist struct.txt ( del struct.txt )
     if exist format.txt ( del format.txt )
     if exist token.txt ( del token.txt )
+    if exist optn_bridges.txt ( del optn_bridges.txt )
     endlocal
 exit /b

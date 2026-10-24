@@ -92,7 +92,15 @@ goto :eof
     )
 
     rem echo SORT ITEM "!sort_item!" "!status!"
+
+    rem exclude bridge that contains an optional chars
+    rem Within 2nd or 3rd call of this recursive function,
+    rem     where left and right primary characters are optional characters
+    rem     we need to disregard the sorted_item because it is a bridge
+    rem     that contains optional delimiting characters.
     
+
+
     call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
 
     rem reconstruct file name here
@@ -107,6 +115,8 @@ rem move this function to different file
     setlocal
 
     set "item=%~1"
+
+    echo RECONSTRUCT WITH "!item!"
    
 
     if not exist construct.txt (
@@ -120,7 +130,6 @@ rem move this function to different file
         set "old=!old!%%i"
     )
 
-    set "saved=!old!!item!"
     set "old=!old!!item!|"
     
     echo !old! > construct.txt

@@ -105,20 +105,22 @@ rem     or an aft-bridge (when finding the last character)
     rem * PAD!aft_bridge! (finding last char)
     set "bridge=%~1"
 
+    rem all optional right chars?
     set "optn1_char=%~2"
     set "optn2_char=%~3"
 
+
     set o1_bridge=
     set o2_bridge=
-    call ".\funcs\utils.bat" :delim_with_char "1" "!optn1_char!" "!bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    call :optional_bridges "!optn1_char!" "!optn2_char!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (optn_bridges.txt) do (
         set "o1_bridge=%%i"
     )
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "!optn2_char!" "!bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=1 delims=|" %%i in (optn_bridges.txt) do (
         set "o2_bridge=%%i"
     )
+
+
 
     set /a diff_bridges=0
     if "!o1_bridge!" neq "!bridge!" (
@@ -134,5 +136,30 @@ rem     or an aft-bridge (when finding the last character)
     set "db=!diff_bridges!|!o1_bridge!|!o2_bridge!|"
     rem echo DB "!db!" bridge "!bridge!"
     echo !db! > reduced_bridge.txt
+    endlocal
+exit /b
+
+:optional_bridges
+    setlocal
+    set "optn1_char=%~1"
+    set "optn2_char=%~2"
+    set "bridge=%~3"
+
+    set o1_bridge=
+    set o2_bridge=
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn1_char!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "o1_bridge=%%i"
+    )
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!optn2_char!" "!bridge!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "o2_bridge=%%i"
+    )
+
+    set "os=!o1_bridge!|!o2_bridge!|"
+    echo !os! > optn_bridges.txt
+
+
     endlocal
 exit /b

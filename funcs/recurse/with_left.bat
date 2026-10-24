@@ -111,14 +111,67 @@ goto :eof
     )
 
 
+    rem echo Lefts "!left!" "!optn1_left!" "!optn2_left!"
 
 
+    rem exclude bridge that contains an optional chars
+    rem Within 2nd or 3rd call of this recursive function,
+    rem     where left and right primary characters are optional characters
+    rem     we need to disregard the sorted_item because it is a bridge
+    rem     that contains optional delimiting characters.
 
-    rem .\funcs\labels\identify.bat
+    rem This portion works for file names with only 2 encapsulators within the file name,
+    rem     and there is only 1 instance of each encapsulator
+    rem Examle: "B1 (P +) B2 [S +]",
+    rem     where B1=<nothing>, <space>, or <BRIDGE>,
+    rem     where B2=<nothing>, <space>, or <BRIDGE>
+
+    set o1_bridge=
+    set o2_bridge=
+    call ".\funcs\encaps\chars.bat" :optional_bridges "!optn1_right!" "!optn2_right!" "!from_item!"
+    for /f "tokens=1 delims=|" %%i in (optn_bridges.txt) do (
+        set "o1_bridge=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in (optn_bridges.txt) do (
+        set "o2_bridge=%%i"
+    )
+    echo P right "!right!"
+     echo 01 right "!optn1_right!" YIELDS "!o1_bridge!"
+     echo 02 right "!optn2_right!" YIELDS "!o2_bridge!"
+     echo from item "!from_item!"
+
+
+    set /a same=0
+    if "!o1_bridge!" equ "!from_item!" (
+        set /a same+=1
+    )
+
+    if "!o2_bridge!" equ "!from_item!" (
+        set /a same+=1
+    )
+
+    set /a diff=0
+    if "!o1_bridge!" neq "!from_item!" (
+        set /a diff+=1
+    )
+    if "!o2_bridge!" neq "!from_item!" (
+        set /a diff+=1
+    )
+
+    if "!diff!" equ "2" (
+        echo FROM ITEM "!from_item!" needs to be cursed....
+        echo find first char in "!from_item!"
+        echo find last char in "!from_item!"
+        echo does the first char == last char?
+        echo if yes, dont' use the last char that matches first char
+        echo if no, use the last char that does not match the first char
+    )
+
 
     rem **** KEEP!!!! : Displays whether from item is BRIDGE, NESTED, OR INDIV
+    if "!same!" equ "2" (
     call ".\funcs\labels\identify.bat" :id_label "!left!" "!right!" "!item!" "!from_item!"
-
+     )
 
     if "!next!" equ " " (
         exit /b

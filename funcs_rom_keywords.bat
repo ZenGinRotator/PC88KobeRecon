@@ -151,7 +151,7 @@ exit /b
 
     if "!construct!" neq "!name!" (
         echo ERROR: constructed name vs input name
-        echo "!construct!" "!name!"
+        echo "!construct!" VS "!name!"
         pause
         exit /b
     )
@@ -295,15 +295,8 @@ rem echo "ITEM" "!item!"
             set /a last_encap_token=!last_encap_token!-1
             rem echo Last enc tokn = !last_encap_token!
         )
-
-
         rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Errror last_encap_token = 0 !!!!!!!!!!!!!!!!!!!!
         rem echo "LET" "!last_encap_token!"
-
-
-
-
-
 
         rem shorten the bridge with the last encap token
         rem call ".\funcs\utils.bat" :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
@@ -313,8 +306,8 @@ rem echo "ITEM" "!item!"
         
         set "dois=1|!primes!|!orig_bridge!|!o1s!|!o2s!"
          rem  echo DOIS "!dois!"
-        
-
+        echo ORIG BRIDGE "!orig_bridge!"
+        rem has embedded function call ".\funcs\recurse\with_left.bat" :rec_left
         call :DOIR_BRIDGE "!dois!"
 
     )
@@ -383,42 +376,6 @@ exit /b
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 :DOIR_BRIDGE
     setlocal
     set "dois=%~1"
@@ -476,8 +433,10 @@ rem ECHO doir bridge *
     REM "!!!!! don't nknow if these function calls are required !!!!"
     rem "!!!! applied a name change to DOIL function -> :rec_left"
     rem "!!!! funcs\recurse\with_left.bat"
-    rem call :DOIL_BRIDGE "!doils!"
+
+    rem this is named differently from a different file location
     rem call :DOIL2 "!doils!"
+    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!"
     set /a token+=1
     
 
