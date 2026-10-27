@@ -31,6 +31,8 @@ goto :eof
     rem PAUSE
         rem ECHO * doil 2 *
     set "doils2=%~1"
+    set "encap_type=%~2"
+    
 
     
     set ttoken=
@@ -111,142 +113,78 @@ goto :eof
     )
 
 
-    rem echo Lefts "!left!" "!optn1_left!" "!optn2_left!"
+    rem echo FROM ITEM "!from_item!"
+    rem echo LEFT AND RIGHT "!left!" and "!right!"
 
 
-    rem exclude bridge that contains an optional chars
-    rem Within 2nd or 3rd call of this recursive function,
-    rem     where left and right primary characters are optional characters
-    rem     we need to disregard the sorted_item because it is a bridge
-    rem     that contains optional delimiting characters.
+    set last_char=
 
-    rem This portion works for file names with only 2 encapsulators within the file name,
-    rem     and there is only 1 instance of each encapsulator
-    rem Examle: "B1 (P +) B2 [S +]",
-    rem     where B1=<nothing>, <space>, or <BRIDGE>,
-    rem     where B2=<nothing>, <space>, or <BRIDGE>
 
-    set o1_bridge=
-    set o2_bridge=
-    call ".\funcs\encaps\chars.bat" :optional_bridges "!optn1_right!" "!optn2_right!" "!from_item!"
-    for /f "tokens=1 delims=|" %%i in (optn_bridges.txt) do (
-        set "o1_bridge=%%i"
+    rem "!!!! Making an attempt to re-use this if-condition as a callable function !!!!
+
+    rem **** need to add parameter to show results for last char output
+    call ".\funcs\encaps\last.bat" :find_last_char "!from_item!" ""
+    for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
+        rem echo LAST CHAR "%%i"
+        set "last_char=%%i"
+        if "!last_char!" equ "@" (
+            set last_char=
+        )
+            
     )
-    for /f "tokens=2 delims=|" %%i in (optn_bridges.txt) do (
-        set "o2_bridge=%%i"
+    rem echo SECONDARY LAST CHAR "!last_char!"
+    set "use_optnR=!optn1_right!"
+    if "!last_char!" equ "!optn2_right!" (
+        set "use_optnR=!optn2_right!"
+
     )
-    echo P right "!right!"
-     echo 01 right "!optn1_right!" YIELDS "!o1_bridge!"
-     echo 02 right "!optn2_right!" YIELDS "!o2_bridge!"
-     echo from item "!from_item!"
+    rem echo USE OPTION R "!use_optnR!"
+
+    if "!encap_type!" equ "O1" (
+
+        REM Avoid delimiting the bridge again if previously delimited
+        if "!use_optnR!" neq "!right!" (
+
+            rem Avoid delimiting a bridge without any encapsulators
+            if "!last_char!" neq "" (
+            rem echo ......................... USE FOUND OPTION "!use_optnR!" within found item
+            
+            set "use_optnL=("
+            if "!use_optnR!" equ "}" (
+                set "use_optnL={"
+            )
+            if "!use_optnR!" equ "]" (
+                set "use_optnL=["
+            )
+            
+            set "primes=!use_optnL!|!use_optnR!"
+            set "o1s=!optn_one_left!|!optn_one_right!"
+            set "o2s=!optn_two_left!|!optn_two_right!"
+            set "doils=1|!primes!|!from_item!|!o1s!|!o2s!"
 
 
-    set /a same=0
-    if "!o1_bridge!" equ "!from_item!" (
-        set /a same+=1
+            call "funcs_rom_keywords.bat" :DOIR_BRIDGE "!doils!"
+            )
+
+        )
+        
     )
 
-    if "!o2_bridge!" equ "!from_item!" (
-        set /a same+=1
-    )
+    set /a do_=0
+    if "!last_char!" equ "" (
+        call ".\funcs\labels\identify.bat" :id_label "!left!" "!right!" "!item!" "!from_item!"
+    ) 
 
-    set /a diff=0
-    if "!o1_bridge!" neq "!from_item!" (
-        set /a diff+=1
-    )
-    if "!o2_bridge!" neq "!from_item!" (
-        set /a diff+=1
-    )
+    
 
-    if "!diff!" equ "2" (
-        echo FROM ITEM "!from_item!" needs to be cursed....
-        echo find first char in "!from_item!"
-        echo find last char in "!from_item!"
-        echo does the first char == last char?
-        echo if yes, dont' use the last char that matches first char
-        echo if no, use the last char that does not match the first char
-    )
-
-
-    rem **** KEEP!!!! : Displays whether from item is BRIDGE, NESTED, OR INDIV
-    if "!same!" equ "2" (
-    call ".\funcs\labels\identify.bat" :id_label "!left!" "!right!" "!item!" "!from_item!"
-     )
-
+    rem if "!do_!" neq "0" (
+       rem  call ".\funcs\labels\identify.bat" :id_label "!left!" "!right!" "!item!" "!from_item!"
+    rem )
+    
     if "!next!" equ " " (
         exit /b
     )
 
-
-
-    
-
- rem exclude strings  containing either option 1 left or option 2 right
-    set haso1=
-    set haso2=
-    set /a hide=0
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "!optn1_right!" "!use!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "haso1=%%i"
-    )
-        if "!haso1!" neq "!use!" (
-            set /a hide+=1
-        )
-
-    
-    call ".\funcs\utils.bat" :delim_with_char "1" "!optn2_right!" "!use!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "haso2=%%i"
-    )
-        if "!haso2!" neq "!use!" (
-            set /a hide+=1
-        )
-
-    
-
-
-REM echo ITEM "!item!"
-
-rem currently use can save a space " "
-    if "!use!" neq " " (
-         if "!hide!" equ "0" (
-
-            rem set "nest_status=A BRIDGE"
-            if "!ttoken!" equ "2" (
-            REM TEST FOR nested label
-            
-            set /a temp=!ttoken!+1
-            call ".\funcs\utils.bat" :delim_with_char "!temp!" "!left!" "!item!"
-            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-                if "%%i" neq " " (
-                    rem set "nest_status=NESTED"
-                    REM echo #### NEXT  "%%i" ##### "!left!" "!item!"
-                    REM echo "" > nested.txt
-                )
-            )
-            )
-
-
-            rem if item === bitem, then the item/bitem is last of nested label
-            rem if item == bitem, then item/bitem is an ending bridge
-
-            rem if exist nested.txt (
-            rem     set "nest_status=NESTED"
-            rem )
-
-
-             echo "!brk!" use "!use!" "!nest_status!"
-            REM echo ITEM "!item!"
-            REM echo BITEM "!bitem!"
-            REM echo PAD "!pad!"
-            REM echo PADDED "!padded!"
-
-            rem need to determine if this is an encapsulated label or a bridge
-            
-         )
-        rem echo ITEM "!item!"
-    )
 
     if "!bitem!" equ " " (
        
@@ -261,7 +199,7 @@ rem currently use can save a space " "
     set "o1s=!optn1_left!|!optn1_right!"
     set "o2s=!optn2_left!|!optn2_right!"
     set "doils2=!ttoken!|!primes!|!item!|!o1s!|!o2s!"
-    call :rec_left "!doils2!"
+    call :rec_left "!doils2!" "!encap_type!"
 
     endlocal
 exit /b

@@ -203,12 +203,6 @@ exit /b
         set "optn_two_right=%%i"
     )
 
-    rem echo RECS "!recs!"
-
-
-
-
-
 
     set item=
     call ".\funcs\utils.bat" :delim_with_char "!token!" "!right_char!" "!name!"
@@ -232,29 +226,17 @@ exit /b
     )
 
 
-    set label=
-    call ".\funcs\utils.bat" :delim_with_char "2" "!left_char!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "label=%%i"
-    )
 
     rem Item does not have a preceeding bridge
     rem Example item: "{label"
     if "!left_char!!orig_bridge!" equ "!item!" (
-        set "label=!orig_bridge!"
         set orig_bridge=
     )
 
-    
-REM echo item "!item!"
-rem echo "ITEM" "!item!"
-    rem echo BRIDGE IS "!orig_bridge!"
-    
-    REM echo label "!label!"
-
-    rem must match last char with one of the option cars
-    rem Both option chars are not empty but need to test
     set last_char=
+
+
+    rem "!!!! Making an attempt to re-use this if-condition as a callable function !!!!
 
     rem **** need to add parameter to show results for last char output
     call ".\funcs\encaps\last.bat" :find_last_char "!orig_bridge!" ""
@@ -266,11 +248,16 @@ rem echo "ITEM" "!item!"
         )
             
     )
-    echo LAST CHAR "!last_char!"
-    rem for /f "tokens=*" %%i in (token.txt) do (
-        REM echo TOKEN.TXT "%%i"
-    rem )
-    rem ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
+    
+    
+
+    rem Last_char exists within our discovered bridge, however this bridge
+    rem     can be one of two situations, where bridge B exists within file F
+    rem     in the form of
+    rem     F=B <last_encap> label </last_encap>,
+    rem     where B=Bridge2 <optn2_encap> label </optn2_encap>, or 
+    rem     where B=Bridge1 <optn1_encap> label </optn1_encap> Bridge2 <optn2_encap> lael </optn2_encap>
+    rem echo INIT LAST CHAR "!last_char!"
     if "!last_char!" neq "" (
 
         rem primes must contain one of the two option characters
@@ -281,41 +268,19 @@ rem echo "ITEM" "!item!"
             set "o_right=!optn_two_right!"
             set "o_left=!optn_two_left!"
         )
+
         set "primes=!o_left!|!o_right!"
         set "o1s=!optn_one_left!|!optn_one_right!"
         set "o2s=!optn_two_left!|!optn_two_right!"
         
-        
-        rem extract contents before last char using saved token from recursive function
-        rem recurse_to_end returns the 1 token before the end
-        call ".\funcs\encaps\last.bat" :recurse_to_end "1" "!last_char!" "!orig_bridge!"
-        for /f "tokens=*" %%i in (token.txt) do (
-            rem echo recursed token = "%%i"
-            SET "last_encap_token=%%i"
-            set /a last_encap_token=!last_encap_token!-1
-            rem echo Last enc tokn = !last_encap_token!
-        )
-        rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Errror last_encap_token = 0 !!!!!!!!!!!!!!!!!!!!
-        rem echo "LET" "!last_encap_token!"
-
-        rem shorten the bridge with the last encap token
-        rem call ".\funcs\utils.bat" :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
-        rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-            rem echo last encap "%%i"
-        rem )
-        
         set "dois=1|!primes!|!orig_bridge!|!o1s!|!o2s!"
-         rem  echo DOIS "!dois!"
-        echo ORIG BRIDGE "!orig_bridge!"
-        rem has embedded function call ".\funcs\recurse\with_left.bat" :rec_left
-        call :DOIR_BRIDGE "!dois!"
+        
+        
+        set "encap_type=O1"
+        call :DOIR_BRIDGE "!dois!" "!encap_type!"
 
-    )
-
-    set no_show=
-    set "do_show=\"
-    rem call "funcs\encaps\first.bat" :find_first_char "!bridge!" "!do_show!"
-    
+    ) 
+    rem else (   
    
     set "primes=!left_char!|!right_char!"
     set "o1s=!optn_one_left!|!optn_one_right!"
@@ -325,14 +290,10 @@ rem echo "ITEM" "!item!"
     
 
     REM This function can correctly identify bridges, indivs, or nested labels
-    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!"
 
-
-
-    rem Loook for options 1 & 2 within bridge from pad name
-    set has01=
-    set has02=
-
+    set "encap_type=P"
+    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!
+    
 
 
 
@@ -379,6 +340,8 @@ exit /b
 :DOIR_BRIDGE
     setlocal
     set "dois=%~1"
+    set "encap_type=%~2"
+   
 rem ECHO doir bridge *
     set token=
     set left=
@@ -436,7 +399,10 @@ rem ECHO doir bridge *
 
     rem this is named differently from a different file location
     rem call :DOIL2 "!doils!"
-    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!"
+
+    rem this function call works for 
+    
+    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!"
     set /a token+=1
     
 
@@ -444,9 +410,24 @@ rem ECHO doir bridge *
     set "o1s=!optn1_left!|!optn1_right!"
     set "o2s=!optn2_left!|!optn2_right!"
     set "dois=!token!|!primes!|!item!|!o1s!|!o2s!"
-    call :DOIR_BRIDGE "!dois!"
+    call :DOIR_BRIDGE "!dois!" "!encap_type!"
     endlocal
 exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 :DOIR_INNER_MOST_BRIDGE
@@ -683,6 +664,110 @@ rem pause
 
 
 
+
+
+    endlocal
+exit /b
+
+
+rem From lines 169 -  316
+:2nd_level_rec
+    setlocal
+
+    set "recs=%~1"
+
+    set token=
+    set left_char=
+    set right_char=
+    set name=
+    set optn_one_left=
+    set optn_one_right=
+    set optn_two_left=
+    set optn_two_right=
+    
+
+    for /f "tokens=1 delims=|" %%i in ("!recs!") do (
+        set "token=%%i"
+    )
+    for /f "tokens=2 delims=|" %%i in ("!recs!") do (
+        set "left_char=%%i"
+    )
+    for /f "tokens=3 delims=|" %%i in ("!recs!") do (
+        set "right_char=%%i"
+    )
+    for /f "tokens=4 delims=|" %%i in ("!recs!") do (
+        set "name=%%i"
+    )
+    for /f "tokens=5 delims=|" %%i in ("!recs!") do (
+        set "optn_one_left=%%i"
+    )
+    for /f "tokens=6 delims=|" %%i in ("!recs!") do (
+        set "optn_one_right=%%i"        
+    )
+    for /f "tokens=7 delims=|" %%i in ("!recs!") do (
+        set "optn_two_left=%%i"
+    )
+    for /f "tokens=8 delims=|" %%i in ("!recs!") do (
+        set "optn_two_right=%%i"
+    )
+
+
+    
+    rem **** need to add parameter to show results for last char output
+    call ".\funcs\encaps\last.bat" :find_last_char "!orig_bridge!" ""
+    for /f "tokens=1 delims=|" %%i in (last_char.txt) do (
+        rem echo LAST CHAR "%%i"
+        set "last_char=%%i"
+        if "!last_char!" equ "@" (
+            set last_char=
+        )
+            
+    )
+    echo LAST CHAR "!last_char!"
+    rem for /f "tokens=*" %%i in (token.txt) do (
+        REM echo TOKEN.TXT "%%i"
+    rem )
+    rem ECHO LAST CHAR *** "!last_char!" "!orig_bridge!"
+    if "!last_char!" neq "" (
+
+        rem primes must contain one of the two option characters
+        rem Use last char to find the correct opton<1/2>_right char, the latter of which is not == @ (indicatinga blank char)
+        set "o_left=!optn_one_left!"
+        set "o_right=!optn_one_right!"
+        if "!last_char!" neq "!o_right!" (
+            set "o_right=!optn_two_right!"
+            set "o_left=!optn_two_left!"
+        )
+        set "primes=!o_left!|!o_right!"
+        set "o1s=!optn_one_left!|!optn_one_right!"
+        set "o2s=!optn_two_left!|!optn_two_right!"
+        
+        
+        rem extract contents before last char using saved token from recursive function
+        rem recurse_to_end returns the 1 token before the end
+        call ".\funcs\encaps\last.bat" :recurse_to_end "1" "!last_char!" "!orig_bridge!"
+        for /f "tokens=*" %%i in (token.txt) do (
+            rem echo recursed token = "%%i"
+            SET "last_encap_token=%%i"
+            set /a last_encap_token=!last_encap_token!-1
+            rem echo Last enc tokn = !last_encap_token!
+        )
+        rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Errror last_encap_token = 0 !!!!!!!!!!!!!!!!!!!!
+        rem echo "LET" "!last_encap_token!"
+
+        rem shorten the bridge with the last encap token
+        rem call ".\funcs\utils.bat" :delim_with_char "!last_encap_token!" "!last_char!" "!orig_bridge!"
+        rem for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            rem echo last encap "%%i"
+        rem )
+        
+        set "dois=1|!primes!|!orig_bridge!|!o1s!|!o2s!"
+         rem  echo DOIS "!dois!"
+        echo ORIG BRIDGE "!orig_bridge!"
+        rem has embedded function call ".\funcs\recurse\with_left.bat" :rec_left
+        call :DOIR_BRIDGE "!dois!"
+
+    )
 
 
     endlocal
