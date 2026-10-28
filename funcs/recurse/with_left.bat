@@ -176,10 +176,6 @@ goto :eof
     ) 
 
     
-
-    rem if "!do_!" neq "0" (
-       rem  call ".\funcs\labels\identify.bat" :id_label "!left!" "!right!" "!item!" "!from_item!"
-    rem )
     
     if "!next!" equ " " (
         exit /b

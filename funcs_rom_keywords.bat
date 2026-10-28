@@ -975,7 +975,7 @@ rem ----------------------------------------
     set old=
     if not exist !file! ( exit /b )
     for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!  %%i!brk!"
+        set "old=!old!%%i!brk!"
     )
 
     echo "!brk!"

@@ -1,4 +1,8 @@
 setlocal EnableDelayedExpansion
+set brk=^
+
+
+
 
 call %*
 
@@ -47,9 +51,10 @@ rem Use this function to save bridges, indivs, or nested labels
 
 
     rem use format argument
-    rem if "!type!" equ "3" (
+    
     if "!type!" equ "NESTED" (
-        set file=nested.txt
+        rem set file=nested.txt
+        set file=nested_line.txt
     )
 
 
@@ -73,21 +78,60 @@ rem Use this function to save bridges, indivs, or nested labels
 
 
     set /a same_line=0
+    echo --------
+rem     echo "!file!"
+rem     echo type "!type!"
+rem     echo Item "!item!"
+rem     echo format "!format!"
 
-    rem if "!format!" equ "0" (
     if "!format!" equ "BRDG" (
+        
+        rem " " in between two closed within nested set of labels
         if exist is_nested.txt (
             set /a same_line+=1
         )
     )
 
-    rem if "!format!" equ "2" (
+    rem last label of nested
     if "!format!" equ "OPN_STRTD" (
+        echo "!format!"
         set /a same_line+=1
+        set old=
+        
+        rem getting items from the temp file
+
+        for /f "tokens=1 delims=|" %%i in (!file!) do (
+            set "old=!old!%%i"
+        )
+        set "old=!old!!item!|"
+        set "blank=|"
+         echo !blank! > !file!
+        rem del !file!
+       
+        rem getting items from primary file
+        set nest_old=
+        if exist nested.txt (
+        for /f "tokens=1 delims=|" %%i in (nested.txt) do (
+            set "nest_old=!nest_old!!brk!%%i"
+        )
+        )
+
+        if "!nest_old!" equ "ECHO is off." (
+            set "nest_old="
+        )
+        ECHO NEST OLD "!nest_old!"
+        rem add temp items to primary file
+        set "old=!nest_old!!brk!!old!|"
+        echo !old! > nested.txt
+exit /b
+         
     )
 
-    REM if "!format!" equ "3" (
+    
+    rem source of same line nested labels within nested.txt
     if "!format!" equ "CLSD" (
+        
+        rem closed within nested set of labels
         if exist is_nested.txt (
             set /a same_line+=1
         )
@@ -100,17 +144,39 @@ rem Use this function to save bridges, indivs, or nested labels
     rem echo SEPARATOR "!separator!"
 
 
-
-
+    set old=
+    set with_brk=
+    
     for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!!separator!%%i"
+        set "with_brk=!with_brk!!brk!%%i"
     )
+    
+    rem if "!format!" equ "OPN_STRTD" (
+        rem set "old=!old!!item!"
+        rem SET "old=!old!|"
+        rem ECHO !old! > nested.txt
+        rem echo "" > !file!
+        rem exit /b
+    rem )
 
+    
+        
     
     set "old=!old!!separator!!item!|"
     
+
+
+
     
-    
+    echo *OLD "!old!"
+    rem if "!old!" equ "ECHO is"
+
+    rem if "!format!" neq "OPN_STRTD" (
     echo !old! > "!file!"
+    rem )
+
+
+
     endlocal
 exit /b
