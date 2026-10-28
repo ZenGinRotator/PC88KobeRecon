@@ -67,6 +67,12 @@ rem Use this function to save bridges, indivs, or nested labels
         REM echo OLD "!item!" into "!file!"
         set "item=!item!|"
         echo !item! > "!file!"
+
+        REM stop add to position.txt when we enter the first label
+        rem     belonging to the first instance of a nested set of labels
+        if "!type!" neq "NESTED" (
+            call :label_list "!type!" "1" "!item!"
+        )
         exit /b
     )
 
@@ -78,7 +84,7 @@ rem Use this function to save bridges, indivs, or nested labels
 
 
     set /a same_line=0
-    echo --------
+    REM echo -------- TYPE "!type!"
 rem     echo "!file!"
 rem     echo type "!type!"
 rem     echo Item "!item!"
@@ -105,25 +111,37 @@ rem     echo format "!format!"
         )
         set "old=!old!!item!|"
         set "blank=|"
-         echo !blank! > !file!
-        rem del !file!
-       
+        echo !blank! > !file!
+        
+
         rem getting items from primary file
         set nest_old=
+        set copy=
+        rem quantity for the label of the same type
+        set /a qty=0
+
+
         if exist nested.txt (
-        for /f "tokens=1 delims=|" %%i in (nested.txt) do (
-            set "nest_old=!nest_old!!brk!%%i"
-        )
+            for /f "tokens=1 delims=|" %%i in (nested.txt) do (
+                set "nest_old=!nest_old!!brk!%%i"
+                set /a qty+=1
+
+
+                
+            )
         )
 
         if "!nest_old!" equ "ECHO is off." (
             set "nest_old="
         )
-        ECHO NEST OLD "!nest_old!"
+
         rem add temp items to primary file
         set "old=!nest_old!!brk!!old!|"
         echo !old! > nested.txt
-exit /b
+
+        set /a qty+=1
+        call :label_list "!type!" "!qty!" "!item!"
+        exit /b
          
     )
 
@@ -140,43 +158,73 @@ exit /b
         set "separator="
     )
 
-    rem echo SAME-LINE "!same_line!"
-    rem echo SEPARATOR "!separator!"
-
-
     set old=
+    set copy_=
     set with_brk=
-    
+    set /a l_qty=0
+    set /a qty=0
     for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!!separator!%%i"
-        set "with_brk=!with_brk!!brk!%%i"
+        set /a qty+=1
     )
-    
-    rem if "!format!" equ "OPN_STRTD" (
-        rem set "old=!old!!item!"
-        rem SET "old=!old!|"
-        rem ECHO !old! > nested.txt
-        rem echo "" > !file!
-        rem exit /b
-    rem )
-
-    
-        
+         
+   
     
     set "old=!old!!separator!!item!|"
     
-
-
-
-    
-    echo *OLD "!old!"
-    rem if "!old!" equ "ECHO is"
-
-    rem if "!format!" neq "OPN_STRTD" (
     echo !old! > "!file!"
-    rem )
 
 
+    rem block counter for number of nested lables,
+    rem     We determine this quantity when finding open_started label
+
+    rem quantity for the label of the same type
+    set /a qty+=1
+    if "!type!" neq "NESTED" (
+        call :label_list "!type!" "!qty!" "!item!"
+    )
+
+    endlocal
+exit /b
+
+
+
+
+:label_list
+    setlocal
+
+    set "type=%~1"
+    set "qty=%~2"
+    set "item=%~3"
+    
+    set "alpha=B"
+
+    if "!type!" equ "INDIV" (
+        set "alpha=I"
+    )
+
+    if "!type!" equ "NESTED" (
+        set "alpha=N"
+    )
+
+    set file=positions.txt
+    echo CODE: !alpha!.!qty!
+    set "code=!alpha!.!qty! !item!"
+    rem EXIT /B
+
+    if not exist !file! (
+        echo !code! > !file!
+        exit /b
+    )
+
+    set old=
+    for /f "tokens=*" %%i in (!file!) do (
+        set "old=!old!%%i!brk!"
+    )
+
+    set "old=!old!!code!"
+    echo !old! > !file!
+    
 
     endlocal
 exit /b

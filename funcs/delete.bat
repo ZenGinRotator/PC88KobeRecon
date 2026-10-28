@@ -48,5 +48,7 @@ goto :eof
     if exist token.txt ( del token.txt )
     if exist optn_bridges.txt ( del optn_bridges.txt )
     if exist nested_line.txt ( del nested_line.txt )
+    if exist qty.txt ( del qty.txt )
+    rem if exist positions.txt ( del positions.txt )
     endlocal
 exit /b
