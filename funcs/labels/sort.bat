@@ -208,8 +208,8 @@ exit /b
     )
 
     set file=positions.txt
-    echo CODE: !alpha!.!qty!
-    set "code=!alpha!.!qty! !item!"
+    rem echo CODE: !alpha!.!qty!
+    set "code=!alpha!.!qty!|"
     rem EXIT /B
 
     if not exist !file! (
@@ -218,7 +218,7 @@ exit /b
     )
 
     set old=
-    for /f "tokens=*" %%i in (!file!) do (
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!%%i!brk!"
     )
 

@@ -83,7 +83,9 @@ goto :eof
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "from_item=%%i"
     )
-
+    echo ITEM "!item!"
+    ECHO FROM ITEM "!from_item!"
+    echo TOKEN "!ttoken!"
 
     
     rem "bridge"                          "PADbridge"

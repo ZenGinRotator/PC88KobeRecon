@@ -78,6 +78,9 @@ exit /b
     call :print_txt "B"
     call :print_txt "I"
     call :print_txt "N"
+    call ".\funcs\labels\identify.bat" :reconstruct2
+    echo FINAL NAME "!name!"
+
 
     call ".\funcs\delete.bat" :del_txts
     endlocal
@@ -151,7 +154,9 @@ exit /b
 
     if "!construct!" neq "!name!" (
         echo ERROR: constructed name vs input name
-        echo "!construct!" VS "!name!"
+        echo "!construct!" 
+        ECHO VS 
+        ECHO "!name!"
         pause
         exit /b
     )
@@ -381,7 +386,12 @@ rem ECHO doir bridge *
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "delimed_right=%%i"
     )
+echo DELIMD RIGHT "!delimed_right!" Token "!token!"
 
+    REM Append a terminating character to from item
+    rem Delimit this appended from item with right using token=2
+    rem if the outcome does not equal the terminating character, we 
+    rem we need to save the space in between right_char and terminating character
   
     if "!delimed_right!" equ " " (
         exit /b
@@ -393,14 +403,7 @@ rem ECHO doir bridge *
     set "doils=1|!primes!|!delimed_right!|!o1s!|!o2s!"
     
     
-    REM "!!!!! don't nknow if these function calls are required !!!!"
-    rem "!!!! applied a name change to DOIL function -> :rec_left"
-    rem "!!!! funcs\recurse\with_left.bat"
 
-    rem this is named differently from a different file location
-    rem call :DOIL2 "!doils!"
-
-    rem this function call works for 
     
     call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!"
     set /a token+=1
@@ -484,10 +487,6 @@ exit /b
 
     REM MIGHT BE THE INCORRECT function call for DOIL type
     
-    REM "!!!!! don't nknow if these function calls are required !!!!"
-    rem "!!!! applied a name change to DOIL function -> :rec_left"
-    rem "!!!! funcs\recurse\with_left.bat"
-
     rem call :DOIL2 "!doils2!"
     set /a token+=1
     
