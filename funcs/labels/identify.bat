@@ -162,13 +162,15 @@ exit /b
 
     set old=
     set item=
-    for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!%%i!brk!"
+    if exist !file! (
+        for /f "tokens=1 delims=|" %%i in (!file!) do (
+            set "old=!old!%%i!brk!"
         rem echo item: "%%i"
 
-        set "item=%%i"
-        call :parse "!item!"
+            set "item=%%i"
+            call :parse "!item!"
 
+        )
     )
 
 
@@ -176,7 +178,9 @@ exit /b
 
 
     rem this is a temporary location for file deletion
-    del !file!
+    if exist !file! (
+        del !file!
+    )
     endlocal
 exit /b
 

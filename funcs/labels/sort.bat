@@ -244,10 +244,10 @@ exit /b
         exit /b
     )
 
-    set old=
     for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!%%i!brk!"
     )
+    
 
     set "old=!old!!code!"
     echo !old! > !file!
