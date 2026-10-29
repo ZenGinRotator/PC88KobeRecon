@@ -1,4 +1,19 @@
 setlocal EnableDelayedExpansion
+
+set hep=has_encaps_pnth.txt
+set hec=has_encaps_curl.txt
+set hes=has_encaps_sqr.txt
+
+set inp=is_nested_pnth.txt
+set inc=is_nested_curl.txt
+set ins=is_nested_sqr.txt
+
+set grptxt=group.txt
+set delimtxt=delimited.txt
+set toktxt=tokens.txt
+set encptd=encapsulated.txt
+set onstxt=ones.txt
+set brgtxt=bridges.txt
 set brk=^
 
 
@@ -14,16 +29,13 @@ goto :eof
     set "right=%~2"
     set "item=%~3"
     set "from_item=%~4"
-   
-echo ------
-
     
 
     set status=
     set encap_item=
 
 
-
+ 
 
     if exist type.txt ( del type.txt )
 
@@ -120,6 +132,8 @@ rem move this function to different file
     set "item=%~1"
 
     echo RECONSTRUCT WITH "!item!"
+
+    rem exclude bridges composed of 1 or more spaces
    
 
     if not exist construct.txt (

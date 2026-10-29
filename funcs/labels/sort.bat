@@ -32,6 +32,24 @@ rem Use this function to save bridges, indivs, or nested labels
     rem     and item=" " is a bridge, because we don't want 
     rem     to write item (" ") to bridges.txt file
 
+   rem exclude bridges having only 1 or more spaces,
+    REM     but save those single spaces in between pair of
+    rem     neighboring, nested labels
+    set "append=!item!"
+    set test=
+    call ".\funcs\utils.bat" :delim_with_char "1" " " "!append!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "test=%%i"
+    )
+
+    if "!test!" equ " " (
+        if not exist is_nested.txt (
+            exit /b
+        )
+    )
+
+
+
 
     if "!item!" equ " " (
         if "!type!" equ "BRIDGE" (
@@ -132,7 +150,7 @@ rem     echo format "!format!"
             )
         )
 
-echo NEST OLD "!nest_old!"
+REM echo NEST OLD "!nest_old!"
         if "!nest_old!" equ "ECHO is off." (
             set "nest_old="
         )
