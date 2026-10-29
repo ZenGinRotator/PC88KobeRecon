@@ -14,8 +14,11 @@ goto :eof
     set "right=%~2"
     set "item=%~3"
     set "from_item=%~4"
-
-    rem echo CALL ID_LABEL
+    set "add_space=%~5"
+echo ------
+     rem echo :ID_LABEL, addSpace = "!add_space!"
+     
+     rem echo ADD SPACE "!add_space!"
     
 
     set status=
@@ -26,7 +29,7 @@ goto :eof
 
     if exist type.txt ( del type.txt )
 
-    call :text_type "!left!" "!right!" "!item!" "!from_item!"
+    call :text_type "!left!" "!right!" "!item!" "!from_item!" "!add_space!"
 
 
     rem type.txt contains BRIDGE, INDIV, OR NESTED
@@ -102,7 +105,7 @@ goto :eof
     
 
 
-    call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
+    call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!" "!add_space!"
 
     rem reconstruct file name here
     call :reconstruct "!sort_item!"
@@ -118,7 +121,7 @@ rem move this function to different file
 
     set "item=%~1"
 
-    echo RECONSTRUCT WITH "!item!"
+    REM echo RECONSTRUCT WITH "!item!"
    
 
     if not exist construct.txt (
@@ -229,6 +232,7 @@ exit /b
     set "right=%~2"
     set "item=%~3"
     set "from_item=%~4"
+    set "add_space=%~5"
 rem echo CALL TEXT_TYPE
 rem ECHO "!left!"
 rem echo "!right!"
@@ -349,11 +353,14 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
         set "nest_status=BRIDGE"
         set "bridge=BRDG"
         set "format=!bridge!"
+
         if exist is_nested.txt (
             set "nest_status=NESTED"
             set "nested=BRDG"
             set "format=!nested!"
         
+
+            
         )
         
         set "nest_status=!nest_status!|"
@@ -375,10 +382,19 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
         rem set "format=(indiv)"
         set "format=CLSD"
         set "nest_status=INDIV"
+
+        rem keep add_space
+
+
+
+
         if exist is_nested.txt (
             set "nest_status=NESTED"
             rem set "format=(NESTED)"
             set "format=CLSD"
+
+            rem eliminate add_space
+            rem set "!add_space="
         )
     )
 
@@ -394,6 +410,11 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
         rem if "!from_item!" equ "!sec!" ( set "format=(NESTED + ")
         if "!from_item!" equ "!sec!" (
             set "format=OPN_ENDD"
+            rem 
+            
+
+
+
         )
         rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
         if "!from_item!" equ "!third!" (
@@ -404,7 +425,7 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
 
 
     rem echo "!format!"
-     call :encap_struct "!format!" "!left!|!right!" "!from_item!"
+     call :encap_struct "!format!" "!left!|!right!" "!from_item!" "!add_space!"
 
 
     set "nest_status=!nest_status!|"
@@ -438,6 +459,7 @@ rem ECHO CALLL ENCAP_STRUCT
     set "type=%~1"
     set "encap_set=%~2"
     set "labels=%~3"
+    set "add_space=%~4"
     rem set "file_type=%~4"
 
     rem store ecapsulators: (), {}, or []
@@ -467,6 +489,13 @@ rem ECHO CALLL ENCAP_STRUCT
     REM if "!type!" equ "3" (
     if "!type!" equ "CLSD" (
         set "use=!left!!labels!!right!"
+    )
+
+    rem This accounts for indiv neighbors, separated with a space
+
+    echo USSE "!use!" "!add_space!"
+    if "!use! " equ "!add_space!" (
+        rem set "use=!add_space!"
     )
 
     rem if exist struct.txt ( del struct.txt )

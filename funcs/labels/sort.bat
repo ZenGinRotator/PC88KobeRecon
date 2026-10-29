@@ -24,6 +24,7 @@ rem Use this function to save bridges, indivs, or nested labels
     set "item=%~1"
     set "type=%~2"
     set "format=%~3"
+    set "add_space=%~4"
 
 
     rem Block an item=" " in situations such as:
@@ -131,12 +132,23 @@ rem     echo format "!format!"
             )
         )
 
+echo NEST OLD "!nest_old!"
         if "!nest_old!" equ "ECHO is off." (
             set "nest_old="
         )
 
+
+
         rem add temp items to primary file
+
         set "old=!nest_old!!brk!!old!|"
+
+        if "!nest_old! " equ "!add_space!" (
+            set "old=!add_space!"
+        )
+        echo NEST OLD "!nest_old!"
+
+
         echo !old! > nested.txt
 
         set /a qty+=1
