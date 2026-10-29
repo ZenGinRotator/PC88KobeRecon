@@ -282,25 +282,8 @@ exit /b
         
         
         set "encap_type=O1"
-        set add_space=
-                    set "end_mark=\"
-                set "appended=!orig_bridge!!end_mark!"
-                rem echo APPENDED "!appended!"
-                set end_char=
-
-                call ".\funcs\utils.bat" :delim_with_char "2" "!o_right!" "!appended!"
-                for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-                    rem echo TERMATING CHAR? "%%i"
-                    set "end_char=%%i"
-                )
-                set add_space=
-                if "!end_char!" neq "!end_mark!" (
-                    rem echo WE NEED TO ADD A SPACE BECAUSE END CHAR IS "!end_char!"
-                    set "add_space=!orig_bridge!"
-                 rem echo **** SET ADD SPACE **** "!add_space!"
-                )
-                rem echo PRIMES "!primes!"
-        call :DOIR_BRIDGE "!dois!" "!encap_type!" "!add_space!"
+              
+        call :DOIR_BRIDGE "!dois!" "!encap_type!"
 
     ) 
     rem else (   
@@ -313,7 +296,7 @@ exit /b
     
 
     REM This function can correctly identify bridges, indivs, or nested labels
-
+    rem     when delimiting use left & right primary encapsulators
     set "encap_type=P"
     call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!
     
@@ -364,8 +347,8 @@ exit /b
     setlocal
     set "dois=%~1"
     set "encap_type=%~2"
-    set "add_space=%~3"
-   
+    
+    
 rem ECHO doir bridge *
     set token=
     set left=
@@ -401,25 +384,19 @@ rem ECHO doir bridge *
     )
 
     set delimed_right=
-    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right!" "!item!\"
+    set "end_mark=\"
+    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right!" "!item!!end_mark!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "delimed_right=%%i"
     )
-    echo DOIR: FROM ITEM "!item!"
-echo DELIMD RIGHT "!delimed_right!"
+    rem echo DOIR: FROM ITEM "!item!"
+rem echo DELIMD RIGHT "!delimed_right!"
 rem echo RIGHT "!right!"
 rem echo APPENDED "!item!\"
-    set /a temp=!token!+1
-    set next=
-    set mod=
-    call ".\funcs\utils.bat" :delim_with_char "!token!" "!right!" "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "next=%%i"
-        set "mod=%%i"
-    )
+   
+   
   
     if "!delimed_right!" equ " " (
-    rem if "!next!" equ " " (
         exit /b
     )
 
@@ -427,7 +404,7 @@ rem echo APPENDED "!item!\"
     set "orig_delimtd=!delimed_right!"
 
     rem Determine if a bridge exists before end mark
-    call ".\funcs\utils.bat" :delim_with_char "1" "\" "!delimed_right!"
+    call ".\funcs\utils.bat" :delim_with_char "1" "!end_mark!" "!delimed_right!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "possibly_diff=%%i"
     )
@@ -436,9 +413,9 @@ rem echo APPENDED "!item!\"
         set "delimed_right=!possibly_diff!"
     )
 
-    rem To account where two neighboring encapsulators do not share a 
+    rem To account where two neighboring encapsulators (of different alpabets) do not share a 
     rem     bridge between them.
-    if "!orig_delimtd!" equ "\" (
+    if "!orig_delimtd!" equ "!end_mark!" (
         exit /b
     )
 
@@ -451,7 +428,7 @@ rem echo APPENDED "!item!\"
     
 
     
-    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!" "!add_space!"
+    call ".\funcs\recurse\with_left.bat" :rec_left "!doils!" "!encap_type!"
     set /a token+=1
     
 
@@ -459,7 +436,7 @@ rem echo APPENDED "!item!\"
     set "o1s=!optn1_left!|!optn1_right!"
     set "o2s=!optn2_left!|!optn2_right!"
     set "dois=!token!|!primes!|!item!|!o1s!|!o2s!"
-    call :DOIR_BRIDGE "!dois!" "!encap_type!" "!add_space!"
+    call :DOIR_BRIDGE "!dois!" "!encap_type!"
     endlocal
 exit /b
 
