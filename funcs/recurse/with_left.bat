@@ -172,7 +172,7 @@ goto :eof
                 set "doils=1|!primes!|!from_item!|!o1s!|!o2s!"
                 
 
-                call "funcs_rom_keywords.bat" :DOIR_BRIDGE "!doils!" "O2"
+                call ".\funcs\recurse\with_right.bat" :DOIR_BRIDGE "!doils!" "O2"
             )
 
         )

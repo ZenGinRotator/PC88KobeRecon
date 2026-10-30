@@ -157,7 +157,6 @@ rem Use this function to save bridges, indivs, or nested labels
 
     call :item_separator "!format!"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
-         echo _SAME LINE "%%i"
         set "same_line=%%i"
     )
     

@@ -74,10 +74,7 @@ rem echo ID ITEM "!item!"
 
     rem echo FORMAT "!format!"
 
-    set "exist=N"
-    if exist is_nested.txt (
-        set "exist=Y"
-    )
+    
     rem echo is_nested: "!exist!"
 
 
@@ -218,7 +215,7 @@ exit /b
         set file=spaces.txt
     )
 
-    echo ----- file ----- "!file!"
+    
     rem indivs.txt
     rem nested.txt
     rem echo THE FILE "!file!"
@@ -231,16 +228,12 @@ exit /b
         REM echo IN FILE "%%i"
         set /a qty+=1
         if "!qty!" equ "!positn!" (
-             rem echo SHOW POSITION "!qty!" "!item!" "%%i"
-             rem echo LOOK UP "%%i"
              set "gotn=%%i"
-             rem echo "!gotn!"
              set "label="
             call ".\funcs\utils.bat" :delim_with_char "1" "#" "!gotn!"
             for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
                 set "label=%%i"
             )
-             ECHO ******* label "!label!"
             set "name=!name!!label!"
         )
     )
