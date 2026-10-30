@@ -1,4 +1,6 @@
 setlocal EnableDelayedExpansion
+set "space_saver=#"
+set "end_mark=|"
 set brk=^
 
 
@@ -30,64 +32,20 @@ rem Use this function to save bridges, indivs, or nested labels
 
     rem open-started OPN_STRTD, open-ended OPN_ENDD, closed, BRDG?
     set "format=%~3"
-    rem set "item=%~4"
     
     
-
-    rem Block an item=" " in situations such as:
-    rem Two neighboring closed labels, that are both indiv labels: (label 1)<space>(label 2)
-    rem     and item=" " is a bridge, because we don't want 
-    rem     to write item (" ") to bridges.txt file
-
-   rem exclude bridges having only 1 or more spaces,
-    REM     but save those single spaces in between pair of
-    rem     neighboring, nested labels
-    set "append=!item!"
-    set test=
+   
     set "orig_item=!item!"
-    rem echo APPEND "!append!"
-    rem echo test from APPEND "!test!"
+
     
-    call ".\funcs\utils.bat" :delim_with_char "1" " " "!append!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "test=%%i"
-        rem echo TEST "!test!"
-    )
-
-    set /a is_bridge=0
-    set /a blank_qty=0
-    call ".\funcs\utils.bat" :delim_with_char "1" " " "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        rem set "test=%%i"
-        rem echo TEST2 "!test2!"
-        if "%%i" NEQ " " (
-            SET /A is_bridge+=1
-        )
-        if "%%i" equ " " (
-            set /a blank_qty+=1            
-        )
-    )
-    call ".\funcs\utils.bat" :delim_with_char "2" " " "!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        rem set "test=%%i"
-        rem echo TEST2 "!test2!"
-        if "%%i" neq " " (
-            set /a is_bridge+=1
-        )
-        if "%%i" equ " " (
-            set /a blank_qty+=1            
-        )
-
-
-    )
+    
 
     SET "is_blank="
-
-    if "!blank_qty!" equ "2" (
-        set "is_blank=T"
-        echo IS BLANK
-        echo ORIG_ITEM "!orig_item!" "!type!" "!format!"
+    call :is_item_all_spaces "!item!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "is_blank=%%i"
     )
+    rem echo "!is_blank!"
 
     rem Need to exclude  bridges that need future recursion using DOIR# & DOIL#
     rem I might have an existing function that can be used to identify bridges matching these characteristics.
@@ -102,76 +60,28 @@ rem Use this function to save bridges, indivs, or nested labels
 
 
     if "!type!" equ "NESTED" (
-        rem set file=nested.txt
         set file=nested_line.txt
     )
 
 
-    if "!is_blank!" neq "" (
+    if "!is_blank!" neq " " (
         set file=spaces.txt
-    )
-
-    
-
-
-    rem echo FFFFIIIIILLLLLEEEEEEE "!file!"
-    rem test can equal " " when:
-    
-    rem token=2, then token=1, delims=" "
-    rem                     2
-    rem     bridge = " A BRIDGE WITH SPACE\"
-
-    rem     bridge = "BRIDGE with space \"
-    rem     bridge = " BRIDGE WITH SPACE\"
-    rem     bridge = " BRIDGE WITH SPACE \"
-
-    rem                 2= " ", 1=BRIDGE
-    REM     bridge = "BRIDGE\"
-    rem     bridge = " BRIDGE\"
-    rem     bridge = "BRIDGE \"
-    REM     bridge = " BRIDGE \"
-
-    rem     bridge = " ", "     ", or something else?
-   
-   
-    
-    set "item=#!item!|"
-
-    if "!type!" equ "NESTED" (
-        rem set "item=|!orig_item!#"
-        
-        rem OPN_ENDD
-        if "!format!" equ "OPN_ENDD" (
-            set "item=#!orig_item!|"
-        )
-        
-        REM CLSD
-        if "!format!" equ "CLSD" (
-            set "item=!orig_item!|"
-        )
-
-        rem OPN_STRTD
-        if "!format!" equ "OPN_STRTD" (
-            set "item=!orig_item!#"
-        )
-
-        if "!is_blank!" neq "" (
+        if exist is_nested.txt (
             set file=nested_line.txt
         )
-
     )
 
 
-        if "!is_blank!" neq "" (
-            set "item=!orig_item!|"
-            if not exist is_nested.txt (
-                set "item=#!item!"
-            )
-        )
-        rem BRDG
 
-    echo ****** "!item!" into FILE "!file!"
-    rem file could exist
+
+    call :prep_item_with_spaces "!type!" "!format!" "!is_blank!" "!orig_item!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "item=%%i"
+    )
+    set "item=!item!!end_mark!"
+    
+
+
 
     if not exist "!file!" (       
         echo !item! > "!file!"
@@ -268,9 +178,9 @@ rem Use this function to save bridges, indivs, or nested labels
    
     
     set "old=!old!!separator!!item!"
-    echo SEPARATOR: "!separator!"
-    echo FILE : !file!
-    echo OLD: "!old!"
+    rem echo SEPARATOR: "!separator!"
+    rem echo FILE : !file!
+    rem echo OLD: "!old!"
     echo !old! > "!file!"
 
 
@@ -310,8 +220,8 @@ exit /b
     )
 
     rem Now is single spaced item
-    rem echo "LABLE LIST ITEM" "!item!" "!type!" "!is_blank!"
-    if "!is_blank!" neq "" (
+   
+    if "!is_blank!" neq " " (
         set "alpha=S"
     )
 
@@ -337,15 +247,98 @@ exit /b
     
 
     set "old=!old!!code!"
-    if "!alpha!" equ "S" (
-REM echo OLD "!old!"
-    )
-    echo Positions: OLD 
-    echo "!old!"
+   
+   
+    rem echo Positions: OLD 
+    rem echo "!old!"
     
     rem echo end of old
     echo !old! > !file!
     
 
+    endlocal
+exit /b
+
+
+:is_item_all_spaces
+    setlocal
+
+    rem is:
+    rem     bridge of at least 1 character,
+    rem     indiv {label 1},
+    rem     part of nested group {label 1, {label 2}, {label 3 }, ... label n},
+    rem     or bridge of 1 or more spaces (ex: " ", "          ")
+    set "item_from_name=%~1"
+
+    set /a space_qty=0
+
+    call ".\funcs\utils.bat" :delim_with_char "1" " " "!item_from_name!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        if "%%i" equ " " (
+            set /a space_qty+=1
+        )
+    )
+
+    set "is_blank="
+    if "!space_qty!" equ "1" (
+        set "is_blank=T"
+    )
+
+    set "is_blank=!is_blank!|"
+
+    echo !is_blank! > return.txt
+
+    endlocal
+exit /b
+
+
+
+:prep_item_with_spaces
+    setlocal
+    rem object from name, can be:
+    rem     NESTED
+    rem     INDIV
+    rem     BRIDGE
+    set "obj=%~1"
+
+    rem encap style, can be:
+    rem     {label 1
+    rem     {label L}, 1 < L < n
+    rem     {label n}
+    set "encap=%~2"
+    rem boolean flag 
+    set "is_blank=%~3"
+
+    rem item from name
+    set "item=%~4"
+
+    set "use=!space_saver!!item!"
+
+    if "!obj!" EQU "NESTED" (
+
+        if "!encap!" equ "OPN_ENDD" (
+            set "use=!space_saver!!item!"
+        )
+
+        if "!encap!" equ "CLSD" (
+            set "use=!item!"
+        )
+
+        if "!encap!" equ "OPN_STRTD" (
+            set "use=!item!!space_saver!"
+        )
+    )
+
+
+
+    if "!is_blank!" neq " " (
+        set "use=!space_saver!!item!!end_mark!"
+        if exist is_nested.txt (
+            set "use=!item!!end_mark!"
+        )
+    )
+
+    set "use=!use!!end_mark!"
+    echo !use! > return.txt
     endlocal
 exit /b
