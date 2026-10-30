@@ -97,25 +97,21 @@ rem Use this function to save bridges, indivs, or nested labels
         exit /b
     )
 
-    rem make diffline and sameline version
-    set old=
-    set "separator=!brk!"
 
-    set /a same_line=0
-  
-  
-    if "!format!" equ "BRDG" (
-        
-        rem " " in between two closed within nested set of labels
-        if exist is_nested.txt (
-            set /a same_line+=1
-        )
-    )
+    rem DECOUPLE into functions
+    rem reading file, needs:
+    rem     if exists condition
+    rem     qty counter
+    rem     separator for joining previously read contents
+    rem     print statement?: echo ? for showing errors 
+    rem     print errors:
+    rem         mismatching file names,
+    rem         other related errors
 
+    rem --------------------------------------------
     rem last label of nested
     if "!format!" equ "OPN_STRTD" (
-        echo "!format!"
-        set /a same_line+=1
+        
         set old=
         
         rem getting items from the temp file
@@ -151,36 +147,44 @@ rem Use this function to save bridges, indivs, or nested labels
         exit /b
          
     )
+    rem --------------------------------------------
 
-    
-    rem source of same line nested labels within nested.txt
-    if "!format!" equ "CLSD" (
-        
-        rem closed within nested set of labels
-        if exist is_nested.txt (
-            set /a same_line+=1
-        )
+
+
+    set "separator=!brk!"
+
+    set /a same_line=0
+
+    call :item_separator "!format!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+         echo _SAME LINE "%%i"
+        set "same_line=%%i"
     )
+    
     if "!same_line!" neq "0" (
         set "separator="
     )
 
+
+
+
+
+
+
     set old=
     set copy_=
     set with_brk=
-    set /a l_qty=0
     set /a qty=0
     for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!!separator!%%i"
+        rem set "old=!old!!separator!%%i"
+        set "old=!old!%%i!separator!"
         set /a qty+=1
     )
          
    
     
-    set "old=!old!!separator!!item!"
-    rem echo SEPARATOR: "!separator!"
-    rem echo FILE : !file!
-    rem echo OLD: "!old!"
+    rem set "old=!old!!separator!!item!"
+    set "old=!old!!item!"
     echo !old! > "!file!"
 
 
@@ -340,5 +344,47 @@ exit /b
 
     set "use=!use!!end_mark!"
     echo !use! > return.txt
+    endlocal
+exit /b
+
+
+:item_separator
+    setlocal
+
+    rem encap style, can be:
+    rem     {label 1
+    rem     {label L}, 1 < L < n
+    rem     {label n}
+
+    set "encap=%~1"
+
+    set /a same_line=0
+    
+    if not exist is_nested.txt (
+        set "return=!same_line!!end_mark!"
+        echo !return! > return.txt
+        exit /b
+    )
+
+    if "!encap!" equ "BRDG" (
+        set /a same_line+=1
+    )
+
+    if "!encap!" equ "CLSD" (
+        set /a same_line+=1
+    )
+
+    rem set "same_line=!same_line!!end_mark!"
+    set "return=!same_line!!end_mark!"
+    echo !return! > return.txt
+    endlocal
+exit /b
+
+
+:read_file
+    setlocal
+
+
+
     endlocal
 exit /b
