@@ -1,5 +1,8 @@
 @ echo off
 @ setlocal EnableDelayedExpansion
+set delimtxt=delimited.txt
+
+
 set "equ_border=****************************************************************************************************************************************************************************"
 rem need nested [] () and {}
 rem need indiv [] () and {} - single and multi-word?
@@ -157,11 +160,31 @@ set "isp_front_bar=|isphrase"
 set "isp_front_bar_extra=|isphrase|"
  set "isp_mid_bar=is|phrase"
 set "isp_none=isphrase"
+set "i1= phrase"
+set "i2=phrase "
+set "i3= phrase "
+set "i4=phrase"
+set "i5= is phrase"
+set "i6=is phrase "
+set "i7= is phrase "
+set "i8=is phrase"
 echo VERIFY DELIMITING USING 
 call :v_bar "!isp_front_bar!" "|"
 call :v_bar "!isp_front_bar_extra!" "|"
 call :v_bar "!isp_mid_bar!" "|"
 call :v_bar "!isp_none!" "|"
+call :v_bar "!i1!" " "
+call :v_bar "!i2!" " "
+call :v_bar "!i3!" " "
+call :v_bar "!i4!" " "
+call :v_bar "!i5!" " "
+call :v_bar "!i6!" " "
+call :v_bar "!i7!" " "
+call :v_bar "!i8!" " "
+call :v_bar "" " "
+call :v_bar " " " "
+call :v_bar "  " " "
+
 
 
 rem call :all_bridges
@@ -1234,6 +1257,23 @@ exit /b
     )
 
     for /f "tokens=3 delims=%~2" %%i in ("!phrase!") do (
+        set "token3=%%i"
+    )
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!delim_char!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "token1=%%i"
+    )
+
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!delim_char!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "token2=%%i"
+    )
+
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!delim_char!" "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
         set "token3=%%i"
     )
 

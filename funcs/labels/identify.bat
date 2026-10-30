@@ -34,7 +34,7 @@ goto :eof
     set status=
     set encap_item=
 
-
+rem echo ID ITEM "!item!"
  
 
     if exist type.txt ( del type.txt )
@@ -126,12 +126,13 @@ exit /b
 
 
 rem move this function to different file
+rem real-time reconstruction of file name without the use of *.txt files
 :reconstruct
     setlocal
 
     set "item=%~1"
 
-    echo RECONSTRUCT WITH "!item!"
+    rem echo RECONSTRUCT WITH "!item!"
 
     rem exclude bridges composed of 1 or more spaces
    
@@ -155,6 +156,11 @@ rem move this function to different file
     endlocal
 exit /b
 
+
+
+
+
+
 :reconstruct2
     setlocal
 
@@ -173,10 +179,6 @@ exit /b
         )
     )
 
-
-
-
-
     rem this is a temporary location for file deletion
     if exist !file! (
         del !file!
@@ -184,10 +186,15 @@ exit /b
     endlocal
 exit /b
 
+
+
+
+
+
 :parse
     setlocal
     set "item=%~1"
-
+   
     set file_code=
     set /a positn=0
     for /f "tokens=1 delims=." %%i in ("!item!") do (
@@ -206,6 +213,12 @@ exit /b
     if "!file_code!" equ "I" (
         set file=indivs.txt
     )
+
+    if "!file_code!" equ "S" (
+        set file=spaces.txt
+    )
+
+    echo ----- file ----- "!file!"
     rem indivs.txt
     rem nested.txt
     rem echo THE FILE "!file!"
@@ -213,26 +226,40 @@ exit /b
     rem loop through the file and find counter that matches positn
     set /a qty=0
     set name=
+    set label=
     for /f "tokens=*" %%i in (!file!) do (
+        REM echo IN FILE "%%i"
         set /a qty+=1
-        if "!qty!" equ  "!positn!" (
-            rem echo SHOW POSITION "!qty!" "!item!" "%%i"
-            set "name=!name!%%i"
+        if "!qty!" equ "!positn!" (
+             rem echo SHOW POSITION "!qty!" "!item!" "%%i"
+             rem echo LOOK UP "%%i"
+             set "gotn=%%i"
+             rem echo "!gotn!"
+             set "label="
+            call ".\funcs\utils.bat" :delim_with_char "1" "#" "!gotn!"
+            for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+                set "label=%%i"
+            )
+             ECHO ******* label "!label!"
+            set "name=!name!!label!"
         )
     )
-
+rem echo NAME "!name!"
     if not exist name.txt (
         set "name=!name!|"
         echo !name! > name.txt
         exit /b
     )
 
-    set old=
+    set "old="
     for /f "tokens=1 delims=|" %%i in (name.txt) do (
         set "old=!old!%%i"
     )
+    rem set "OLD" 
+    rem echo "!old!"
     set "name=!old!!name!"
-    rem echo CONST NAME "!name!"
+    echo CONST NAME "!name!"
+    set "name=!name!|"
     echo !name! > name.txt
 
     endlocal
@@ -247,6 +274,9 @@ exit /b
     set "left=%~1"
     set "right=%~2"
     set "item=%~3"
+
+
+
     set "from_item=%~4"
 rem echo CALL TEXT_TYPE
 rem ECHO "!left!"

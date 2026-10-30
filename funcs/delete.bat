@@ -49,6 +49,8 @@ goto :eof
     if exist optn_bridges.txt ( del optn_bridges.txt )
     if exist nested_line.txt ( del nested_line.txt )
     if exist qty.txt ( del qty.txt )
-    rem if exist positions.txt ( del positions.txt )
+    if exist name.txt ( del name.txt )
+    if exist positions.txt ( del positions.txt )
+    if exist spaces.txt ( del spaces.txt )
     endlocal
 exit /b
