@@ -251,7 +251,7 @@ rem echo NAME "!name!"
     rem set "OLD" 
     rem echo "!old!"
     set "name=!old!!name!"
-    echo CONST NAME "!name!"
+    REM echo CONST NAME "!name!"
     set "name=!name!|"
     echo !name! > name.txt
 

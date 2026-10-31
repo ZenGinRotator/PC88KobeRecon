@@ -153,7 +153,8 @@ exit /b
     )
 
     if "!construct!" neq "!name!" (
-        echo ERROR: constructed name vs input name
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo REAL TIME CONSTRUCT ERROR: constructed name vs input name
         echo "!construct!" 
         ECHO VS 
         ECHO "!name!"
@@ -161,6 +162,23 @@ exit /b
         exit /b
     )
 
+    set construct2=
+    if exist name.txt (
+        for /f "tokens=1 delims=|" %%i in (name.txt) do (
+            set "construct2=%%i"
+        )
+    )
+
+    if "!construct2!" NEQ "!name!" (
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo BY LABEL CONSTRUCT ERROR: constructed name vs input name
+        echo "!construct2!" 
+        ECHO VS 
+        ECHO "!name!"
+        pause
+        exit /b
+
+    )
 
    
     
