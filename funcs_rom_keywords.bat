@@ -80,6 +80,26 @@ exit /b
     call :print_txt "N"
     call ".\funcs\labels\identify.bat" :reconstruct2
     echo FINAL NAME "!name!"
+    
+    set construct2=
+    if exist name.txt (
+        for /f "tokens=1 delims=|" %%i in (name.txt) do (
+            set "construct2=%%i"
+        )
+    )
+
+    if "!construct2!" NEQ "!name!" (
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo BY LABEL CONSTRUCT ERROR: constructed name vs input name
+        echo "!construct2!" 
+        ECHO VS 
+        ECHO "!name!"
+        pause
+        exit /b
+
+    )
+
+
 
 
     call ".\funcs\delete.bat" :del_txts
@@ -162,23 +182,6 @@ exit /b
         exit /b
     )
 
-    set construct2=
-    if exist name.txt (
-        for /f "tokens=1 delims=|" %%i in (name.txt) do (
-            set "construct2=%%i"
-        )
-    )
-
-    if "!construct2!" NEQ "!name!" (
-        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        echo BY LABEL CONSTRUCT ERROR: constructed name vs input name
-        echo "!construct2!" 
-        ECHO VS 
-        ECHO "!name!"
-        pause
-        exit /b
-
-    )
 
    
     

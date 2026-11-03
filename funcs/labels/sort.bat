@@ -24,6 +24,7 @@ rem Use this function to save bridges, indivs, or nested labels
 :sort_label
     setlocal
 
+    
     rem partially or fully encapsulated label, OR BRIDGE
     set "item=%~1"
 
@@ -37,7 +38,7 @@ rem Use this function to save bridges, indivs, or nested labels
    
     set "orig_item=!item!"
 
-    
+    rem ECHO item "!item!"
     
 
     SET "is_blank="
@@ -50,26 +51,35 @@ rem Use this function to save bridges, indivs, or nested labels
     rem Need to exclude  bridges that need future recursion using DOIR# & DOIL#
     rem I might have an existing function that can be used to identify bridges matching these characteristics.
     set file=bridges.txt
-
+    set "file_code=BRIDG"
 
    
     REM if "!type!" equ "2" (
     if "!type!" equ "INDIV" (
         set file=indivs.txt
+        set "file_code=INDVS"
     )
 
 
     if "!type!" equ "NESTED" (
+        rem have alternate
         set file=nested_line.txt
+        set "file_code=NSTD_LN"
     )
 
 
     if "!is_blank!" neq " " (
+        set "file_code=SPCS"
         set file=spaces.txt
+        
+
+        rem have alternate
         if exist is_nested.txt (
             set file=nested_line.txt
+            set "file_code=NSTD_LN"
         )
     )
+
 
 
 
@@ -79,123 +89,27 @@ rem Use this function to save bridges, indivs, or nested labels
         set "item=%%i"
     )
     set "item=!item!!end_mark!"
+
+    rem echo prepped ITEM "!item!"
+    
     
 
 
-
+    rem Saving the first instace of a 
     if not exist "!file!" (       
-        echo !item! > "!file!"
-
-        rem To account for space-derived bridge
-        
-
-        REM stop add to position.txt when we enter the first label
-        rem     belonging to the first instance of a nested set of labels
-        if "!type!" neq "NESTED" (
-            call :label_list "!type!" "1" "!item!" "!is_blank!"
-        )
+        call :1st_instance "!type!" "!item!" "!is_blank!" "1" "!file_code!" "!item!"
         exit /b
     )
 
 
-    rem DECOUPLE into functions
-    rem reading file, needs:
-    rem     if exists condition
-    rem     qty counter
-    rem     separator for joining previously read contents
-    rem     print statement?: echo ? for showing errors 
-    rem     print errors:
-    rem         mismatching file names,
-    rem         other related errors
-
-    rem --------------------------------------------
     rem last label of nested
     if "!format!" equ "OPN_STRTD" (
-        
-        set old=
-        
-        rem getting items from the temp file
-        for /f "tokens=1 delims=|" %%i in (!file!) do (
-            set "old=!old!%%i"
-        )
-        set "old=!old!!item!|"
-        set "blank=|"
-        echo !blank! > !file!
-        
-
-        rem getting items from primary file
-        set nest_old=
-        set copy=
-        rem quantity for the label of the same type
-        set /a qty=0
-
-
-        if exist nested.txt (
-            for /f "tokens=1 delims=|" %%i in (nested.txt) do (
-                set "nest_old=!nest_old!%%i!brk!"
-                set /a qty+=1
-            )
-        )
-
-        rem add temp items to primary file
-
-        set "old=!nest_old!!old!!item!|"
-        echo !old! > nested.txt
-
-        set /a qty+=1
-        call :label_list "!type!" "!qty!" "!item!" "!is_blank!"
+        call :is_opn_started "!file_code!" "!type!" "!is_blank!"
         exit /b
-         
-    )
-    rem --------------------------------------------
-
-
-
-    set "separator=!brk!"
-
-    set /a same_line=0
-
-    call :item_separator "!format!"
-    for /f "tokens=1 delims=|" %%i in (return.txt) do (
-        set "same_line=%%i"
     )
     
-    if "!same_line!" neq "0" (
-        set "separator="
-    )
 
-
-
-
-
-
-
-    set old=
-    set copy_=
-    set with_brk=
-    set /a qty=0
-    for /f "tokens=1 delims=|" %%i in (!file!) do (
-        rem set "old=!old!!separator!%%i"
-        set "old=!old!%%i!separator!"
-        set /a qty+=1
-    )
-         
-   
-    
-    rem set "old=!old!!separator!!item!"
-    set "old=!old!!item!"
-    echo !old! > "!file!"
-
-
-
-    rem block counter for number of nested lables,
-    rem     We determine this quantity when finding open_started label
-
-    rem quantity for the label of the same type
-    set /a qty+=1
-    if "!type!" neq "NESTED" (
-        call :label_list "!type!" "!qty!" "!item!" "!is_blank!"
-    )
+    call :others "!file_code!" "!format!" "!item!" "!type!" "!item!" "!is_blank!"
 
     endlocal
 exit /b
@@ -237,7 +151,6 @@ exit /b
     rem EXIT /B
 
     if not exist !file! (
-        rem echo START WITH CODE "!code!"
         echo !code! > !file!
         exit /b
     )
@@ -245,17 +158,12 @@ exit /b
     set old=
     for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!%%i!brk!"
-        rem echo echoing "%%i"
     )
     
 
     set "old=!old!!code!"
    
    
-    rem echo Positions: OLD 
-    rem echo "!old!"
-    
-    rem echo end of old
     echo !old! > !file!
     
 
@@ -288,6 +196,8 @@ exit /b
     )
 
     set "is_blank=!is_blank!|"
+
+    if exist return.txt ( del return.txt )
 
     echo !is_blank! > return.txt
 
@@ -342,6 +252,8 @@ exit /b
     )
 
     set "use=!use!!end_mark!"
+
+    if exist returnt.txt ( del return.txt )
     echo !use! > return.txt
     endlocal
 exit /b
@@ -361,6 +273,7 @@ exit /b
     
     if not exist is_nested.txt (
         set "return=!same_line!!end_mark!"
+        if exist return.txt ( del return.txt )
         echo !return! > return.txt
         exit /b
     )
@@ -375,14 +288,208 @@ exit /b
 
     rem set "same_line=!same_line!!end_mark!"
     set "return=!same_line!!end_mark!"
+    if exist return.txt ( del return.txt )
     echo !return! > return.txt
     endlocal
 exit /b
 
 
-:read_file
+
+:1st_instance
+    setlocal
+    set "type=%~1"
+    set "write_this=%~2"
+    set "is_blank=%~3"
+    set "qty=%~4"
+    set "code=%~5"
+    set "line=%~6"
+
+    
+    if "!code!" equ "" ( exit /b )
+
+    set "file="
+    if "!code!" equ "BRIDG" (
+        set file=bridges.txt
+    )
+    if "!code!" equ "INDVS" (
+        set file=indivs.txt
+    )
+    if "!code!" equ "NSTD" (
+        set file=nested.txt
+    )
+    if "!code!" equ "NSTD_LN" (
+        set file=nested_line.txt
+    )
+    if "!code!" equ "SPCS" (
+        set file=spaces.txt
+    )
+
+    if "!code!" equ "NAME" (
+        set file=name.txt
+    )
+
+    if "!file!" equ "" (
+        exit /b
+    )
+
+
+    echo !write_this! > !file!
+
+    if "!type!" NEQ "NESTED" (
+        call :label_list "!type!" "!qty!" "!line!" "!is_blank!"
+    )
+
+    endlocal
+exit /b
+
+
+:is_opn_started
+    setlocal
+    set "code=%~1"
+    set "type=%~2"
+    set "is_blank=%~3"
+
+    if "!code!" equ "" ( exit /b )
+
+    set "file="
+    if "!code!" equ "BRIDG" (
+        set file=bridges.txt
+    )
+    if "!code!" equ "INDVS" (
+        set file=indivs.txt
+    )
+    if "!code!" equ "NSTD" (
+        set file=nested.txt
+    )
+    if "!code!" equ "NSTD_LN" (
+        set file=nested_line.txt
+    )
+    if "!code!" equ "SPCS" (
+        set file=spaces.txt
+    )
+
+    if "!code!" equ "NAME" (
+        set file=name.txt
+    )
+
+    if "!file!" equ "" (
+        exit /b
+    )
+
+
+
+
+    del is_nested.txt
+    set "old_line="
+
+
+        rem getting items from the nestd_line file
+        for /f "tokens=1 delims=|" %%i in (!file!) do (
+            set "old_line=!old_line!%%i"
+        )
+
+        rem add item to content from line file
+        set "new_nested=!old_line!!item!|"
+        
+         
+        set /a qty=0
+        rem read all contents from nested file
+        if exist nested.txt (
+            set "old_nested="
+            for /f "tokens=1 delims=|" %%i in (nested.txt) do (
+                set "old_nested=!old_nested!%%i!brk!"
+                set /a qty+=1
+            )
+        )
+
+
+        rem add new nested line to existing content from nested file
+        set "old_nested=!old_nested!!new_nested!"
+
+        rem getting items from primary file
+        rem quantity for the label of the same type
+        
+        del !file!
+
+
+
+        set /a qty+=1
+
+        echo !old_nested! > nested.txt
+        call :label_list "!type!" "!qty!" "!new_nested!" "!is_blank!"
+    endlocal
+exit /b
+
+:others
     setlocal
 
+    set "code=%~1"
+    set "format=%~2"
+    set "item=%~3"
+    set "type=%~4"
+    set "item=%~5"
+    set "is_blank=%~6"
+    
+    if "!code!" equ "" ( exit /b )
+
+    set "file="
+    if "!code!" equ "BRIDG" (
+        set file=bridges.txt
+    )
+    if "!code!" equ "INDVS" (
+        set file=indivs.txt
+    )
+    if "!code!" equ "NSTD" (
+        set file=nested.txt
+    )
+    if "!code!" equ "NSTD_LN" (
+        set file=nested_line.txt
+    )
+    if "!code!" equ "SPCS" (
+        set file=spaces.txt
+    )
+
+    if "!code!" equ "NAME" (
+        set file=name.txt
+    )
+
+    if "!file!" equ "" (
+        exit /b
+    )
+
+    rem 
+    set "separator=!brk!"
+
+    set /a same_line=0
+
+    call :item_separator "!format!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "same_line=%%i"
+    )
+    
+    if "!same_line!" neq "0" (
+        set "separator="
+    )
+
+    set old=
+
+    set /a qty=0
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
+        set "old=!old!%%i!separator!"
+        set /a qty+=1
+    )
+
+
+    set "old=!old!!item!"
+    
+    
+    set /a qty+=1
+    
+    rem echo FILE CODE "!file_code!"
+  echo !old! > "!file!"
+if "!type!" neq "NESTED" (
+        call :label_list "!type!" "!qty!" "!item!" "!is_blank!"
+   )
 
 
     endlocal

@@ -56,6 +56,9 @@ rem Function to determine if any optional characters exist
     endlocal
 exit /b
 
+
+
+
 rem bridge.txt
 rem bridges.txt
 rem change.txt
@@ -70,6 +73,7 @@ rem first_char.txt
 rem first_qty
 rem first_largest_qty
 rem format.txt
+REM indivs.txt INDVS
 rem inverted.txt
 
 rem is_nested
@@ -77,7 +81,8 @@ rem labels
 rem last_char.txt
 rem longest_encaps_words.txt
 rem name.txt
-rem nested.txt
+rem nested.txt  "NESTED", NSTD
+rem nested_line.txt "NSTD_LN"
 rem nums.txt
 rem old_item.txt
 rem ones.txt
@@ -86,6 +91,7 @@ rem reduced_bridge.txt
 rem return.txt
 rem sec_qty
 rem sec_largest_qty
+rem spaces.txt SPCS
 rem struct.txt
 
 rem third_qty
@@ -93,3 +99,131 @@ rem third_largest_qty
 rem three.txt
 rem token.txt
 rem type.txt
+
+
+:content
+    setlocal
+    set "code=%~1"
+    set "separator=%~2"
+    rem echo SEPARATOR "!separator!"
+
+    set "flag="
+    rem set "separator_=!separator!"
+    if "!separator!" equ "\" (
+        set "separator=!brk!"
+        set "flag=T"
+
+
+    )
+
+    if "!code!" equ "" ( exit /b )
+
+    set "file="
+    if "!code!" equ "BRIDG" (
+        set file=bridges.txt
+    )
+    if "!code!" equ "INDVS" (
+        set file=indivs.txt
+    )
+    if "!code!" equ "NSTD" (
+        set file=nested.txt
+    )
+    if "!code!" equ "NSTD_LN" (
+        set file=nested_line.txt
+    )
+    if "!code!" equ "SPCS" (
+        set file=spaces.txt
+    )
+
+    if "!code!" equ "NAME" (
+        set file=name.txt
+    )
+
+    if "!file!" equ "" (
+        exit /b
+    )
+
+    if exist return.txt ( del return.txt )
+    if exist return_qty.txt ( del return_qty.txt )
+
+    set /a qty=0
+    set "old="
+    if exist !file! (
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
+        set "old=!old!%%i"
+        rem echo ****** "%%i"
+        set /a qty+=1
+    )
+    )
+
+    rem if "!flag!" neq "T" (
+set "old=!old!|"
+    rem )
+    echo OLD "!old!"
+    REM echo wrtingin "!old!"
+    echo !old! > return.txt
+
+    set "qty=!qty!|"
+    echo !qty! > return_qty.txt
+    
+    
+    endlocal
+exit /b
+
+
+:list_n_qty
+    setlocal
+
+    rem delete the return.txt file
+    if exist return.txt ( del return.txt )
+
+    rem call listify
+    call :recurse_listify "1" "&" 
+
+    endlocal
+exit /b
+
+
+
+
+:recurse_listify
+    setlocal
+
+    set "token=%~1"
+    set "delim_chr=%~2"
+    set "whole_str=%~3"
+
+    set "item="
+    rem delim char, set item
+    call :delim_with_char "!token!" "!delim_chr!" "!whole_str!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" equ " " (
+        
+        
+        
+        exit /b
+    )
+    rem stop condition, item=" "
+
+    set "d="
+    rem if exist return_.txt ( del return.txt
+    for /f "tokens=*" %%i in (return.txt) do (
+        set "d=!d!%%i!brk!"
+    )
+    rem )
+
+
+     set "d=!d!!item!"
+    
+
+    rem add the token to output before writing to file
+    echo !d! > return_.txt
+
+    set /a token+=1
+    call :listify "!token!" "!delim_chr!" "!whole_str!"
+
+    endlocal
+exit /b

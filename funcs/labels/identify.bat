@@ -237,7 +237,7 @@ exit /b
             set "name=!name!!label!"
         )
     )
-rem echo NAME "!name!"
+
     if not exist name.txt (
         set "name=!name!|"
         echo !name! > name.txt
@@ -246,14 +246,20 @@ rem echo NAME "!name!"
 
     set "old="
     for /f "tokens=1 delims=|" %%i in (name.txt) do (
-        set "old=!old!%%i"
+         set "old=!old!%%i"
     )
-    rem set "OLD" 
-    rem echo "!old!"
+    
+
+
     set "name=!old!!name!"
-    REM echo CONST NAME "!name!"
+    rem echo OLD1 "!name!"
+    
+    rem echo OLD2 "!old2!"
+    rem echo CONSTRUC 2 "!name!"
     set "name=!name!|"
+    
     echo !name! > name.txt
+    
 
     endlocal
 exit /b
@@ -359,7 +365,7 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
         set "bridge=BRDG"
         set "format=!bridge!"
         if exist is_nested.txt (
-            del is_nested.txt
+            rem del is_nested.txt
             set "nest_status=NESTED"
 
             rem echo ENCAPED FORMAT: "label)"

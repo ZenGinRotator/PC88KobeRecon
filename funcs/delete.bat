@@ -52,5 +52,6 @@ goto :eof
     if exist name.txt ( del name.txt )
     if exist positions.txt ( del positions.txt )
     if exist spaces.txt ( del spaces.txt )
+    if exist return.txt ( del return.txt )
     endlocal
 exit /b
