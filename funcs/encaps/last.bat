@@ -240,13 +240,8 @@ rem                 the 1st or 2nd character is the last character of the file n
         set "bridge= !end_mark!"
     )
 
-    rem echo brdige "!bridge!"
-    rem echo "!p_bridge!"
-    rem echo "!c_bridge!"
-    rem echo "!s_bridge!"
-
-
-    
+   
+   
 
     CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!end_mark!" "!echo_verify!"
 
@@ -478,6 +473,8 @@ exit /b
     set "token=%~1"
     set "right_c=%~2"
     set "phrase=%~3"
+
+    rem Do I need this argument?
     set "old_item=%~4"
 
     set item=
@@ -486,11 +483,9 @@ exit /b
         set "item=%%i"
     )
      
-rem echo ITEM "!item!" TOKEN "!token!"
 
     if "!item!" equ " " (
         set "old_item=!old_item!|"
-    rem     echo old item "!old_item!" 
         echo !old_item! > "old_item.txt"
         rem pause
         set /a temp=!token!-1

@@ -126,7 +126,7 @@ exit /b
     
     
     rem this function calls find_last_char, which populates chars.txt wit primary and option 1 & 2 chars
-    call ".\funcs\encaps\chars.bat" :start_n_ends "!name!" ""
+    call ".\funcs\encaps\chars.bat" :first_n_last "!name!" ""
     
     for /f "tokens=*" %%i in (chars.txt) do (
         echo CHARS.TXT "%%i"

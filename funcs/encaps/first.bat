@@ -72,10 +72,8 @@ goto :eof
         set "first_char={"
         set "smallest_bridge=!c_bridge!"
     )
-    rem echo p bridge "!p_bridge!"
-    rem echo s bridge "!s_bridge!"
-    rem echo c bridge "!c_bridge!"
-    rem echo sm bridge "!smallest_bridge!"
+
+
     if "!c_bridge!" equ "PAD" (
         set "smallest_bridge=PAD"
     )

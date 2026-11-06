@@ -24,7 +24,7 @@ call %*
 goto :eof
 
 
-:start_n_ends
+:first_n_last
     setlocal
     set "name=%~1"
     set "show_out=%~2"
@@ -55,48 +55,16 @@ goto :eof
 
     echo **** "!left!" "!right!"
 
-    set "orig_name=!name!"
-
-
-    rem Blank file name, version 1
-    if "!name!" equ "" (
-        rem set /a filled+=1
-        exit /b
-    )
-
-    rem Blank file name, version 2
-    if "!name!" equ " " (
-        rem set /a filled+=1
-        exit /b
-    )
-
-
     set "rom="
-    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD#!name!"
-
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    call ".\funcs\labels\rom.bat" :find_rom_label "!name!" "!left!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
         set "rom=%%i"
     )
- 
 
-    rem File name without a rom name but has encapsulators
-    if "!rom!" equ "PAD#" (
+    if "!rom!" EQU " " (
         exit /b
     )
 
-    rem File name without any encapsulators
-    rem rem = name
-    set "pad="
-    call ".\funcs\utils.bat" :delim_with_char "2" "#" "!rom!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "rom=%%i"
-    )
-
-
-    rem set "rom=#!rom!|"
-    rem echo !rom! > rom.txt
-
-    rem call "funcs\labels\sort.bat" :positions_list "ROM" "1" "!rom!" " "
     call "funcs\labels\sort.bat" :sort_label "!rom!" "ROM" "RM"
 
 
