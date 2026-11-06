@@ -150,10 +150,6 @@ rem     found with the optional characters
     for /f "tokens=3 delims=|" %%i in (reduced_bridge.txt) do (
         set "o2_bridge=%%i"
     )
-rem echo after call "!o1_bridge!" "!o2_bridge!"
-rem echo bridge "!smallest_bridge!"
-rem echo "!o1_bridge!"
-rem echo "!o2_bridge!"
 
 
   
@@ -182,7 +178,7 @@ rem echo "!o2_bridge!"
         )
         set "first_char=!first_char!|"
         echo !first_char! > first_char.txt
-        echo FIRST CHAR PAUSE
+        echo FIRST CHAR ERROR
         pause
         exit /b
     )

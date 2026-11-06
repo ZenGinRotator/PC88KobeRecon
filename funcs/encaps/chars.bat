@@ -1,4 +1,23 @@
 setlocal EnableDelayedExpansion
+set hep=has_encaps_pnth.txt
+set hec=has_encaps_curl.txt
+set hes=has_encaps_sqr.txt
+
+set inp=is_nested_pnth.txt
+set inc=is_nested_curl.txt
+set ins=is_nested_sqr.txt
+
+set grptxt=group.txt
+set delimtxt=delimited.txt
+set toktxt=tokens.txt
+set encptd=encapsulated.txt
+set onstxt=ones.txt
+set brgtxt=bridges.txt
+set brk=^
+
+
+
+
 
 call %*
 
@@ -35,6 +54,51 @@ goto :eof
     )
 
     echo **** "!left!" "!right!"
+
+    set "orig_name=!name!"
+
+
+    rem Blank file name, version 1
+    if "!name!" equ "" (
+        rem set /a filled+=1
+        exit /b
+    )
+
+    rem Blank file name, version 2
+    if "!name!" equ " " (
+        rem set /a filled+=1
+        exit /b
+    )
+
+
+    set "rom="
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD#!name!"
+
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "rom=%%i"
+    )
+ 
+
+    rem File name without a rom name but has encapsulators
+    if "!rom!" equ "PAD#" (
+        exit /b
+    )
+
+    rem File name without any encapsulators
+    rem rem = name
+    set "pad="
+    call ".\funcs\utils.bat" :delim_with_char "2" "#" "!rom!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "rom=%%i"
+    )
+
+
+    rem set "rom=#!rom!|"
+    rem echo !rom! > rom.txt
+
+    rem call "funcs\labels\sort.bat" :positions_list "ROM" "1" "!rom!" " "
+    call "funcs\labels\sort.bat" :sort_label "!rom!" "ROM" "RM"
+
 
     endlocal
 exit /b

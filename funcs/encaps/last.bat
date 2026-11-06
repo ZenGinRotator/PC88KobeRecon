@@ -330,7 +330,7 @@ rem     found with the optional characters
         )
 
         rem return error
-        echo LAST CHAR PAUSE
+        echo LAST CHAR ERROR
         PAUSE
         set "last_char=-!last_char!|"
         echo !last_char! > last_char.txt

@@ -53,5 +53,6 @@ goto :eof
     if exist positions.txt ( del positions.txt )
     if exist spaces.txt ( del spaces.txt )
     if exist return.txt ( del return.txt )
+    if exist rom.txt ( del rom.txt )
     endlocal
 exit /b

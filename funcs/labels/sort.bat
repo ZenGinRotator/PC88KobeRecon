@@ -27,7 +27,7 @@ rem Use this function to save bridges, indivs, or nested labels
     
     rem partially or fully encapsulated label, OR BRIDGE
     set "item=%~1"
-
+rem echo ITEM --- "!item!"
     rem type= BRIDGE, INDIV, or NESTED
     set "type=%~2"
 
@@ -60,6 +60,10 @@ rem Use this function to save bridges, indivs, or nested labels
         set "file_code=INDVS"
     )
 
+    if "!type!" equ "ROM" (
+        set file=rom.txt
+        set "file_code=ROM"
+    )
 
     if "!type!" equ "NESTED" (
         rem have alternate
@@ -92,12 +96,40 @@ rem Use this function to save bridges, indivs, or nested labels
 
     rem echo prepped ITEM "!item!"
     
+    REM This, incorrectly, might include the first instance of a bridge
+    rem within the file name, as a ROM descriptor when it should remain
+    rem a bridge.
+   
+    
     
 
+    rem echo ITME "!item!"
+    set "rom="
+    if exist rom.txt (
+        
+        for /f "tokens=1 delims=|" %%i in (rom.txt) do (
+            set "rom=%%i"
+        )
+        if "!rom!|" equ "!item!" (
+            exit /b
+        )
+    )
 
     rem Saving the first instace of a 
     if not exist "!file!" (       
-        call :1st_instance "!type!" "!item!" "!is_blank!" "1" "!file_code!" "!item!"
+
+        rem set /a empty=0
+        rem if "!item!" equ "" (
+        rem     set /a empty+=1
+        rem )
+        rem if "!item!" equ " " (
+        rem     set /a empty+=1
+        rem )
+        rem if "!empty!" neq "0" (
+        rem     echo EXIT ? DELETE THIS -----
+        rem     exit /b
+        rem )
+        call :1st_instance_of_type "!type!" "!item!" "!is_blank!" "1" "!file_code!" "!item!"
         exit /b
     )
 
@@ -109,7 +141,7 @@ rem Use this function to save bridges, indivs, or nested labels
     )
     
 
-    call :others "!file_code!" "!format!" "!item!" "!type!" "!item!" "!is_blank!"
+    call :subsequents "!file_code!" "!format!" "!item!" "!type!" "!item!" "!is_blank!"
 
     endlocal
 exit /b
@@ -117,7 +149,7 @@ exit /b
 
 
 
-:label_list
+:positions_list
     setlocal
 
     set "type=%~1"
@@ -130,6 +162,10 @@ exit /b
 
     if "!type!" equ "INDIV" (
         set "alpha=I"
+    )
+
+    if "!type!" equ "ROM" (
+        set "alpha=R"
     )
 
     if "!type!" equ "NESTED" (
@@ -146,7 +182,7 @@ exit /b
     set file=positions.txt
     
     set "code=!alpha!.!qty!|"
-    rem echo CODE: !code! ITEM "!item!"
+    
     
     rem EXIT /B
 
@@ -253,7 +289,7 @@ exit /b
 
     set "use=!use!!end_mark!"
 
-    if exist returnt.txt ( del return.txt )
+    if exist return.txt ( del return.txt )
     echo !use! > return.txt
     endlocal
 exit /b
@@ -295,7 +331,7 @@ exit /b
 
 
 
-:1st_instance
+:1st_instance_of_type
     setlocal
     set "type=%~1"
     set "write_this=%~2"
@@ -311,6 +347,11 @@ exit /b
     if "!code!" equ "BRIDG" (
         set file=bridges.txt
     )
+
+    if "!code!" equ "ROM" (
+        set file=rom.txt
+    )
+
     if "!code!" equ "INDVS" (
         set file=indivs.txt
     )
@@ -336,7 +377,7 @@ exit /b
     echo !write_this! > !file!
 
     if "!type!" NEQ "NESTED" (
-        call :label_list "!type!" "!qty!" "!line!" "!is_blank!"
+        call :positions_list "!type!" "!qty!" "!line!" "!is_blank!"
     )
 
     endlocal
@@ -416,18 +457,20 @@ exit /b
         set /a qty+=1
 
         echo !old_nested! > nested.txt
-        call :label_list "!type!" "!qty!" "!new_nested!" "!is_blank!"
+        call :positions_list "!type!" "!qty!" "!new_nested!" "!is_blank!"
     endlocal
 exit /b
 
-:others
+:subsequents
     setlocal
 
     set "code=%~1"
     set "format=%~2"
     set "item=%~3"
+    rem echo item 1 "!item!"
     set "type=%~4"
     set "item=%~5"
+    rem echo item 2 "!item!"
     set "is_blank=%~6"
     
     if "!code!" equ "" ( exit /b )
@@ -488,7 +531,7 @@ exit /b
     rem echo FILE CODE "!file_code!"
   echo !old! > "!file!"
 if "!type!" neq "NESTED" (
-        call :label_list "!type!" "!qty!" "!item!" "!is_blank!"
+        call :positions_list "!type!" "!qty!" "!item!" "!is_blank!"
    )
 
 

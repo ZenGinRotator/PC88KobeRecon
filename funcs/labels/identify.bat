@@ -215,6 +215,10 @@ exit /b
         set file=spaces.txt
     )
 
+    if "!file_code!" equ "R" (
+        set file=rom.txt
+    )
+
     
     rem indivs.txt
     rem nested.txt

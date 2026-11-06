@@ -75,24 +75,31 @@ exit /b
     set "name=%~1"
     call ".\funcs\delete.bat" :del_txts
     call :start_kywds "!name!"
+    call :print_txt "R"
     call :print_txt "B"
     call :print_txt "I"
     call :print_txt "N"
     call ".\funcs\labels\identify.bat" :reconstruct2
     echo FINAL NAME "!name!"
     
-    set construct2=
+    set "construct2="
     if exist name.txt (
         for /f "tokens=1 delims=|" %%i in (name.txt) do (
             set "construct2=%%i"
         )
     )
 
+
+    if "!name!" equ " " (
+        set "construct2= "
+    )
+
+
     if "!construct2!" NEQ "!name!" (
-        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-        echo BY LABEL CONSTRUCT ERROR: constructed name vs input name
+        if "!construct2!" equ "" ( exit /b )
+        echo ************  BY LABEL CONSTRUCT ERROR: constructed name vs input name ******************
         echo "!construct2!" 
-        ECHO VS 
+        ECHO - VS - 
         ECHO "!name!"
         pause
         exit /b
@@ -155,7 +162,12 @@ exit /b
     set "o2s=!optn_two_left!|!optn_two_right!"
     set "recs=!token!|!primes!|!name!|!o1s!|!o2s!"
 
-    rem if exist construct.txt ( del construct.txt )
+    rem Find the rom descriptor from file name & add that rom to
+    rem bridges.txt
+
+    rem *******************************************************
+    rem set "rom="
+    rem call ".\funcs\utils.bat" :delim_with_char "1"
 
     call ".\funcs\recurse\on_name.bat" :recurse_on_group2 "!recs!"
    
@@ -753,6 +765,11 @@ rem ----------------------------------------
     if "!type!" equ "I" (
         set file=indivs.txt
         SET "title=-- INDIVS --"
+    )
+
+    if "!type!" equ "R" (
+        set file=rom.txt
+        set "title=-- ROM --"
     )
 
 
