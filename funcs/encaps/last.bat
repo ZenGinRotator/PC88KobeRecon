@@ -194,189 +194,58 @@ rem     )
     rem Delete file from previous run of the algorithm
     if exist old_item.txt ( del old_item.txt )
     
-
-
-    rem These will be used to store bridges (non-encapsulated text) that 
-    rem appear after the last character in the file name.
-    set p_bridge=
-    set c_bridge=
-    set s_bridge=
-    set bridge=
     set "bridge=!phrase!"
 
     set last_char=
 
-    set p_token=
-    set c_token=
-    set s_token=
-
 rem -----------------------------------------
 
-    call :recurse_to_end "1" ")" "!phrase!" 
-    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
-        set "p_bridge=%%i"
-    )
-
-    for /f "tokens=*" %%i in (token.txt) do (
-        set "p_token=%%i"
-    )
-
-
-    if "!p_bridge!" neq "!phrase!" (
-        set "last_char=)"
-        rem set "bridge=!p_bridge!"
-    )
- 
-
-
-    set "last_char_="
-    set "bridge_="
 
 
     call :bridge_with_endmark "!phrase!" ")"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-            set "last_char_=%%i"
+            set "last_char=%%i"
         )
      
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-        set "bridge_=%%i"
+            set "bridge=%%i"
         )
     )
 
     
 
-    
-    if "!last_char!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "P_LAST_CHAR" "!last_char_!" "!last_char!"
-    )
-
-    if "!bridge!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "P_BRIDGE" "!bridge_!" "!bridge!"
-    )
-
-
-
-
-
-
 rem --------------------------------
-    call :recurse_to_end "1" "}" "!p_bridge!"
-
-    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
-        set "c_bridge=%%i"
-    )
-    
-    for /f "tokens=*" %%i in (token.txt) do (
-        set "c_token=%%i"
-    )
-    
-
-    if "!c_bridge!" neq "!p_bridge!" (
-        set "last_char=}"
-        rem set "bridge=!c_bridge!"
-    )
-    rem set "bridge=!c_bridge!"
-
-
-    rem call :bridge_with_endmark "!p_bridge!" "}"
+   
     call :bridge_with_endmark "!bridge!" "}"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-            set "last_char_=%%i"
+            set "last_char=%%i"
         )
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-        rem set "bridge_=%%i"
             set "bridge=%%i"
         )
     )
-
-    if "!last_char!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "C_LAST_CHAR" "!last_char_!" "!last_char!"
-    )
-
-    if "!bridge!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "C_BRIDGE" "!bridge_!" "!bridge!"
-    )
-
-
-
-
-
-
-
-
 
 rem ---------------------------------------------
 
-    call :recurse_to_end "1" "]" "!c_bridge!"
-    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
-        set "s_bridge=%%i"
-    )
-
-    for /f "tokens=*" %%i in (token.txt) do (
-        set "s_token=%%i"
-    )
-
-
-   
-    if "!s_bridge!" neq "!c_bridge!" (
-        set "last_char=]"
-        rem set "bridge=!s_bridge!"
-    )
-
-    
-    rem call :bridge_with_endmark "!c_bridge!" "]"
     call :bridge_with_endmark "!bridge!" "]"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-        set "last_char_=%%i"
+            set "last_char=%%i"
         )
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
-        rem set "bridge_=%%i"
             set "bridge=%%i"
         )
     )
 
-    if "!last_char!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "S_LAST_CHAR" "!last_char_!" "!last_char!"
-    )
 
-    if "!bridge!" neq "" (
-        rem call ".\funcs\utils.bat" :compare_n_pause "S_BRIDGE" "!bridge_!" "!bridge!"
-    )
-
-
-
-    rem echo ORIG LAST_CHAR "!last_char!"
-    echo LAST_CHAR_ "!last_char_!"
-    echo LAST_CHAR "!last_char!"
-    echo BRIDGE_ "!bridge_!"
-    echo BRIDGE "!bridge!"
-
-
-
-
-
-    
-    rem Don't know if these if-conditions are import
-    if "!c_bridge!" equ "!end_mark!" (
-        rem set "bridge=!end_mark!"
-    )
-
-    if "!c_bridge!" equ " !end_mark!" (
-        rem set "bridge= !end_mark!"
-    )
-    rem echo CHANGED BRIDGE "!bridge!"
-
-   
-   
 
     CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!echo_verify!"
 
