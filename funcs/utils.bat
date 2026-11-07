@@ -227,3 +227,20 @@ exit /b
 
     endlocal
 exit /b
+
+
+:compare_n_pause
+    setlocal
+
+        set "text=%~1"
+        set "first=%~2"
+        set "sec=%~3"
+
+        if "!first!" neq "!sec!" (
+            echo ERROR: !text! MISMATCH: 
+            ECHO FIRST "!first!"
+            echo SECND "!sec!"
+        )
+
+    endlocal
+exit /b

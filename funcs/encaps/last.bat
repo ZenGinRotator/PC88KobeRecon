@@ -133,7 +133,39 @@ rem                 the 1st or 2nd character is the last character of the file n
 
 
 
+:test_for_last_char
+    setlocal
 
+    set "text=%~1"
+
+    set /a has_encap+=1
+    call ".\funcs\utils.bat" :delim_with_char "1" ")" "!text!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        if "%%i" neq "!test!" (
+            set /a has_encap+=1
+        )
+    )
+    call ".\funcs\utils.bat" :delim_with_char "1" "]" "!text!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        if "%%i" neq "!test!" (
+            set /a has_encap+=1
+        )
+
+    )
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "}" "!text!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        if "%%i" neq "!test!" (
+            set /a has_encap+=1
+        )
+    )
+    
+
+
+
+
+    endlocal
+exit /b
 
 
 :find_last_char
@@ -142,9 +174,9 @@ rem                 the 1st or 2nd character is the last character of the file n
     set "echo_verify=%~2"
      
     
-    if "!echo_verify!" neq "" (
+    rem if "!echo_verify!" neq "" (
         echo ---------------- Phrase "!phrase!" ------------------
-    )
+rem     )
     
 
     rem Need this to indicate the end of a file (with .cmt, .d88, or .t88 extension)
@@ -171,16 +203,15 @@ rem                 the 1st or 2nd character is the last character of the file n
     set s_bridge=
     set bridge=
 
-    set read_item=
     set last_char=
-    set empty_old_item=
 
     set p_token=
     set c_token=
     set s_token=
 
-    rem set "last_char=)"
-    call :recurse_to_end "1" ")" "!phrase!" "!empty_old_item!"
+rem -----------------------------------------
+
+    call :recurse_to_end "1" ")" "!phrase!" 
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "p_bridge=%%i"
     )
@@ -194,9 +225,43 @@ rem                 the 1st or 2nd character is the last character of the file n
         set "last_char=)"
         set "bridge=!p_bridge!"
     )
+    rem set "bridge=!p_bridge!"
 
 
-    call :recurse_to_end "1" "}" "!p_bridge!" "!empty_old_item!"
+    set "last_char_="
+    set "bridge_="
+
+
+    call :bridge_with_endmark "!phrase!" ")"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "last_char_=%%i"
+        )
+     
+    )
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        set "bridge_=%%i"
+    )
+
+    
+
+    
+    if "!last_char!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "P_LAST_CHAR" "!last_char_!" "!last_char!"
+    )
+
+    if "!bridge!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "P_BRIDGE" "!bridge_!" "!bridge!"
+    )
+
+
+
+
+
+
+rem --------------------------------
+    call :recurse_to_end "1" "}" "!p_bridge!"
+    rem call :recurse_to_end "1" "}" "!bridge!"
 
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "c_bridge=%%i"
@@ -211,10 +276,38 @@ rem                 the 1st or 2nd character is the last character of the file n
         set "last_char=}"
         set "bridge=!c_bridge!"
     )
+    rem set "bridge=!c_bridge!"
+
+
+    call :bridge_with_endmark "!p_bridge!" "}"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "last_char_=%%i"
+        )
+    )
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        set "bridge_=%%i"
+    )
+
+    if "!last_char!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "C_LAST_CHAR" "!last_char_!" "!last_char!"
+    )
+
+    if "!bridge!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "C_BRIDGE" "!bridge_!" "!bridge!"
+    )
 
 
 
-    call :recurse_to_end "1" "]" "!c_bridge!" "!empty_old_item!"
+
+
+
+
+
+
+rem ---------------------------------------------
+
+    call :recurse_to_end "1" "]" "!c_bridge!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "s_bridge=%%i"
     )
@@ -231,22 +324,111 @@ rem                 the 1st or 2nd character is the last character of the file n
     )
 
     
+    call :bridge_with_endmark "!c_bridge!" "]"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+        set "last_char_=%%i"
+        )
+    )
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        set "bridge_=%%i"
+    )
+
+    if "!last_char!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "S_LAST_CHAR" "!last_char_!" "!last_char!"
+    )
+
+    if "!bridge!" neq "" (
+        rem call ".\funcs\utils.bat" :compare_n_pause "S_BRIDGE" "!bridge_!" "!bridge!"
+    )
+
+
+
+    rem echo ORIG LAST_CHAR "!last_char!"
+    echo LAST_CHAR_ "!last_char_!"
+    echo BRIDGE_ "!bridge_!"
+    echo BRIDGE "!bridge!"
+
+
+
+
+
     
+    rem Don't know if these if-conditions are import
     if "!c_bridge!" equ "!end_mark!" (
-        set "bridge=!end_mark!"
+        rem set "bridge=!end_mark!"
     )
 
     if "!c_bridge!" equ " !end_mark!" (
-        set "bridge= !end_mark!"
+        rem set "bridge= !end_mark!"
     )
+    echo CHANGED BRIDGE "!bridge!"
 
    
    
 
-    CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!end_mark!" "!echo_verify!"
+    CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!echo_verify!"
 
     endlocal
 exit /b
+
+
+
+
+:bridge_with_endmark
+    setlocal
+
+    rem Assume the string has no encapsulators
+    set "text=%~1"
+
+    rem right delimiting character
+    set "right=%~2"
+    
+
+    rem resulting bridge after delimiting text with right char which is ] [s], } {c}, or (p))
+    set "delim_bridge="
+    call :recurse_to_end "1" "!right!" "!text!"
+    for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
+        set "delim_bridge=%%i"
+    )
+
+
+    set "last_char="
+    set "bridge="
+    rem Is the bridge smaller than the text?
+    rem If so, then we have found an encapsulator that COULD be
+    rem     the last character in the string
+    if "!delim_bridge!" neq "!text!" (
+        set "last_char=!right!"
+        set "bridge=!delim_bridge!"
+    )
+
+
+    set "out=!last_char!|!bridge!|"
+
+    echo !out! > return.txt
+
+
+
+
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -259,8 +441,8 @@ rem     found with the optional characters
     set "phrase=%~1"
     set "last_char=%~2"
     set "last_bridge=%~3"
-    set "end_mark=%~4"
-    set "echo_verify=%~5"
+    rem set "end_mark=%~4"
+    set "echo_verify=%~4"
 
    rem echo VLB bridge "!last_bridge!" "!last_char!"
     rem Collecting option chars
@@ -474,9 +656,6 @@ exit /b
     set "right_c=%~2"
     set "phrase=%~3"
 
-    rem Do I need this argument?
-    set "old_item=%~4"
-
     set item=
     call ".\funcs\utils.bat" :delim_with_char "!token!" "!right_c!" "!phrase!"
     for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
@@ -485,12 +664,17 @@ exit /b
      
 
     if "!item!" equ " " (
+        set /a temp=!token!-1
+        set "old_item="
+        call ".\funcs\utils.bat" :delim_with_char "!temp!" "!right_c!" "!phrase!"
+        for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+            set "old_item=%%i"
+        )
+
         set "old_item=!old_item!|"
         echo !old_item! > "old_item.txt"
-        rem pause
-        set /a temp=!token!-1
+
         echo !temp! > "token.txt"
-        rem echo TOKEN "!temp!" RIGHT "!right_c!"
         exit /b
     )
      
@@ -499,7 +683,6 @@ exit /b
 
 
     set /a token+=1
-    call :recurse_to_end "!token!" "!right_c!" "!phrase!" "!item!" 
+    call :recurse_to_end "!token!" "!right_c!" "!phrase!" 
     endlocal
 exit /b
-
