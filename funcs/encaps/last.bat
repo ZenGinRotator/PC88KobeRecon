@@ -202,6 +202,7 @@ rem     )
     set c_bridge=
     set s_bridge=
     set bridge=
+    set "bridge=!phrase!"
 
     set last_char=
 
@@ -223,9 +224,9 @@ rem -----------------------------------------
 
     if "!p_bridge!" neq "!phrase!" (
         set "last_char=)"
-        set "bridge=!p_bridge!"
+        rem set "bridge=!p_bridge!"
     )
-    rem set "bridge=!p_bridge!"
+ 
 
 
     set "last_char_="
@@ -240,7 +241,9 @@ rem -----------------------------------------
      
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
         set "bridge_=%%i"
+        )
     )
 
     
@@ -261,7 +264,6 @@ rem -----------------------------------------
 
 rem --------------------------------
     call :recurse_to_end "1" "}" "!p_bridge!"
-    rem call :recurse_to_end "1" "}" "!bridge!"
 
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "c_bridge=%%i"
@@ -274,19 +276,23 @@ rem --------------------------------
 
     if "!c_bridge!" neq "!p_bridge!" (
         set "last_char=}"
-        set "bridge=!c_bridge!"
+        rem set "bridge=!c_bridge!"
     )
     rem set "bridge=!c_bridge!"
 
 
-    call :bridge_with_endmark "!p_bridge!" "}"
+    rem call :bridge_with_endmark "!p_bridge!" "}"
+    call :bridge_with_endmark "!bridge!" "}"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
             set "last_char_=%%i"
         )
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
-        set "bridge_=%%i"
+        if "%%i" neq " " (
+        rem set "bridge_=%%i"
+            set "bridge=%%i"
+        )
     )
 
     if "!last_char!" neq "" (
@@ -320,18 +326,22 @@ rem ---------------------------------------------
    
     if "!s_bridge!" neq "!c_bridge!" (
         set "last_char=]"
-        set "bridge=!s_bridge!"
+        rem set "bridge=!s_bridge!"
     )
 
     
-    call :bridge_with_endmark "!c_bridge!" "]"
+    rem call :bridge_with_endmark "!c_bridge!" "]"
+    call :bridge_with_endmark "!bridge!" "]"
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         if "%%i" neq " " (
         set "last_char_=%%i"
         )
     )
     for /f "tokens=2 delims=|" %%i in (return.txt) do (
-        set "bridge_=%%i"
+        if "%%i" neq " " (
+        rem set "bridge_=%%i"
+            set "bridge=%%i"
+        )
     )
 
     if "!last_char!" neq "" (
@@ -346,6 +356,7 @@ rem ---------------------------------------------
 
     rem echo ORIG LAST_CHAR "!last_char!"
     echo LAST_CHAR_ "!last_char_!"
+    echo LAST_CHAR "!last_char!"
     echo BRIDGE_ "!bridge_!"
     echo BRIDGE "!bridge!"
 
@@ -362,7 +373,7 @@ rem ---------------------------------------------
     if "!c_bridge!" equ " !end_mark!" (
         rem set "bridge= !end_mark!"
     )
-    echo CHANGED BRIDGE "!bridge!"
+    rem echo CHANGED BRIDGE "!bridge!"
 
    
    
