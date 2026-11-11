@@ -247,7 +247,7 @@ rem ---------------------------------------------
 
 
 
-    CALL :verify_last_bridge "!phrase!" "!last_char!" "!bridge!" "!echo_verify!"
+    CALL ".\funcs\verify\last.bat" :end_bridge "!phrase!" "!last_char!" "!bridge!" "!echo_verify!"
 
     endlocal
 exit /b
@@ -312,103 +312,6 @@ exit /b
 
 
 
-
-rem -- This might be a shared function for verifying the found first & last chars -- 
-rem Compare the bridge from the found last character, with the bridges 
-rem     found with the optional characters
-:verify_last_bridge
-    setlocal
-    
-    set "phrase=%~1"
-    set "last_char=%~2"
-    set "last_bridge=%~3"
-    rem set "end_mark=%~4"
-    set "echo_verify=%~4"
-
-   rem echo VLB bridge "!last_bridge!" "!last_char!"
-    rem Collecting option chars
-    set o1_right=
-    set o2_right=
-
-    REM echo VERIFY "LAST BRIDGE" "!last_bridge!"
-
-    call ".\funcs\encaps\chars.bat" :primary_and_optn_chars "!last_char!"
-
-    for /f "tokens=2 delims=|" %%i in (chars.txt) do (
-        set "last_char=%%i"
-    )
-
-    for /f "tokens=4 delims=|" %%i in (chars.txt) do (
-        set "o1_right=%%i"
-    )
-    
-    for /f "tokens=6 delims=|" %%i in (chars.txt) do (
-        set "o2_right=%%i"
-    )
-  
-    set "pad_last_bridge=PAD!last_bridge!"
- 
-
-
-    call ".\funcs\encaps\chars.bat" :optns_in_last_char_bridge "!pad_last_bridge!" "!o1_right!" "!o2_right!"
-    set /a not_reduced=0
-    set o1_bridge=
-    set o2_bridge=
-
-    for /f "tokens=1 delims=|" %%i in (reduced_bridge.txt) do (
-        set /a not_reduced=%%i
-    )
-    for /f "tokens=2 delims=|" %%i in (reduced_bridge.txt) do (
-        set "o1_bridge=%%i"
-    )
-    for /f "tokens=3 delims=|" %%i in (reduced_bridge.txt) do (
-        set "o2_bridge=%%i"
-    )
-
-    
-
-
-
-    set "los=!last_char!|!o1_right!|!o2_right!"
-    set "lasts=!last_bridge!|!pad_last_bridge!"
-    set "o_bridges=!o1_bridge!|!o2_bridge!"
-
-    set "ops=!los!|!lasts!|!o_bridges!"
-    rem echo LAST CHAR OPS
-    rem echo "!los!"
-    rem echo "!lasts!"
-    rem echo "!o_bridges!"
-
-
-    set "last_chr_func=L"
-    if "!not_reduced!" neq "0" (
-        set fail=
-        if "!echo_verify!" neq "" (
-            call :out "!ops!" "!last_chr_func!" "!fail!"
-        )
-
-        rem return error
-        echo LAST CHAR ERROR
-        PAUSE
-        set "last_char=-!last_char!|"
-        echo !last_char! > last_char.txt
-        EXIT /B
-    )
-  
-
-   
-    set "pass=p"
-    if "!echo_verify!" neq "" (
-        call :out "!ops!" "!last_chr_func!" "!pass!"
-    )
-
-    set "last_char=!last_char!|"
-    echo !last_char! > last_char.txt
-
-    rem return the last char
-    
-    endlocal
-exit /b
 
 
 :out
