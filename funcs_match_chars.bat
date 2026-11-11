@@ -83,7 +83,7 @@ set "t12=[S2 + [s] [s] s]BRIDGE 1(P1 + (p) (p) (p) p)BRIDGE 2{C1+ {c} c} - Copy"
 
 
 
-set "t13=ROM[S2 + [s] [s] s]BRIDGE 1(P1 + (p) (p) (p) p)BRIDGE 2{C1+ {c} c} - Copy"
+set "t13=ROM[S2 + [s2] [s3] s4]BRIDGE 1(P1 + (p) (p) (p) p)BRIDGE 2{C1+ {c} c} - Copy"
 
 set "t15=ROM[S2 +] (P1 +) {C1+} - Copy"
 set "t110=ROM[S2 +](P1 +){C1+} - Copy"  
@@ -111,7 +111,7 @@ set "t9=[S2 +]BRIDGE 1 (P1 +) BRIDGE 2 {C1+} - Copy"
 
 call "funcs_rom_keywords.bat" :rom_n_labels "!t13!"    
 call "funcs_rom_keywords.bat" :rom_n_labels "!t10!"
-exit /b
+REM exit /b
 call "funcs_rom_keywords.bat" :rom_n_labels "!t12!"    
 call "funcs_rom_keywords.bat" :rom_n_labels "!t11!"
  call "funcs_rom_keywords.bat" :rom_n_labels "!t5!"
@@ -122,7 +122,7 @@ call "funcs_rom_keywords.bat" :rom_n_labels "!t11!"
    call "funcs_rom_keywords.bat" :rom_n_labels "!t6!"
    call "funcs_rom_keywords.bat" :rom_n_labels "!t7!"
 
-
+EXIT /B
       call "funcs_rom_keywords.bat" :rom_n_labels "!t13!"
          call "funcs_rom_keywords.bat" :rom_n_labels "!t110!"
       call "funcs_rom_keywords.bat" :rom_n_labels "!t14!"

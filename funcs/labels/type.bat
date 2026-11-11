@@ -1,4 +1,5 @@
 setlocal EnableDelayedExpansion
+set delimtxt=delimited.txt
 set brk=^
 
 
@@ -71,56 +72,30 @@ rem echo "!from_item!"
     set first=
     set sec=
     set third=
-    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+
+
+    call :3_parts "!item!" "!left!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
         set "first=%%i"
     )
-
-    
-    call ".\funcs\utils.bat" :delim_with_char "2" "!left!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
         set "sec=%%i"
     )
-
-    
-    call ".\funcs\utils.bat" :delim_with_char "3" "!left!" "PAD!item!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+    for /f "tokens=3 delims=|" %%i in (return.txt) do (
         set "third=%%i"
     )
-
-rem echo FROM EQU? ITEM "!from_item!" "!item!"
-    REM echo THIRD "!third!"
+    
+    
     REM save whether string is bridge, nested, or indiv encapsulator
     set nest_status=
 
-    rem endmark=\ open, token=1 -> (label, token > 1 -> label)
-    rem endmark=/ closed (label)
+
 
     rem applies to bridge B, last nested label L, 
     rem B (label (label) (label) L) B
     rem B (label) B
     if "!from_item!" equ "!item!" (
-        set "nest_status=BRIDGE"
-        set "bridge=0"
-        set "bridge=BRDG"
-        set "format=!bridge!"
-        if exist is_nested.txt (
-            rem del is_nested.txt
-            set "nest_status=NESTED"
-
-            rem echo ENCAPED FORMAT: "label)"
-            set "open_started=2"
-            set "open_started=OPN_STRTD"
-            set "format=!open_started!"
-            set "nested=3"
-            call :encap_struct "!open_started!" "!left!|!right!" "!from_item!"
-        )
-        set "nest_status=!nest_status!|"
-        echo !nest_status! > type.txt
-        if exist format.txt ( del format.txt )
-        set "format=!format!|"
-        echo !format! > format.txt
-
+        call :bridge_or_last_nest_label "!left!" "!right!" "!from_item!"
         exit /b
 
     )
@@ -134,27 +109,8 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
     rem B1="bridge", " "<space>, ""<no space>,
     rem B2=" "<space>
     if "PAD!from_item!" equ "!first!" (
-        set "nest_status=BRIDGE"
-        set "bridge=BRDG"
-        set "format=!bridge!"
-
-        if exist is_nested.txt (
-            set "nest_status=NESTED"
-            set "nested=BRDG"
-            set "format=!nested!"
-        
-
-            
-        )
-        
-        set "nest_status=!nest_status!|"
-        echo !nest_status! > type.txt
-        if exist format.txt ( del format.txt )
-        set "format=!format!|"
-        echo !format! > format.txt
-
+        call :bridge_or_nest_space
         exit /b
-
     )
 
     rem applies to label L
@@ -163,55 +119,17 @@ rem echo FROM EQU? ITEM "!from_item!" "!item!"
     rem PAD(L (x) (x) x)
     rem PADbridge(L (x) (x) x)
     if "!from_item!" equ "!sec!" (
-        rem set "format=(indiv)"
-        set "format=CLSD"
-        set "nest_status=INDIV"
-
-
-        if exist is_nested.txt (
-            set "nest_status=NESTED"
-            rem set "format=(NESTED)"
-            set "format=CLSD"
-
-        
-        )
+        call :indiv_label_or_1st_nest_label "!left!" "!right!" "!from_item!" "!third!"
+        exit /b
     )
 
 
     rem Applies to label L:
-    rem PAD(x (L) (x) x)
-    rem PADbridge(x (L) (x) x)
+    rem PAD(x (L) (L) (L)... x)
+    rem PADbridge(x (L) (L) (L)... x)
     rem PAD(x), which has non-existent L
-    
-    if "!third!" neq " " (
-        set "nest_status=NESTED"
-        ECHO "" > is_nested.txt
-        rem if "!from_item!" equ "!sec!" ( set "format=(NESTED + ")
-        if "!from_item!" equ "!sec!" (
-            set "format=OPN_ENDD"
-            rem 
-            
+    call :other_labels "!left!" "!right!" "!from_item!"
 
-
-
-        )
-        rem IF "!from_item!" equ "!third!" ( set "format=(NESTED -)")
-        if "!from_item!" equ "!third!" (
-            set "format=CLSD"
-        )
-    )
-
-
-
-    rem echo "!format!"
-     call :encap_struct "!format!" "!left!|!right!" "!from_item!"
-
-
-    set "nest_status=!nest_status!|"
-    echo !nest_status! > type.txt
-    if exist format.txt ( del format.txt )
-    set "format=!format!|"
-    echo !format! > format.txt
     endlocal
 exit /b
 
@@ -272,5 +190,145 @@ rem closed: "(label 1, label 2, .... labelN)" -> 3
     rem echo ENCAP STRUCT "!use!"
     echo "|!use!|" > struct.txt
     
+    endlocal
+exit /b
+
+
+rem Identify whether item has:
+rem * a bridge
+rem * an indiv label
+rem * a nested label with its accompanying sibling label (a 2nd nested label)
+:3_parts
+    setlocal
+
+    set "item=%~1"
+    set "left=%~2"
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "first=%%i"
+    )
+
+    
+    call ".\funcs\utils.bat" :delim_with_char "2" "!left!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "sec=%%i"
+    )
+
+    
+    call ".\funcs\utils.bat" :delim_with_char "3" "!left!" "PAD!item!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "third=%%i"
+    )
+
+    set "out=!first!|!sec!|!third!|"
+    echo !out! > return.txt
+
+    endlocal
+exit /b
+
+
+:bridge_or_last_nest_label
+    setlocal
+
+    set "left=%~1"
+    set "right=%~2"
+    set "from_item=%~3"
+
+
+
+    set "nest_status=BRIDGE"
+    set "bridge=BRDG"
+    set "format=!bridge!"
+    if exist is_nested.txt (
+        set "nest_status=NESTED"
+        set "open_started=OPN_STRTD"
+        set "format=!open_started!"
+        call :encap_struct "!open_started!" "!left!|!right!" "!from_item!"
+    )
+
+    call :prep_n_write "!nest_status!" "!format!"
+
+    endlocal
+exit /b
+
+
+:bridge_or_nest_space
+    setlocal
+
+    set "nest_status=BRIDGE"
+    set "bridge=BRDG"
+    set "format=!bridge!"
+
+    if exist is_nested.txt (
+        set "nest_status=NESTED"
+        set "nested=BRDG"
+        set "format=!nested!"        
+    )
+    
+    call :prep_n_write "!nest_status!" "!format!"
+    endlocal
+exit /b
+
+
+:indiv_label_or_1st_nest_label
+    setlocal
+
+    set "left=%~1"
+    set "right=%~2"
+    set "from_item=%~3"
+    set "third=%~4"
+
+
+    rem set "format=(indiv)"
+    set "format=CLSD"
+    set "nest_status=INDIV"
+
+    if "!third!" neq " " (
+        set "format=OPN_ENDD"
+    )
+
+    if exist is_nested.txt (
+        set "nest_status=NESTED"
+        rem set "format=(NESTED)"
+        set "format=CLSD"
+    )
+
+    call :encap_struct "!format!" "!left!|!right!" "!from_item!"
+    call :prep_n_write "!nest_status!" "!format!"
+
+
+    endlocal
+exit /b
+
+:other_labels
+    setlocal
+
+    set "left=%~1"
+    set "right=%~2"
+    set "from_item=%~3"
+
+    set "nest_status=NESTED"
+    ECHO "" > is_nested.txt
+
+    set "format=CLSD"
+
+    call :encap_struct "!format!" "!left!|!right!" "!from_item!"
+    call :prep_n_write "!nest_status!" "!format!"
+
+    endlocal
+exit /b
+
+:prep_n_write
+    setlocal
+
+    set "nest_status=%~1|"
+    set "format=%~2|"
+
+    echo !nest_status! > type.txt
+
+    if exist format.txt ( del format.txt )
+    echo !format! > format.txt
+
     endlocal
 exit /b
