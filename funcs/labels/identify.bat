@@ -115,41 +115,9 @@ rem echo ID ITEM "!item!"
     call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
 
     rem reconstruct file name here
-    call :reconstruct "!sort_item!"
+    call ".\funcs\verify\realtime.bat" :reconstruct "!sort_item!"
     
 
-    endlocal
-exit /b
-
-
-rem move this function to different file
-rem real-time reconstruction of file name without the use of *.txt files
-:reconstruct
-    setlocal
-
-    set "item=%~1"
-
-    rem echo RECONSTRUCT WITH "!item!"
-
-    rem exclude bridges composed of 1 or more spaces
-   
-
-    if not exist construct.txt (
-        set "item=!item!|"
-        echo !item! > construct.txt
-        exit /b
-    )
-
-    set old=
-    for /f "tokens=1 delims=|" %%i in (construct.txt) do (
-        set "old=!old!%%i"
-    )
-
-    set "old=!old!!item!|"
-    
-    echo !old! > construct.txt
-
- 
     endlocal
 exit /b
 

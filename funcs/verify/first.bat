@@ -92,7 +92,6 @@ goto :eof
     set "ops=!los!|!firsts!|!o_bridges!"
     
 
-    echo "!not_reduced!"
     set first_chr_func=
     if "!not_reduced!" neq "0" (
         if "!echo_verify!" neq "" (
@@ -103,7 +102,7 @@ goto :eof
         )
         set "first_char=!first_char!|"
         echo !first_char! > first_char.txt
-        echo FIRST CHAR ERROR
+        echo FIRST CHAR ERROR, FILE NAME: "!phrase!"
         pause
         exit /b
     )
