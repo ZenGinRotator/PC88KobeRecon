@@ -79,7 +79,8 @@ exit /b
     call :print_txt "B"
     call :print_txt "I"
     call :print_txt "N"
-    call ".\funcs\labels\identify.bat" :reconstruct2
+    rem call ".\funcs\labels\identify.bat" :reconstruct2
+    call ".\funcs\verify\by_label.bat" :reconstruct2
     echo FINAL NAME "!name!"
     
     set "construct2="
