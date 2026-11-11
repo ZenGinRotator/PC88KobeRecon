@@ -34,61 +34,104 @@ goto :eof
     )
     
     set "pad_name=PAD!name!"
-    rem echo padname "!pad_name!"
 
-    set first_char=
-    set p_bridge=
-    set c_bridge=
-    set s_bridge=
     set "smallest_bridge= "
-    call ".\funcs\utils.bat" :delim_with_char "1" "(" "!pad_name!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "p_bridge=%%i"
+    set "bridge=!pad_name!"
+
+
+    call :first_bridge "!pad_name!" "("
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "first_char_=%%i"
+        )
+    )
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "bridge=%%i"
+        )
     )
 
 
-    if "!p_bridge!" neq "!pad_name!" (
-        set "first_char=("
-        set "smallest_bridge=!p_bridge!"
+
+
+    call :first_bridge "!bridge!" "["
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "first_char_=%%i"
+        )
     )
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "[" "!p_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "s_bridge=%%i"
-    )
-
-    if "!s_bridge!" neq "!p_bridge!" (
-        set "first_char=["
-        set "smallest_bridge=!s_bridge!"
-    )
-
-
-    call ".\funcs\utils.bat" :delim_with_char "1" "{" "!s_bridge!"
-    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
-        set "c_bridge=%%i"
-    )
-
-    if "!c_bridge!" neq "!s_bridge!" (
-        set "first_char={"
-        set "smallest_bridge=!c_bridge!"
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "bridge=%%i"
+        )
     )
 
 
-    if "!c_bridge!" equ "PAD" (
-        set "smallest_bridge=PAD"
-    )
 
-    if "!c_bridge!" equ "PAD " (
-        set "smallest_bridge=PAD "
-    )
 
+    call :first_bridge "!bridge!" "{"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "first_char_=%%i"
+        )
+    )
+    for /f "tokens=2 delims=|" %%i in (return.txt) do (
+        if "%%i" neq " " (
+            set "bridge=%%i"
+        )
+    )
    
 
-    call :verify_smallest_bridge "!first_char!" "!name!" "!smallest_bridge!" "!echo_verify!"
+    call :verify_smallest_bridge "!first_char_!" "!name!" "!bridge!" "!echo_verify!"
     
     
     endlocal
 exit /b
+
+
+
+
+:first_bridge
+    setlocal
+
+
+    rem Phrase to delimit
+    set "text=%~1"
+
+    rem Left delimiting character
+    set "left=%~2"
+
+    set "first_char="
+    set "bridge="
+    set "delim_bridge="
+
+    call ".\funcs\utils.bat" :delim_with_char "1" "!left!" "!text!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "delim_bridge=%%i"
+    )
+
+    if "!delim_bridge!" neq "!text!" (
+        set "first_char=!left!"
+        set "bridge=!delim_bridge!"
+    )
+
+    set "out=!first_char!|!bridge!|"
+
+    echo !out! > return.txt
+    echo "!out!"
+
+
+    endlocal
+exit /b
+
+
+
+
+
+
+
+
+
 
 rem -- This might be a shared function for verifying the found first & last chars -- 
 rem Compare the bridge from the found first character, with the bridges 

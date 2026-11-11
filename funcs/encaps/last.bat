@@ -266,7 +266,7 @@ exit /b
     
 
     rem resulting bridge after delimiting text with right char which is ] [s], } {c}, or (p))
-    set "delim_bridge="
+    set "delim_bridge=!text!"
     call :recurse_to_end "1" "!right!" "!text!"
     for /f "tokens=1 delims=|" %%i in (old_item.txt) do (
         set "delim_bridge=%%i"
@@ -285,6 +285,7 @@ exit /b
 
 
     set "out=!last_char!|!bridge!|"
+
 
     echo !out! > return.txt
 
