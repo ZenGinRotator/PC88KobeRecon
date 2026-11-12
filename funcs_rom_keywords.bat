@@ -84,7 +84,11 @@ exit /b
     call ".\funcs\verify\by_label.bat" :reconstruct2
     echo FINAL NAME "!name!"
     
-    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL"
+   
+    rem comparing the constructed file name with the file name
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "" "ERRORS\REALTIME"
+
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL" "ERRORS\BY_LABEL"
 
     call ".\funcs\delete.bat" :del_txts
     endlocal
@@ -139,18 +143,8 @@ exit /b
     set "o2s=!optn_two_left!|!optn_two_right!"
     set "recs=!token!|!primes!|!name!|!o1s!|!o2s!"
 
-    rem Find the rom descriptor from file name & add that rom to
-    rem bridges.txt
-
-    rem *******************************************************
-    rem set "rom="
-    rem call ".\funcs\utils.bat" :delim_with_char "1"
-
+   
     call ".\funcs\recurse\on_name.bat" :recurse_on_group2 "!recs!"
-   
-    rem comparing the constructed file name with the file name
-    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" ""
-   
    
     endlocal
 exit /b

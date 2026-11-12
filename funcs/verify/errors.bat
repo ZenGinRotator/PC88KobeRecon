@@ -52,6 +52,11 @@ rem This is a new file and function. Need to use git add ... command
             set "fail="
             call ".\funcs\encaps\last.bat" :out "!ops!" "!chr_func!" "!fail!"
         )
+
+        if not exist "!path!\" (
+            md "!path!\"
+        )
+
         echo !name! > "!path!\!name!"
         echo "!prompt! CHAR ERROR, FILE NAME: !name!"
         set "do_exist=T|"
@@ -70,6 +75,7 @@ exit /b
     
     set "name=%~1"
     set "flag=%~2"
+    set "path=%~3"
 
     set file=construct.txt
     set "prompt=REAL TIME"
@@ -99,6 +105,13 @@ rem ERRORS\RECONSTRUCT\REALTIME
         echo "!construct!" 
         ECHO VS 
         ECHO "!name!"
+        set "item_path=!path!\CORRECT - !name!"
+        if not exist "!item_path!\" (
+            md "!item_path!\"
+        )
+
+        echo "" > "!item_path!\ERR - !construct!"
+        echo "" > "!item_path!\COR - !name!"
         pause
     )
     endlocal
