@@ -54,5 +54,21 @@ goto :eof
     if exist spaces.txt ( del spaces.txt )
     if exist return.txt ( del return.txt )
     if exist rom.txt ( del rom.txt )
+    rem call :no_recstruct_err
+    endlocal
+exit /b
+
+:no_recstruct_err
+    setlocal
+    set "dir=RECONSTRUCT_ERRORS\"
+    if exist !dir! (
+        
+        for %%i in ("!dir!\*") do (
+            del "%%i"
+            echo CLEARING ALL ELEMENTS
+        )
+    ) else ( echo NOT FOUND )
+
+
     endlocal
 exit /b

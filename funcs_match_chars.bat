@@ -103,8 +103,10 @@ set "t9=[S2 +]BRIDGE 1 (P1 +) BRIDGE 2 {C1+} - Copy"
 
 
 
-    call "funcs_rom_keywords" :rom_n_labels ""
-    call "funcs_rom_keywords" :rom_n_labels " "
+     call "funcs_rom_keywords" :rom_n_labels ""
+    
+    rem exit /b
+     call "funcs_rom_keywords" :rom_n_labels " "
     call "funcs_rom_keywords" :rom_n_labels "hi"
     
 

@@ -102,14 +102,7 @@ exit /b
          set "old=!old!%%i"
     )
     
-
-
-    set "name=!old!!name!"
-    rem echo OLD1 "!name!"
-    
-    rem echo OLD2 "!old2!"
-    rem echo CONSTRUC 2 "!name!"
-    set "name=!name!|"
+    set "name=!old!!name!|"
     
     echo !name! > name.txt
     
@@ -118,3 +111,37 @@ exit /b
 exit /b
 
 
+
+
+
+
+:check_bl
+    setlocal
+
+    set "name=%~1"
+
+    set "construct2="
+    if exist name.txt (
+        for /f "tokens=1 delims=|" %%i in (name.txt) do (
+            set "construct2=%%i"
+        )
+    )
+
+
+    if "!name!" equ " " (
+        set "construct2= "
+    )
+
+
+rem ERRORS\RECONSTRUCT\BY_LABEL
+    if "!construct2!" neq "!name!" (
+        
+        echo ************  BY LABEL CONSTRUCT ERROR: constructed name vs input name ******************
+        echo "!construct2!" 
+        ECHO - VS - 
+        ECHO "!name!"
+        pause
+    )
+
+    endlocal
+exit /b

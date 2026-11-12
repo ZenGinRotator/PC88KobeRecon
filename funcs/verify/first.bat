@@ -84,31 +84,45 @@ goto :eof
 
 
     set "los=!first_char!|!o1_left_char!|!o2_left_char!"
-    rem set los "!los!"
-
     set "firsts=!smallest_bridge!|!smallest_bridge!"
     set "o_bridges=!o1_bridge!|!o2_bridge!"
 
     set "ops=!los!|!firsts!|!o_bridges!"
     
 
+rem ERRORS\CHARS\FIRST
     set first_chr_func=
     if "!not_reduced!" neq "0" (
         if "!echo_verify!" neq "" (
             set fail=
-
-            call ".\funcs\encaps\first.bat" :out "!ops!" !first_chr_func!" "!fail!" 
-            
+            call ".\funcs\encaps\last.bat" :out "!ops!" !first_chr_func!" "!fail!" 
         )
         set "first_char=!first_char!|"
-        echo !first_char! > first_char.txt
+        echo !first_char! > "RECONSTRUCT_ERRORS\!phrase!.txt"
         echo FIRST CHAR ERROR, FILE NAME: "!phrase!"
         pause
         exit /b
+
+        set "one=!first_chr_func!|!not_reduced!"
+        set "two=!ops!|!echo_verify!"
+        set "three=ERRORS\CHARS\FIRST|!phrase!"
+        set "ers=!one!|!two!|!three!|"
+        call ".\funcs\verify\output.bat" :char_error "!ers!"
+        set "do_exit="
+        for /f "tokens=1 delims=|" %%i in (return.txt) do (
+            set "do_exit=%%i"
+        )
+        if "!do_exist!" equ "T" (
+            exit /b
+        )
     )
+
+
+
+
     set "pass=p"
     if "!echo_verify!" neq "" (
-        call ".\funcs\encaps\first.bat" :out "!ops!" "!first_chr_func!" "!pass!"
+        call ".\funcs\encaps\last.bat" :out "!ops!" "!first_chr_func!" "!pass!"
     )
     set "first_char=!first_char!|"
     echo !first_char! > first_char.txt

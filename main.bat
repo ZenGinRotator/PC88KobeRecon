@@ -224,6 +224,10 @@ rem ECHO HI
 rem call ".\funcs\utils.bat" :print
 
 ECHO --------------------------------- DONE ----
+echo RECONSTRUCT ERRORS:
+for %%i in ("RECONSTRUCT_ERRORS\*") do (
+    echo ERROR: "%%i"
+)
 
 PAUSE
 goto :eof

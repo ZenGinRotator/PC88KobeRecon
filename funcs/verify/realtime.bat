@@ -38,3 +38,33 @@ goto :eof
  
     endlocal
 exit /b
+
+:check_rt
+    setlocal
+
+    set "name=%~1"
+
+    set construct=
+    if exist construct.txt (
+        for /f "tokens=1 delims=|" %%i in (construct.txt) do (
+            set "construct=%%i"
+        )
+    )
+
+    set "adjust=!name!"
+    if "!name!" equ " " (
+        set "construct= "
+    )
+
+
+rem ERRORS\RECONSTRUCT\REALTIME
+    if "!construct!" neq "!name!" (
+        echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        echo REAL TIME CONSTRUCT ERROR: constructed name vs input name
+        echo "!construct!" 
+        ECHO VS 
+        ECHO "!name!"
+    )
+
+    endlocal
+exit /b
