@@ -108,6 +108,7 @@ goto :eof
         )
             
     )
+    rem set "last_char=]"
     
     
 

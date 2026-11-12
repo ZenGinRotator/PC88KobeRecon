@@ -1,5 +1,8 @@
 setlocal EnableDelayedExpansion
 
+
+
+
 call %*
 
 goto :eof
@@ -58,5 +61,45 @@ rem This is a new file and function. Need to use git add ... command
 
     echo !do_exist! > return.txt
 
+    endlocal
+exit /b
+
+
+:reconstruct_errors
+    setlocal
+    
+    set "name=%~1"
+    set "flag=%~2"
+
+    set file=construct.txt
+    set "prompt=REAL TIME"
+
+    if "!flag!" equ "BL" (
+        set file=name.txt
+        set "prompt=BY LABEL"
+    )
+
+    set construct=
+    if exist !file! (
+        for /f "tokens=1 delims=|" %%i in (!file!) do (
+            set "construct=%%i"
+        )
+    )
+
+
+    if "!name!" equ " " (
+        set "construct= "
+    )
+
+
+rem ERRORS\RECONSTRUCT\REALTIME
+    if "!construct!" neq "!name!" (
+        echo "*************************************************************"
+        echo "!prompt! CONSTRUCT ERROR: constructed name vs input name"
+        echo "!construct!" 
+        ECHO VS 
+        ECHO "!name!"
+        pause
+    )
     endlocal
 exit /b

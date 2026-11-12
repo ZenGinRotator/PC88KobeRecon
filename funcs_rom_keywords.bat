@@ -84,7 +84,7 @@ exit /b
     call ".\funcs\verify\by_label.bat" :reconstruct2
     echo FINAL NAME "!name!"
     
-    call ".\funcs\verify\by_label.bat" :check_bl "!name!"
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL"
 
     call ".\funcs\delete.bat" :del_txts
     endlocal
@@ -149,7 +149,7 @@ exit /b
     call ".\funcs\recurse\on_name.bat" :recurse_on_group2 "!recs!"
    
     rem comparing the constructed file name with the file name
-    call ".\funcs\verify\realtime.bat" :check_rt "!name!"
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" ""
    
    
     endlocal

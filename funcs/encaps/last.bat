@@ -340,45 +340,36 @@ exit /b
         if "!o1_chr!" equ "@" (
             set o1_chr=
         )
-
-
-
-
     )
     for /f "tokens=3 delims=|" %%i in ("!ops!") do (
         set "o2_chr=%%i"
         if "!o2_chr!" equ "@" (
             set o2_chr=
         )
-
     )
     for /f "tokens=4 delims=|" %%i in ("!ops!") do (
         set "bridge=%%i"
         if "!bridge!" equ " " (
             set bridge=
         )
-
     )
     for /f "tokens=5 delims=|" %%i in ("!ops!") do (
         set "pad_bridge=%%i"
         if "!pad_bridge!" equ " " (
             set pad_bridge=
         )
-
     )
     for /f "tokens=6 delims=|" %%i in ("!ops!") do (
         set "o1_bridge=%%i"
         if "!o1_bridge!" equ " " (
             set o1_bridge=
         )
-
     )
     for /f "tokens=7 delims=|" %%i in ("!ops!") do (
         set "o2_bridge=%%i"
         if "!o2_bridge!" equ " " (
             set o2_bridge=
         )
-
     )
 
     set "char_label=LAST"

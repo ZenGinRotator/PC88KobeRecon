@@ -51,7 +51,7 @@ exit /b
         )
     )
 
-    set "adjust=!name!"
+
     if "!name!" equ " " (
         set "construct= "
     )

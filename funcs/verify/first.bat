@@ -93,26 +93,26 @@ goto :eof
 rem ERRORS\CHARS\FIRST
     set first_chr_func=
     if "!not_reduced!" neq "0" (
-        if "!echo_verify!" neq "" (
-            set fail=
-            call ".\funcs\encaps\last.bat" :out "!ops!" !first_chr_func!" "!fail!" 
-        )
-        set "first_char=!first_char!|"
-        echo !first_char! > "RECONSTRUCT_ERRORS\!phrase!.txt"
-        echo FIRST CHAR ERROR, FILE NAME: "!phrase!"
-        pause
-        exit /b
+        rem if "!echo_verify!" neq "" (
+        rem     set fail=
+        rem     call ".\funcs\encaps\last.bat" :out "!ops!" !first_chr_func!" "!fail!" 
+        rem )
+        rem set "first_char=!first_char!|"
+        rem echo !first_char! > "RECONSTRUCT_ERRORS\!phrase!.txt"
+        rem echo FIRST CHAR ERROR, FILE NAME: "!phrase!"
+        rem pause
+        rem exit /b
 
         set "one=!first_chr_func!|!not_reduced!"
         set "two=!ops!|!echo_verify!"
         set "three=ERRORS\CHARS\FIRST|!phrase!"
         set "ers=!one!|!two!|!three!|"
-        call ".\funcs\verify\output.bat" :char_error "!ers!"
+        call ".\funcs\verify\errors.bat" :char_error "!ers!"
         set "do_exit="
         for /f "tokens=1 delims=|" %%i in (return.txt) do (
             set "do_exit=%%i"
         )
-        if "!do_exist!" equ "T" (
+        if "!do_exis!" equ "T" (
             exit /b
         )
     )
