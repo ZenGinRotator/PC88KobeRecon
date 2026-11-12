@@ -18,6 +18,7 @@ rem This is a new file and function. Need to use git add ... command
     set "echo_verify="
     set "name="
     set "path="
+    set "found_char="
 
 
 
@@ -39,6 +40,9 @@ rem This is a new file and function. Need to use git add ... command
     for /f "tokens=6 delims=|" %%i in ("!ers!") do (
         set "name=%%i"        
     )
+    for /f "tokens=7 delims=|" %%i in ("!ers!") do (
+        set "found_char=%%i"
+    )
     
     
     set "prompt=FIRST"
@@ -53,11 +57,16 @@ rem This is a new file and function. Need to use git add ... command
             call ".\funcs\encaps\last.bat" :out "!ops!" "!chr_func!" "!fail!"
         )
 
-        if not exist "!path!\" (
-            md "!path!\"
+
+        set "item_path=!path!\CORRECT - !name!"
+        if not exist "!item_path!\" (
+            md "!item_path!\"
         )
 
-        echo !name! > "!path!\!name!"
+
+        echo "" > "!item_path!\ERR - !found_char!"
+        rem echo "" > "!item_path!\COR - "
+        rem echo !name! > "!path!\!name!"
         echo "!prompt! CHAR ERROR, FILE NAME: !name!"
         set "do_exist=T|"
         PAUSE

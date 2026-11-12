@@ -81,7 +81,9 @@ goto :eof
 
 
   
-
+    rem echo "!first_char!"
+    rem echo "!o1_left_char!"
+    rem echo "!o2_left_char!"
 
     set "los=!first_char!|!o1_left_char!|!o2_left_char!"
     set "firsts=!smallest_bridge!|!smallest_bridge!"
@@ -106,7 +108,8 @@ rem ERRORS\CHARS\FIRST
         set "one=!first_chr_func!|!not_reduced!"
         set "two=!ops!|!echo_verify!"
         set "three=ERRORS\CHARS\FIRST|!phrase!"
-        set "ers=!one!|!two!|!three!|"
+        set "four=!first_char!"
+        set "ers=!one!|!two!|!three!|!four!"
         call ".\funcs\verify\errors.bat" :char_error "!ers!"
         set "do_exit="
         for /f "tokens=1 delims=|" %%i in (return.txt) do (
