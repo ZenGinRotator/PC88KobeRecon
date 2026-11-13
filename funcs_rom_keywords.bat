@@ -84,11 +84,29 @@ exit /b
     call ".\funcs\verify\by_label.bat" :reconstruct2
     echo FINAL NAME "!name!"
     
-   
+    
     rem comparing the constructed file name with the file name
+    
+    set /a is_same=0
     call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "" "ERRORS\RECONSTRUCT\REALTIME"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" equ "T" (
+            set /a is_same+=1
+        )
+    )
+
+
 
     call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL" "ERRORS\RECONSTRUCT\BY_LABEL"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        if "%%i" equ "T" (
+            set /a is_same+=1
+        )
+    )
+    if "!is_same!" equ "2" (
+        echo MOVE NAME "!name!" to a "done" folder
+    )
+
 
     call ".\funcs\delete.bat" :del_txts
     endlocal

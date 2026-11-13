@@ -108,6 +108,7 @@ exit /b
 
 
 rem ERRORS\RECONSTRUCT\REALTIME
+    set "is_same=T|"
     if "!construct!" neq "!name!" (
         echo "*************************************************************"
         echo "!prompt! CONSTRUCT ERROR: constructed name vs input name"
@@ -122,6 +123,10 @@ rem ERRORS\RECONSTRUCT\REALTIME
         echo "" > "!item_path!\ERR - !construct!"
         echo "" > "!item_path!\COR - !name!"
         pause
+        set "is_same=F|""
     )
+
+    echo !is_same! > return.txt
+
     endlocal
 exit /b
