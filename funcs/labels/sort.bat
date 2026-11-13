@@ -117,18 +117,6 @@ rem echo ITEM --- "!item!"
 
     rem Saving the first instace of a 
     if not exist "!file!" (       
-
-        rem set /a empty=0
-        rem if "!item!" equ "" (
-        rem     set /a empty+=1
-        rem )
-        rem if "!item!" equ " " (
-        rem     set /a empty+=1
-        rem )
-        rem if "!empty!" neq "0" (
-        rem     echo EXIT ? DELETE THIS -----
-        rem     exit /b
-        rem )
         call :1st_instance_of_type "!type!" "!item!" "!is_blank!" "1" "!file_code!" "!item!"
         exit /b
     )
@@ -274,7 +262,7 @@ exit /b
         )
 
         if "!encap!" equ "OPN_STRTD" (
-            set "use=!item!!space_saver!"
+            set "use=!item!"
         )
     )
 
