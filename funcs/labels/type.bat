@@ -286,6 +286,7 @@ exit /b
 
     if "!third!" neq " " (
         set "format=OPN_ENDD"
+        set "nest_status=NESTED"
     )
 
     if exist is_nested.txt (
