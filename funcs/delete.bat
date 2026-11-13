@@ -54,21 +54,55 @@ goto :eof
     if exist spaces.txt ( del spaces.txt )
     if exist return.txt ( del return.txt )
     if exist rom.txt ( del rom.txt )
-    rem call :no_recstruct_err
+    rem if exist "ERRORS\" (
+    rem     call :del_errors "ERRORS" "CHARS" "FIRST"
+    rem     call :del_errors "ERRORS" "CHARS" "LAST"
+    rem     call :del_errors "ERRORS" "RECONSTRUCT" "REALTIME"
+    rem     call :del_errors "ERRORS" "RECONSTRUCT" "BY_LABEL"
+    rem     pause
+    rem )
+    
     endlocal
 exit /b
 
-:no_recstruct_err
-    setlocal
-    set "dir=RECONSTRUCT_ERRORS\"
-    if exist !dir! (
-        
-        for %%i in ("!dir!\*") do (
-            del "%%i"
-            echo CLEARING ALL ELEMENTS
-        )
-    ) else ( echo NOT FOUND )
 
+rem ERRORS\CHARS\FIRST
+rem ERRORS\CHARS\LAST
+rem ERRORS\RECONSTRUCT\BY_LABEL
+rem ERRORS\RECONSTRUCT\REALTIME
+
+:del_errors
+    setlocal
+    set "root=%~1"
+    set "parent=%~2"
+    set "dir=%~3"
+
+    rem delete individual files in the sub-directory
+    set "fpath=!root!\!parent!\!dir!"
+    for /d %%i in ("!fpath!\*") do (
+        echo I "%%i"
+        for %%j in ("%%i\*") do (
+            echo ECGI "%%j"
+            del "%%j"
+        )
+        
+        rd "%%i"
+    )
+
+
+    rem delete the sub-directory
+    set "ppath=!root!\!parent!"
+    if exist "!fpath!" (
+        ECHO "!fpath!"
+        rem rd "!ppath!\!dir!"'
+        rd "!fpath!"
+    )
+    
+    if exist "!root!" (
+        rem rd "!root!"
+    )
+    
+    rem delete the parent of the sub-directory - keep ERRORS\
 
     endlocal
 exit /b

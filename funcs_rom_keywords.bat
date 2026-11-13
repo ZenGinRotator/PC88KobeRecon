@@ -86,9 +86,9 @@ exit /b
     
    
     rem comparing the constructed file name with the file name
-    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "" "ERRORS\REALTIME"
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "" "ERRORS\RECONSTRUCT\REALTIME"
 
-    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL" "ERRORS\BY_LABEL"
+    call ".\funcs\verify\errors.bat" :reconstruct_errors "!name!" "BL" "ERRORS\RECONSTRUCT\BY_LABEL"
 
     call ".\funcs\delete.bat" :del_txts
     endlocal
