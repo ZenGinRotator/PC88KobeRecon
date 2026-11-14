@@ -121,9 +121,9 @@ set "t9=[S2 +]BRIDGE 1 (P1 +) BRIDGE 2 {C1+} - Copy"
     call "funcs_rom_keywords" :rom_n_labels "hi"
 call "funcs_rom_keywords.bat" :rom_n_labels "!t51!"
 call "funcs_rom_keywords.bat" :rom_n_labels "!t52!"
+exit /b
 call "funcs_rom_keywords.bat" :rom_n_labels "!t53!"
 call "funcs_rom_keywords.bat" :rom_n_labels "!t54!"
-exit /b
 
 
 call "funcs_rom_keywords.bat" :rom_n_labels "!t13!"

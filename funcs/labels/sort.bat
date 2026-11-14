@@ -488,7 +488,10 @@ exit /b
         exit /b
     )
 
-    rem 
+    rem Might be opportunity to re-use this portion as its own function,
+    rem     so that function will be used for encapsulated and
+    rem     non-encapsulated labels found in the file name.
+    rem This function requires that file names are declared as global variables.
     set "separator=!brk!"
 
     set /a same_line=0
@@ -518,7 +521,10 @@ exit /b
     
     rem echo FILE CODE "!file_code!"
   echo !old! > "!file!"
-if "!type!" neq "NESTED" (
+rem End of portion re-use
+
+
+    if "!type!" neq "NESTED" (
         call :positions_list "!type!" "!qty!" "!item!" "!is_blank!"
    )
 
