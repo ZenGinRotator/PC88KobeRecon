@@ -190,3 +190,71 @@ exit /b
     echo !use! > return.txt
     endlocal
 exit /b
+
+
+:ti
+    setlocal
+    set "item=%~1"
+    set "format=%~2"
+    set "code=%~3"
+
+    
+    set "file="
+    if "!code!" equ "BRIDG" (
+        set file=bridges.txt
+    )
+    if "!code!" equ "INDVS" (
+        set file=indivs.txt
+    )
+    if "!code!" equ "NSTD" (
+        set file=nested.txt
+    )
+    if "!code!" equ "NSTD_LN" (
+        set file=nested_line.txt
+    )
+    if "!code!" equ "SPCS" (
+        set file=spaces.txt
+    )
+
+    if "!code!" equ "NAME" (
+        set file=name.txt
+    )
+
+    if "!file!" equ "" (
+        exit /b
+    )
+
+    set "separator=!brk!"
+
+    set /a same_line=0
+
+    call :item_separator "!format!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "same_line=%%i"
+    )
+    
+    if "!same_line!" neq "0" (
+        set "separator="
+    )
+
+    set old=
+
+    set /a qty=0
+    for /f "tokens=1 delims=|" %%i in (!file!) do (
+        set "old=!old!%%i!separator!"
+        set /a qty+=1
+    )
+
+
+    set "old=!old!!item!"
+    
+    
+    set /a qty+=1
+    
+
+    echo !old! > "!file!"
+
+    echo !qty! > return.txt
+
+    endlocal
+exit /b

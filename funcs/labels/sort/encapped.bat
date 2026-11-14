@@ -313,37 +313,42 @@ exit /b
     rem     so that function will be used for encapsulated and
     rem     non-encapsulated labels found in the file name.
     rem This function requires that file names are declared as global variables.
-    set "separator=!brk!"
+    rem set "separator=!brk!"
 
-    set /a same_line=0
+    rem set /a same_line=0
 
-    call ".\funcs\labels\sort\utils.bat" :item_separator "!format!"
-    for /f "tokens=1 delims=|" %%i in (return.txt) do (
-        set "same_line=%%i"
-    )
+    rem call ".\funcs\labels\sort\utils.bat" :item_separator "!format!"
+    rem for /f "tokens=1 delims=|" %%i in (return.txt) do (
+    rem     set "same_line=%%i"
+    rem )
     
-    if "!same_line!" neq "0" (
-        set "separator="
-    )
+    rem if "!same_line!" neq "0" (
+    rem     set "separator="
+    rem )
 
-    set old=
+    rem set old=
 
-    set /a qty=0
-    for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!%%i!separator!"
-        set /a qty+=1
-    )
+    rem set /a qty=0
+    rem for /f "tokens=1 delims=|" %%i in (!file!) do (
+    rem     set "old=!old!%%i!separator!"
+    rem     set /a qty+=1
+    rem )
 
 
-    set "old=!old!!item!"
+    rem set "old=!old!!item!"
     
     
-    set /a qty+=1
+    rem set /a qty+=1
     
-    rem echo FILE CODE "!file_code!"
-  echo !old! > "!file!"
+
+    rem echo !old! > "!file!"
 rem End of portion re-use
 
+    set /a qty=0
+    call ".\funcs\labels\sort\utils.bat" :ti "!item!" "!format!" "!code!"
+    for /f "tokens=*" %%i in (return.txt) do (
+        set /a qty=%%i
+    )
 
     if "!type!" neq "NESTED" (
         call ".\funcs\labels\sort\utils.bat" :positions_list "!type!" "!qty!" "!item!" "!is_blank!"
