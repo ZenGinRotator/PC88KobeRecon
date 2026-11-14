@@ -728,22 +728,27 @@ rem ----------------------------------------
 
     
     set file=bridges.txt
-    set "title=-- BRIDGES --"
+    set "title=BRIDGES"
     if "!type!" equ "I" (
         set file=indivs.txt
-        SET "title=-- INDIVS --"
+        SET "title=INDIVS"
     )
 
     if "!type!" equ "R" (
         set file=rom.txt
-        set "title=-- ROM --"
+        set "title=ROM"
     )
 
 
     rem use format argument
     if "!type!" equ "N" (
         set file=nested.txt
-        set "title=-- NESTED --"
+        set "title=NESTED"
+    )
+
+    call :list_heading "!title!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "title=%%i"
     )
 
     set old=
@@ -763,7 +768,15 @@ rem ----------------------------------------
     endlocal
 exit /B
 
+:list_heading
+    setlocal
 
+    set "title=%~1"
+
+    set "title=--- !title! ---|"
+    echo !title! > return.txt
+    endlocal
+exit /b
 
 
 
