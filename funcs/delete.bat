@@ -61,6 +61,9 @@ goto :eof
     rem     call :del_errors "ERRORS" "RECONSTRUCT" "BY_LABEL"
     rem     pause
     rem )
+
+    if exist label_nested.txt ( del label_nested.txt )
+    if exist label_indiv.txt ( del label_indiv.txt )
     
     endlocal
 exit /b

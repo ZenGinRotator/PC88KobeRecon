@@ -68,7 +68,7 @@ set "t3=(P1 +){C1 +} (P1 +) BRIDGE 2(P1 +) [S2 +] (P1 +) BRIDGE 3(P1.0 + (P2.1 +
 
 
 set "t5=[S2 +] (P1 +) {C1+} - Copy"
-set "t51=[S2 +] [S2 + [s] [s] s](P1 +) {C1+} - Copy"
+set "t51=[S2 +] [S2 +[s][s]s4](P1 +) {C1+} - Copy"
 set "t52=[S2 +] (P1 +) [S2 + [s] [s] s]{C1+} - Copy"
 set "t53=[S2 +] (P1 +) {C1+}[S2 + [s] [s] s] - Copy"
 set "t54=[S2 + [s] [s] s][S2 +] (P1 +) {C1+} - Copy"

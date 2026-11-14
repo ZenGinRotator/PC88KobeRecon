@@ -78,7 +78,10 @@ exit /b
     call :print_txt "R"
     call :print_txt "B"
     call :print_txt "I"
+    call :print_txt "LI"
     call :print_txt "N"
+    call :print_txt "LN"
+    
 
 
     call ".\funcs\verify\by_label.bat" :reconstruct2
@@ -744,6 +747,16 @@ rem ----------------------------------------
     if "!type!" equ "N" (
         set file=nested.txt
         set "title=NESTED"
+    )
+
+    if "!type!" equ "LN" (
+        set file=label_nested.txt
+        set "title=L_NESTED"
+    )
+
+    IF "!type!" equ "LI" (
+        set file=label_indiv.txt
+        set "title=L_INDIVS"
     )
 
     call :list_heading "!title!"

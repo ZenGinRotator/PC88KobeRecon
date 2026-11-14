@@ -103,6 +103,9 @@ rem echo ID ITEM "!item!"
         )
     )
 
+
+    call ".\funcs\labels\sort\unencapped.bat" :labels "!from_item!" "!status!"
+    
     rem echo SORT ITEM "!sort_item!" "!status!"
 
     rem exclude bridge that contains an optional chars
@@ -118,19 +121,6 @@ rem echo ID ITEM "!item!"
     rem reconstruct file name here in realtime
     call ".\funcs\verify\realtime.bat" :reconstruct "!sort_item!"
 
-    rem We will use this section to bring unstructured labels into
-    rem     their own *.txt files
-set /a show=0
-    if "!status!" equ "NESTED" (
-        set /a show+=1
-    )
-    if "!status!" equ "INDIV" (
-        set /a show+=1
-    )
-
-    if "!show!" neq "0" (
-    echo show "!from_item!" "!status!"
-    )
     
 
     endlocal

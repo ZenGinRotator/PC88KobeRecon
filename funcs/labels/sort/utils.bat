@@ -1,4 +1,5 @@
 setlocal EnableDelayedExpansion
+set "end_mark=|"
 set brk=^
 
 
@@ -68,39 +69,6 @@ exit /b
 
 
 
-:item_separator
-    setlocal
-
-    rem encap style, can be:
-    rem     {label 1
-    rem     {label L}, 1 < L < n
-    rem     {label n}
-
-    set "encap=%~1"
-
-    set /a same_line=0
-    
-    if not exist is_nested.txt (
-        set "return=!same_line!!end_mark!"
-        if exist return.txt ( del return.txt )
-        echo !return! > return.txt
-        exit /b
-    )
-
-    if "!encap!" equ "BRDG" (
-        set /a same_line+=1
-    )
-
-    if "!encap!" equ "CLSD" (
-        set /a same_line+=1
-    )
-
-    rem set "same_line=!same_line!!end_mark!"
-    set "return=!same_line!!end_mark!"
-    if exist return.txt ( del return.txt )
-    echo !return! > return.txt
-    endlocal
-exit /b
 
 
 :is_item_all_spaces
@@ -192,6 +160,8 @@ exit /b
 exit /b
 
 
+rem use this function for reconstruction-related funcs
+rem use this function for label-indivs, and label-nested
 :ti
     setlocal
     set "item=%~1"
@@ -220,6 +190,14 @@ exit /b
         set file=name.txt
     )
 
+    if "!code!" equ "LABEL_NESTED" (
+        set file=label_nested.txt
+    )
+
+    if "!code!" equ "LABEL_INDIV" (
+        set file=label_indiv.txt
+    )
+
     if "!file!" equ "" (
         exit /b
     )
@@ -232,6 +210,8 @@ exit /b
     for /f "tokens=1 delims=|" %%i in (return.txt) do (
         set "same_line=%%i"
     )
+
+    rem echo SAME LINE "!same_line!" "!item!"
     
     if "!same_line!" neq "0" (
         set "separator="
@@ -240,9 +220,11 @@ exit /b
     set old=
 
     set /a qty=0
+    if exist !file! (
     for /f "tokens=1 delims=|" %%i in (!file!) do (
         set "old=!old!%%i!separator!"
         set /a qty+=1
+    )
     )
 
 
@@ -256,5 +238,50 @@ exit /b
 
     echo !qty! > return.txt
 
+    endlocal
+exit /b
+
+
+
+:item_separator
+    setlocal
+
+    rem encap style, can be:
+    rem     {label 1
+    rem     {label L}, 1 < L < n
+    rem     {label n}
+
+    set "encap=%~1"
+    rem ECHO item_separator encap "!encap!"
+
+    set /a same_line=0
+    
+    if not exist is_nested.txt (
+        rem echo NOT EXIST
+        set "return=!same_line!!end_mark!"
+        if exist return.txt ( del return.txt )
+        echo !return! > return.txt
+        exit /b
+    )
+
+    if "!encap!" equ "BRDG" (
+        set /a same_line+=1
+    )
+
+    if "!encap!" equ "CLSD" (
+        set /a same_line+=1
+    )
+
+    if "!encap!" equ "NESTED" (
+        set /a same_line+=1
+    )
+    if "!encap!" equ "INDIV" (
+        set /a same_line+=1
+    )
+
+    rem set "same_line=!same_line!!end_mark!"
+    set "return=!same_line!!end_mark!"
+    if exist return.txt ( del return.txt )
+    echo !return! > return.txt
     endlocal
 exit /b
