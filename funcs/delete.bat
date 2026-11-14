@@ -64,6 +64,7 @@ goto :eof
 
     if exist label_nested.txt ( del label_nested.txt )
     if exist label_indiv.txt ( del label_indiv.txt )
+    IF EXIST label_nested2.txt ( del label_nested2.txt )
     
     endlocal
 exit /b

@@ -162,7 +162,7 @@ exit /b
 
 rem use this function for reconstruction-related funcs
 rem use this function for label-indivs, and label-nested
-:ti
+:item_into_file
     setlocal
     set "item=%~1"
     set "format=%~2"
@@ -198,6 +198,13 @@ rem use this function for label-indivs, and label-nested
         set file=label_indiv.txt
     )
 
+    if "!code!" equ "LABEL_NESTED2" (
+        set file=label_nested2.txt
+        rem change NESTED to NESTED2, to avoid line separator
+        set "format=!format!2"
+        ECHO "!format!"
+    )
+
     if "!file!" equ "" (
         exit /b
     )
@@ -211,7 +218,7 @@ rem use this function for label-indivs, and label-nested
         set "same_line=%%i"
     )
 
-    rem echo SAME LINE "!same_line!" "!item!"
+
     
     if "!same_line!" neq "0" (
         set "separator="
@@ -221,10 +228,10 @@ rem use this function for label-indivs, and label-nested
 
     set /a qty=0
     if exist !file! (
-    for /f "tokens=1 delims=|" %%i in (!file!) do (
-        set "old=!old!%%i!separator!"
-        set /a qty+=1
-    )
+        for /f "tokens=1 delims=|" %%i in (!file!) do (
+            set "old=!old!%%i!separator!"
+            set /a qty+=1
+        )
     )
 
 

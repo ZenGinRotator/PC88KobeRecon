@@ -309,50 +309,15 @@ exit /b
         exit /b
     )
 
-    rem Might be opportunity to re-use this portion as its own function,
-    rem     so that function will be used for encapsulated and
-    rem     non-encapsulated labels found in the file name.
-    rem This function requires that file names are declared as global variables.
-    rem set "separator=!brk!"
-
-    rem set /a same_line=0
-
-    rem call ".\funcs\labels\sort\utils.bat" :item_separator "!format!"
-    rem for /f "tokens=1 delims=|" %%i in (return.txt) do (
-    rem     set "same_line=%%i"
-    rem )
-    
-    rem if "!same_line!" neq "0" (
-    rem     set "separator="
-    rem )
-
-    rem set old=
-
-    rem set /a qty=0
-    rem for /f "tokens=1 delims=|" %%i in (!file!) do (
-    rem     set "old=!old!%%i!separator!"
-    rem     set /a qty+=1
-    rem )
-
-
-    rem set "old=!old!!item!"
-    
-    
-    rem set /a qty+=1
-    
-
-    rem echo !old! > "!file!"
-rem End of portion re-use
-
     set /a qty=0
-    call ".\funcs\labels\sort\utils.bat" :ti "!item!" "!format!" "!code!"
+    call ".\funcs\labels\sort\utils.bat" :item_into_file "!item!" "!format!" "!code!"
     for /f "tokens=*" %%i in (return.txt) do (
         set /a qty=%%i
     )
 
     if "!type!" neq "NESTED" (
         call ".\funcs\labels\sort\utils.bat" :positions_list "!type!" "!qty!" "!item!" "!is_blank!"
-   )
+    )
 
 
     endlocal

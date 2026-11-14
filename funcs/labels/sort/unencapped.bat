@@ -14,7 +14,6 @@ goto :eof
 
     set "item=%~1"
     set "status=%~2"
-    set "code=LABEL_NESTED"
 
     if "!item!" equ " " (
         exit /b
@@ -33,11 +32,19 @@ goto :eof
         exit /b
     )
 
+
+    set "code=LABEL_NESTED"
     if "!status!" equ "INDIV" (
         set "code=LABEL_INDIV"
     )
 
-    call ".\funcs\labels\sort\utils.bat" :ti "!item!" "!status!" "!code!"
+    call ".\funcs\labels\sort\utils.bat" :item_into_file "!item!" "!status!" "!code!"
+
+    if "!code!" equ "LABEL_NESTED" (
+        set "code=!code!2"
+    )
+
+    call ".\funcs\labels\sort\utils.bat" :item_into_file "!item!" "!status!" "!code!"
 
     endlocal
 exit /b

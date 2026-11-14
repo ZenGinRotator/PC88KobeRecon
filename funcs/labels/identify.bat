@@ -63,23 +63,6 @@ rem echo ID ITEM "!item!"
     )
 
 
-    rem the encap format for sorting labels
-    rem 0 - BRDG: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
-    rem 1 - OPN_ENDD: open-ended: (label ... : (always add item to next line)
-    rem 2 - OPN_STRTD: open-started: ...label) : (always add item to same line)
-    rem 3 - CLSD: closed: (...label...) : (nested: same-line, indiv: new-line)
-    rem Use format to determine when to:
-    rem * add nested label to current or new line,
-    rem * if format=2, then new line
-    rem * else same line
-
-    rem echo FORMAT "!format!"
-
-    
-    rem echo is_nested: "!exist!"
-
-
-    rem for /f "tokens=1"
 
 
     rem from item: string only
@@ -105,8 +88,6 @@ rem echo ID ITEM "!item!"
 
 
     call ".\funcs\labels\sort\unencapped.bat" :labels "!from_item!" "!status!"
-    
-    rem echo SORT ITEM "!sort_item!" "!status!"
 
     rem exclude bridge that contains an optional chars
     rem Within 2nd or 3rd call of this recursive function,

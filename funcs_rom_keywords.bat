@@ -81,6 +81,7 @@ exit /b
     call :print_txt "LI"
     call :print_txt "N"
     call :print_txt "LN"
+    call :print_txt "LN2"
     
 
 
@@ -757,6 +758,11 @@ rem ----------------------------------------
     IF "!type!" equ "LI" (
         set file=label_indiv.txt
         set "title=L_INDIVS"
+    )
+
+    if "!type!" equ "LN2" (
+        set file=label_nested2.txt
+        set "title=L_NESTED2"
     )
 
     call :list_heading "!title!"
