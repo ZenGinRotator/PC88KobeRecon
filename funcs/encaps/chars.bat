@@ -53,7 +53,7 @@ goto :eof
         )
     )
 
-    echo **** "!left!" "!right!"
+    rem echo **** "!left!" "!right!"
 
     set "rom="
     call ".\funcs\labels\rom.bat" :find_rom_label "!name!" "!left!"
@@ -65,7 +65,7 @@ goto :eof
         exit /b
     )
 
-    call "funcs\labels\sort.bat" :sort_struct_label "!rom!" "ROM" "RM"
+    call "funcs\labels\sort\encapped.bat" :labels "!rom!" "ROM" "RM"
 
 
     endlocal

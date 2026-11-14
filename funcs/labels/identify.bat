@@ -113,7 +113,7 @@ rem echo ID ITEM "!item!"
     
 
 
-    call ".\funcs\labels\sort.bat" :sort_struct_label "!sort_item!" "!status!" "!format!"
+    call ".\funcs\labels\sort\encapped.bat" :labels "!sort_item!" "!status!" "!format!"
 
     rem reconstruct file name here in realtime
     call ".\funcs\verify\realtime.bat" :reconstruct "!sort_item!"
