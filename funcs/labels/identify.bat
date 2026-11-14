@@ -62,6 +62,7 @@ rem echo ID ITEM "!item!"
         set "format=%%i"
     )
 
+
     rem the encap format for sorting labels
     rem 0 - BRDG: bridge - (nested, " " -> same line, non-nested -> always add item to next line)
     rem 1 - OPN_ENDD: open-ended: (label ... : (always add item to next line)
@@ -86,7 +87,7 @@ rem echo ID ITEM "!item!"
     REM NESTED ( {label, {label}, {label} ),
     REM INDIV, ( {label} )
     REM or BRIDGE, <none>
-    rem echo --- DOIL2 ---- "!from_item!" "!status!"
+   
 
 
     rem change to alphabetic identifier
@@ -112,10 +113,24 @@ rem echo ID ITEM "!item!"
     
 
 
-    call ".\funcs\labels\sort.bat" :sort_label "!sort_item!" "!status!" "!format!"
+    call ".\funcs\labels\sort.bat" :sort_struct_label "!sort_item!" "!status!" "!format!"
 
-    rem reconstruct file name here
+    rem reconstruct file name here in realtime
     call ".\funcs\verify\realtime.bat" :reconstruct "!sort_item!"
+
+    rem We will use this section to bring unstructured labels into
+    rem     their own *.txt files
+set /a show=0
+    if "!status!" equ "NESTED" (
+        set /a show+=1
+    )
+    if "!status!" equ "INDIV" (
+        set /a show+=1
+    )
+
+    if "!show!" neq "0" (
+    echo show "!from_item!" "!status!"
+    )
     
 
     endlocal

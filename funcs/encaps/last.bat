@@ -175,7 +175,7 @@ exit /b
      
     
     rem if "!echo_verify!" neq "" (
-        echo ---------------- Phrase "!phrase!" ------------------
+        rem echo ---------------- Phrase "!phrase!" ------------------
 rem     )
     
 

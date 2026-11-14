@@ -21,7 +21,7 @@ rem     despite our test data not having a ROM descriptor
 rem     within the file name.
 rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 rem Use this function to save bridges, indivs, or nested labels
-:sort_label
+:sort_struct_label
     setlocal
 
     

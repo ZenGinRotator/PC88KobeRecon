@@ -65,7 +65,7 @@ goto :eof
         exit /b
     )
 
-    call "funcs\labels\sort.bat" :sort_label "!rom!" "ROM" "RM"
+    call "funcs\labels\sort.bat" :sort_struct_label "!rom!" "ROM" "RM"
 
 
     endlocal
