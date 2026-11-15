@@ -1,4 +1,6 @@
 setlocal EnableDelayedExpansion
+set delimtxt=delimited.txt
+
 set "end_mark=|"
 set brk=^
 
@@ -202,7 +204,6 @@ rem use this function for label-indivs, and label-nested
         set file=label_nested2.txt
         rem change NESTED to NESTED2, to avoid line separator
         set "format=!format!2"
-        ECHO "!format!"
     )
 
     if "!file!" equ "" (
@@ -235,6 +236,18 @@ rem use this function for label-indivs, and label-nested
     )
 
 
+
+
+    set "returned="
+    call :rec_remove_spaces "!code!" "!item!"
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+      set "returned=%%i"
+      if "!returned!" neq "F" (
+        set "item=!returned!"
+      )
+        
+    )
+
     set "old=!old!!item!"
     
     
@@ -244,6 +257,68 @@ rem use this function for label-indivs, and label-nested
     echo !old! > "!file!"
 
     echo !qty! > return.txt
+
+    endlocal
+exit /b
+
+:rec_remove_spaces
+    setlocal
+
+    set "code=%~1"
+    set "item=%~2"
+
+    set /a do_it=0
+    if "!code!" equ "LABEL_NESTED" (
+        set /a do_it+=1
+    )
+    if "!code!" equ "LABEL_NESTED2" (
+        set /a do_it+=1
+    )
+
+    set "return_this=F|"
+    if "!do_it!" equ "0" (
+        echo !return_this! > return.txt
+        exit /b
+    )
+
+    set "mod="
+    call :rec_blank "1" "!item!" ""
+    for /f "tokens=1 delims=|" %%i in (return.txt) do (
+        set "mod=%%i|"
+    )
+
+    echo !mod! > return.txt
+
+
+    endlocal
+exit /b
+
+:rec_blank
+    setlocal
+    set "token=%~1"
+    set "phrase=%~2"
+    set "saved=%~3"
+
+    set "item="
+    call ".\funcs\utils.bat" :delim_with_char "!token!" " " "!phrase!"
+    for /f "tokens=1 delims=|" %%i in (%delimtxt%) do (
+        set "item=%%i"
+    )
+
+    if "!item!" equ " " (
+        set "saved=!saved!|"
+        echo !saved! > return.txt
+        exit /b
+    )
+
+    if "!saved!" equ "" (
+        set "saved=!item!"
+    ) else (
+        set "saved=!saved! !item!"
+    )
+    
+    set /a token+=1
+    call :rec_blank "!token!" "!phrase!" "!saved!"
 
     endlocal
 exit /b
@@ -259,12 +334,11 @@ exit /b
     rem     {label n}
 
     set "encap=%~1"
-    rem ECHO item_separator encap "!encap!"
 
     set /a same_line=0
     
     if not exist is_nested.txt (
-        rem echo NOT EXIST
+
         set "return=!same_line!!end_mark!"
         if exist return.txt ( del return.txt )
         echo !return! > return.txt
@@ -286,7 +360,7 @@ exit /b
         set /a same_line+=1
     )
 
-    rem set "same_line=!same_line!!end_mark!"
+
     set "return=!same_line!!end_mark!"
     if exist return.txt ( del return.txt )
     echo !return! > return.txt

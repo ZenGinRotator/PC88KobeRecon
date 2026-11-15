@@ -86,7 +86,7 @@ rem echo ID ITEM "!item!"
         )
     )
 
-
+    rem Collecting uncapped labels
     call ".\funcs\labels\sort\unencapped.bat" :labels "!from_item!" "!status!"
 
     rem exclude bridge that contains an optional chars
@@ -96,7 +96,7 @@ rem echo ID ITEM "!item!"
     rem     that contains optional delimiting characters.
     
 
-
+    rem Collecting encapsulated labels
     call ".\funcs\labels\sort\encapped.bat" :labels "!sort_item!" "!status!" "!format!"
 
     rem reconstruct file name here in realtime
